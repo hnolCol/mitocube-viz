@@ -1,0 +1,31 @@
+
+
+.table__container{
+    overflow-y: auto;
+}
+
+.table__item {
+    padding-top: 0.2rem;
+    padding-top: 0.2rem;
+}
+
+
+.table__item--align-right{
+    text-align: right;
+}
+.table__item--align-left{
+    text-align: left;
+}
+.table__item--align-center{
+    text-align: center;
+    border-radius: 0.2rem;
+}
+
+
+
+.table__item--wrap {
+    max-width: 7rem;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}

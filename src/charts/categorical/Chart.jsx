@@ -1,0 +1,485 @@
+
+import _ from "lodash"
+
+import { Group } from "@visx/group"
+import { Text } from "@visx/text"
+import { localPoint } from "@visx/event"
+import { useTooltip, useTooltipInPortal } from "@visx/tooltip"
+
+
+import PropTypes from "prop-types"
+import SingleCategoricalChart from "./Single"
+import MultiCategoricalChart from "./Multiple"
+
+
+// import MetricTable from "../../../base/metrictable"
+
+import hooks from "@mitocube/api-hooks"
+import { getColorPalette } from "../../colors/palette"
+import XYAxisWithBackground from "../../axis/Axis"
+import Box from "../../primitives/Box"
+import Bar from "../../primitives/Bar"
+import ErrorBar from "../base/Error"
+import MetricTable from "../../tooltip/MetricTable"
+
+Categorical.propTypes = {
+    width: PropTypes.number,
+    height: PropTypes.number,
+    data: PropTypes.array,
+    margins: PropTypes.object,
+    yaxisName: PropTypes.string,
+    colorName: PropTypes.string,
+    splitName: PropTypes.string,
+    subplotName: PropTypes.string,
+    yaxisLabel: PropTypes.string,
+    errorName: PropTypes.string,
+    tooltipNames: PropTypes.array,
+    colorPalette: PropTypes.array,
+    minMaxYDomain: PropTypes.any,
+    innerSubplotPadding: PropTypes.number,
+    outerSubplotPadding: PropTypes.number,
+    innerSplitPadding: PropTypes.number,
+    innerColorPadding: PropTypes.number,
+    svgID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    darkmode: PropTypes.bool,
+    chartType: PropTypes.oneOf(["boxplot","barplot","lineplot"])
+}
+
+Categorical.defaultProps = {
+    width: 400,
+    height: 300,
+    data: [
+        { y: 5, T: "A", G: "WT", O : "0.5h", e : 0.2},
+        { y: 4, T: "B", G: "WT", O : "0.5h", e : 0.4 },
+        { y: 10, T: "C", G: "WT", O : "0.5h", e : 1.2 },
+        { y: 5, T: "A", G: "WT", O : "0.5h", e : 0.2 },
+        { y: 4, T: "B", G: "WT", O : "0.5h", e : 0.2 },
+        { y: 10, T: "C", G: "WT", O : "0.5h", e : 0.2 },
+        { y: 5, T: "A", G: "KO", O : "0.5h", e : 0.2 },
+        { y: 40, T: "B", G: "KO", O : "0.5h", e : 0.2 },
+        { y: -20, T: "C", G: "KO", O : "0.5h", e : 0.2 },
+        { y: 5, T: "A", G: "WT", O : "10h", e : 3.2 },
+        { y: 4, T: "B", G: "WT", O : "10h", e : 0.2 },
+        { y: 2, T: "C", G: "WT", O : "10h", e : 0.2 },
+        { y: 5, T: "A", G: "KO", O : "10h", e : 0.8 },
+        { y: 4, T: "B", G: "KO", O : "10h", e : 0.2 },
+        { y: 2, T: "C", G: "KO", O : "10h", e : 6.2 }
+    ],
+    chartType : "barplot",
+    margins: {
+        left: 45,
+        right: 5,
+        bottom: 35,
+        top: 8
+    },
+    yaxisName: "y",
+    colorName: undefined,
+    splitName: undefined,
+    subplotName: undefined,
+    yaxisLabel: undefined,
+    errorName: "e",
+    tooltipNames: [],
+    colorPalette: [],
+    minMaxYDomain: undefined,
+    innerSubplotPadding: 0.05,
+    outerSubplotPadding: 0.1,
+    innerSplitPadding: 0.2,
+    innerColorPadding: 0.0,
+    svgID: undefined,
+    darkmode : false
+}
+
+function Categorical({
+    width,
+    height,
+    data,
+    margins,
+    yaxisName,
+    colorName,
+    splitName,
+    subplotName,
+    yaxisLabel,
+    errorName,
+    tooltipNames,
+    colorPalette,
+    minMaxYDomain,
+    innerSubplotPadding,
+    outerSubplotPadding,
+    innerSplitPadding,
+    innerColorPadding,
+    svgID,
+    darkmode,
+    chartType
+}) {
+
+    // Fetch attribute info for labels
+    const { data: colorAttribute, isSuccess : isColorAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: colorName }, { enabled: _.isString(colorName) && !!colorName })
+    const { data: splitAttribute, isSuccess : isSplitAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: splitName }, { enabled: _.isString(splitName) && !!splitName })
+    const { data: subplotAttribute, isSuccess : isSubplotAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: subplotName }, { enabled: _.isString(subplotName) && !!subplotName })
+
+
+
+    // get color values for legend/label 
+    const uniqueColorValuesFromData = _.uniqBy(data, colorName)
+    const useCustomPalette = _.isArray(colorPalette) && colorPalette.length === uniqueColorValuesFromData.length
+    const colorValues = useCustomPalette
+        ? colorPalette
+        : getColorPalette(uniqueColorValuesFromData.length, darkmode)
+    // map colors to color attribute values 
+    const legendColors = Object.fromEntries(uniqueColorValuesFromData.map((d, idx) => [d[colorName], colorValues[idx]]))
+    const {
+        tooltipData,
+        tooltipLeft,
+        tooltipTop,
+        tooltipOpen,
+        showTooltip,
+        hideTooltip,
+    } = useTooltip();
+    
+    const { containerRef, TooltipInPortal } = useTooltipInPortal({
+        // use TooltipWithBounds
+        detectBounds: true,
+        // when tooltip containers are scrolled, this will correctly update the Tooltip position
+        scroll: true,
+    })
+    
+    const getTooltipData = ({ data, value, errorValue }) => {
+        let quantileData = []
+        let barInfo = []
+        if (chartType === "boxplot") {
+
+            quantileData = extractQuantileData(data, undefined, false, true)
+        }
+        else if (chartType === "barplot") {
+            barInfo = [{ text: yaxisName, value: _.round(value, 2), type : "default" }, { text: "Error", type : "default" , value: _.isNaN(errorValue) ? "NaN" : _.round(errorValue, 2) }]
+        }
+        console.log(tooltipNames)
+        const tooltipInfo = _.map(tooltipNames,
+                tooltipName => {
+                let tooltipValue = data[tooltipName.text]
+
+                return {
+                    text: tooltipName.text,
+                    value: tooltipValue,
+                    type : tooltipName.type
+                }
+            }).filter(t => t.value !== undefined)
+        
+        return _.concat(tooltipInfo, quantileData, barInfo)
+    }
+
+    /**
+     * 
+     * @param {Number[]} array 
+     * @param {Function} yScale 
+     * @param {Boolean} scale 
+     * @param {Boolean} forTooltip 
+     * @returns 
+     */
+    const extractQuantileData = (array, yScale, scale = true, forTooltip = false) => {
+       
+        if (chartType === "boxplot") {
+            if (forTooltip) {
+                return _.map(array[yaxisName], (q, idx) => { return { text: array.labels[idx], type : "default", value: scale ? yScale(q) : _.round(q, 2) } })
+            }
+            return Object.assign(...array[yaxisName].map((q, idx) => { return ({ [array.labels[idx]]: scale ? yScale(q) : _.round(q, 2) }) })
+            )
+        }
+    }
+    
+    /**
+     * 
+     * @param {MouseEvent} event 
+     * @param {Object[]} bartooltipData 
+     */
+    const handleMouseOver = (event, bartooltipData) => {
+        const coords = localPoint(event.target.ownerSVGElement, event);
+        showTooltip({
+          tooltipLeft: coords.x,
+          tooltipTop: coords.y,
+          tooltipData: bartooltipData
+        });
+    };
+    
+    return (
+        <div ref={containerRef} className="flex flex column">
+            {colorName && splitName === undefined && subplotName === undefined?
+                <SingleCategoricalChart
+                {...{data,
+                    width,
+                    height,
+                    svgID,
+                    margins,
+                    yaxisName,
+                    colorName,
+                    minMaxYDomain,
+                    colorPalette: legendColors,
+                    svgRef: containerRef,
+                    yScaleStartsAtZero: chartType === "barplot",
+                    darkmode}}>
+                        {(categoricalData) => categoricalData.map(({
+                        idx,
+                        colorCategories,
+                        chartType,
+                        data,
+                        yaxisName,
+                        colorName,
+                        margins,
+                        splitColorScale,
+                        colorScale,
+                        yScale,
+                        chartHeight,
+                        chartWidth,
+                        colorBandwidth,
+                        darkmode
+                    }, didx) => {
+                        return (
+                            <g key={`singleCat-bar-${idx}-${didx}`}>
+                                <XYAxisWithBackground 
+                                    margins={margins}
+                                    leftScale={yScale}
+                                    bottomScale={splitColorScale}
+                                    bandwidth={colorBandwidth}
+                                    bottomLabel={""}
+                                    leftLabel={_.isString(yaxisLabel)?yaxisLabel:yaxisName}
+                                    {...{
+                                        chartHeight,
+                                        chartWidth,
+                                        darkmode
+                                    }} />
+                                {/* x axis label */}
+                                <Text
+                                    x={margins.left + chartWidth / 2}
+                                    y={margins.top + chartHeight + 25}
+                                    verticalAnchor="start"
+                                    fill={darkmode?"#ffffff":"#000000"}
+                                    textAnchor="middle">
+                                    {isColorAttributeSuccess ? colorAttribute.text : ""}
+                                </Text>
+                                
+                                {colorCategories.map(colorCategory => {
+                                    const xPosition= splitColorScale(colorCategory)
+                                    const color = colorScale(colorCategory)
+                                    const dataForColorCategory = data.filter(d => d[colorName] === colorCategory)[0]
+                                    
+                                    const boxQuantiles = extractQuantileData(dataForColorCategory, yScale)
+                                    
+                                    const yPosition = yScale(dataForColorCategory[yaxisName])
+                                    const errorValue = dataForColorCategory[errorName]
+
+                           
+                                    return (
+                                        <Group
+                                            key={`bar-error-${colorCategory}`}
+                                            left={margins.left}
+                                            onMouseEnter={e => handleMouseOver(e, getTooltipData({ data: dataForColorCategory, value: dataForColorCategory[yaxisName], errorValue }))}
+                                            onMouseLeave={hideTooltip}>
+                                    
+                                            {chartType === "boxplot" ?
+                                                <Box
+                                                    {...boxQuantiles}
+                                                    fill={color}
+                                                    stroke={darkmode ? "#ffffff" : "#000000"}
+                                                    x={xPosition + colorBandwidth / 2}
+                                                    width={colorBandwidth}
+                                                    showWhiskers={true} /> :
+                                                
+                                                chartType === "barplot" ?
+                                                    <Group>
+                                                        <Bar x={xPosition} y1={yPosition} y0={yScale(0)} fill={color} width={colorBandwidth} />
+                                                        {errorName !== undefined && !_.isNaN(errorValue) && _.isNumber(errorValue) ?
+                                                        <ErrorBar
+                                                            x={xPosition+colorBandwidth/2}
+                                                            y0={yPosition} //bar start 
+                                                            y1={yPosition > 0 ? yScale(yPosition + errorValue) : yScale(yPosition - errorValue)}
+                                                            width={colorBandwidth*0.5} /> : null}
+                                                    </Group>
+                                                :
+                                                null}
+        
+                                        
+
+                                        </Group>
+                                    )
+                                })}
+                            </g>
+                        )
+                })}
+
+                </SingleCategoricalChart>:
+        
+            <MultiCategoricalChart
+                {...{
+                    data,
+                    width,
+                    height,
+                    svgID,
+                    margins,
+                    yaxisName,
+                    colorName,
+                    splitName,
+                    subplotName,
+                    innerColorPadding,
+                    innerSplitPadding,
+                    innerSubplotPadding,
+                    outerSubplotPadding,
+                    colorPalette: legendColors,
+                    yScaleStartsAtZero : false,
+                    minMaxYDomain,
+                    svgRef: containerRef,
+                }}>
+            {(categoricalData) => categoricalData.map((
+                {
+                    yaxisName,
+                    splitName,
+                    colorName,
+                    subplotCategory,
+                    splitCategories,
+                    subplotScale,
+                    splitScale,
+                    splitColorScale,
+                    colorScale,
+                    yScale,
+                    subplotData,
+                    chartHeight,
+                    chartWidth,
+                    colorBandwidth,
+                    margins,
+                    xcenter,
+                    subplotCategoryFound,
+                    colorCategoryFound,
+                    splitCategoryFound}, didx) => {
+                const subplotStart = subplotScale(subplotCategory)
+                const subplotWidth = subplotScale.bandwidth()
+                
+                  return(
+                        <g key={`${subplotCategory}-subplot`}>
+
+                          <viz.axis.XYaxis
+                                leftLeft={subplotStart}
+                                topBottom={margins.top + chartHeight}
+                                margins={margins}
+                                leftScale={yScale}
+                                leftTickLabelsVisible={didx === 0}
+                                bottomScale={splitScale}
+                                bottomLabel={""}
+                                bandwidth={splitScale.bandwidth() * 1.1}
+                                leftLabel={didx === 0 ? _.isString(yaxisLabel)?yaxisLabel:yaxisName : ""}
+                                {...{ chartHeight, chartWidth :  subplotWidth }} />
+                        
+                          {subplotCategoryFound ?
+                              <g>
+                                  <Text
+                                    x={xcenter}
+                                    y={margins.top + 12}
+                                    width={subplotWidth}
+                                    verticalAnchor="middle"
+                                    textAnchor="middle">
+                                    {"CA?"}
+                                </Text>
+                              </g> : null}
+                          
+                          {didx === 0 ? <Text
+                              x={margins.left + chartWidth / 2}
+                              y={margins.top + chartHeight + 25}
+                              verticalAnchor="start"
+                              textAnchor="middle">{isSplitAttributeSuccess && _.isObject(splitAttribute) ? splitAttribute.text : splitName}</Text> : null}
+                        
+                          
+                        {/* {If there is not split but a subplot} */}
+                          {(!splitCategoryFound && colorCategoryFound && subplotCategoryFound) ?
+                              subplotData.map(subplotDataArray => {
+                                    
+                                    var boxWidth = splitColorScale.bandwidth()
+                                    var colorCategory = subplotDataArray[colorName]
+                                    var xBar = splitColorScale(colorCategory)
+                                    const boxQuantiles = extractQuantileData(subplotDataArray, yScale)
+                                    return (
+                                        <Group left={subplotStart}
+                                            onMouseEnter={e => handleMouseOver(e, getTooltipData(subplotDataArray))}
+                                            onMouseLeave={hideTooltip}>
+
+                                            <viz.primitives.Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={colorScale(colorCategory)} x={xBar+boxWidth/2} width={boxWidth}/>
+                                        </Group>
+                                    )
+                                })
+                            
+                        : null}
+
+
+                         {/* If there is just a split Category, the split scale cannot be used -- very odd case*/}
+                          {!splitCategoryFound && !colorCategoryFound ?
+                              subplotData.map(subplotDataArray => {
+                                  var xBar = (subplotWidth - subplotWidth * 0.75) / 2
+                                  var boxWidth = subplotWidth * 0.75
+                                  
+                                  const boxQuantiles = extractQuantileData(subplotDataArray, yScale)
+                                  return (
+                                      <Group
+                                        left={subplotStart}
+                                        onMouseEnter={e => handleMouseOver(e, getTooltipData(subplotDataArray))}
+                                        onMouseLeave={hideTooltip}>
+                                          
+                                          <viz.primitives.Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={colorScale()} x={xBar+boxWidth/2} width={boxWidth}/>
+                                            
+                                </Group>  
+                                  )
+                              })
+                            
+                              
+                        : null}
+                        
+                        {/* if splitName is undefined, splitCategories will be en empty array, no plotting required */}
+                        {splitCategories.map((splitCategory, splitIdx) => {
+                            
+                        const splitCatData = subplotData.filter(m => m[splitName] === splitCategory)
+                        const splitStart = splitScale(splitCategory)
+    
+                        return (
+                            <Group left={subplotStart + splitStart} key={`${splitCategory}-${splitIdx}`}>
+                                {splitCatData.map((colorCatData, colorIdx) => {
+                                    var colorCategory = colorCatData[colorName]
+                                    var color = colorScale(colorCategory)
+                                    var xBar = splitColorScale(colorCategory)
+                                    
+                                    const boxQuantiles = extractQuantileData(colorCatData,yScale)
+                                    
+                                return (
+                                    <Group key={`${colorIdx}-${subplotCategory}-${colorCategory}`}
+                                        onMouseEnter={e => handleMouseOver(e, getTooltipData(colorCatData))}
+                                        onMouseLeave={hideTooltip}>
+                                        <viz.primitives.Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={color} x={xBar+colorBandwidth/2} width={colorBandwidth}/>
+                                        
+                                    </Group>
+                                )
+                                })}
+                            </Group>
+                        )
+                        })}
+                    </g>)
+            })}
+                
+                </MultiCategoricalChart>}
+            
+            
+            {tooltipOpen && (
+                <TooltipInPortal
+                // set this to random so it correctly updates with parent bounds
+                key={Math.random()}
+                top={tooltipTop}
+                left={tooltipLeft}
+                >   
+                    {_.isArray(tooltipData) ? <MetricTable data={tooltipData} /> : null}
+                    {/* <div className="flex flex-column">
+                        {Object.keys(tooltipData).map(qLabel => <div key={qLabel}>{qLabel} : <span className="h0-span">{tooltipData[qLabel]}</span></div>)}
+                         */}
+
+                </TooltipInPortal>
+            )}            
+            </div>
+    )
+}
+
+
+
+export default Categorical

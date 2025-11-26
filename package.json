@@ -1,0 +1,23 @@
+{
+  "name": "@mitocube/viz",
+  "author": "Hendrik Nolte <h.nolte@age.mpg.de> (http://github.com/hnolcol)",
+  "contributors": [],
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "A collection of visualization components for mitocube projects built with react and visx.",
+  "keywords": [
+    "react",
+    "d3",
+    "visualisation",
+    "visx",
+    "charts",
+    "mitocube"
+  ],
+  "main": "index.js",
+  "dependencies": {
+    "@visx/axis": "^3.12.0",
+    "@visx/text": "^3.12.0",
+    "@visx/tooltip": "^3.12.0",
+    "lodash": "^4.17.21"
+  }
+}
