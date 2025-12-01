@@ -7,3 +7,5 @@
  * @property {number} right - Right margin in pixels.
  * @property {number} bottom - Bottom margin in pixels.
  */
+
+export default {}
