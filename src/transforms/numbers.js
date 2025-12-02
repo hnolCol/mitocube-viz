@@ -23,3 +23,18 @@ export function abbreviateNumber(number){
     // format number and add suffix
     return scaled.toFixed(1) + suffix;
 }
+
+/**
+ * @param {Object} props
+ * @param {Number} props.number
+ * @param {import("../../types/calculations").MinMaxResult} props.limit
+ */
+export function roundNumber({ number = 1e-6, limit}) {
+
+    let diff = limit.max - limit.min
+    let diffTier = Math.round(Math.log10(diff)) * (-1) + 2
+    let tier = Math.log10(Math.abs(number)) | 0;
+    if (Math.abs(tier) >= 3) return number.toExponential(1)
+    if (diffTier < 0) diffTier = 0
+    return number.toFixed(diffTier)
+}
