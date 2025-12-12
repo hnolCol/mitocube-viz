@@ -112,11 +112,13 @@ function areEqual(prevProps, nextProps) {
     if (prevProps.opacity!== nextProps.opacity) return false
     if (prevProps.fill !== nextProps.fill) return false
     if (prevProps.stroke !== nextProps.stroke) return false
-    if (prevProps.showWhiskers!== nextProps.showWhiskers) return false
+    if (prevProps.strokeWidth !== nextProps.strokeWidth) return false
+    if (prevProps.showWhiskers !== nextProps.showWhiskers) return false
+
     return true
 
-  }
-  
+}
 
 
-  export default memo(Box, areEqual);
+
+export default memo(Box, areEqual);

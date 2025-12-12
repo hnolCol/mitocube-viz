@@ -22,6 +22,7 @@ import Bar from "../../primitives/Bar"
 import ErrorBar from "../base/Error"
 import MetricTable from "../../tooltip/MetricTable"
 
+
 Categorical.propTypes = {
     width: PropTypes.number,
     height: PropTypes.number,
@@ -65,7 +66,7 @@ Categorical.defaultProps = {
         { y: 4, T: "B", G: "KO", O : "10h", e : 0.2 },
         { y: 2, T: "C", G: "KO", O : "10h", e : 6.2 }
     ],
-    chartType : "barplot",
+    chartType : "boxplot",
     margins: {
         left: 45,
         right: 5,
@@ -116,7 +117,6 @@ function Categorical({
     const { data: colorAttribute, isSuccess : isColorAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: colorName }, { enabled: _.isString(colorName) && !!colorName })
     const { data: splitAttribute, isSuccess : isSplitAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: splitName }, { enabled: _.isString(splitName) && !!splitName })
     const { data: subplotAttribute, isSuccess : isSubplotAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: subplotName }, { enabled: _.isString(subplotName) && !!subplotName })
-
 
 
     // get color values for legend/label 
@@ -215,6 +215,7 @@ function Categorical({
                     minMaxYDomain,
                     colorPalette: legendColors,
                     svgRef: containerRef,
+                    chartType,
                     yScaleStartsAtZero: chartType === "barplot",
                     darkmode}}>
                         {(categoricalData) => categoricalData.map(({
@@ -232,7 +233,8 @@ function Categorical({
                         chartWidth,
                         colorBandwidth,
                         darkmode
-                    }, didx) => {
+                        }, didx) => {
+                            console.log("HAPPENS", data, colorCategories)
                         return (
                             <g key={`singleCat-bar-${idx}-${didx}`}>
                                 <XYAxisWithBackground 
@@ -258,16 +260,14 @@ function Categorical({
                                 </Text>
                                 
                                 {colorCategories.map(colorCategory => {
-                                    const xPosition= splitColorScale(colorCategory)
+                                    const xPosition = splitColorScale(colorCategory)
                                     const color = colorScale(colorCategory)
                                     const dataForColorCategory = data.filter(d => d[colorName] === colorCategory)[0]
-                                    
                                     const boxQuantiles = extractQuantileData(dataForColorCategory, yScale)
                                     
                                     const yPosition = yScale(dataForColorCategory[yaxisName])
                                     const errorValue = dataForColorCategory[errorName]
 
-                           
                                     return (
                                         <Group
                                             key={`bar-error-${colorCategory}`}
@@ -355,7 +355,7 @@ function Categorical({
                   return(
                         <g key={`${subplotCategory}-subplot`}>
 
-                          <viz.axis.XYaxis
+                          <XYAxisWithBackground
                                 leftLeft={subplotStart}
                                 topBottom={margins.top + chartHeight}
                                 margins={margins}
@@ -399,7 +399,7 @@ function Categorical({
                                             onMouseEnter={e => handleMouseOver(e, getTooltipData(subplotDataArray))}
                                             onMouseLeave={hideTooltip}>
 
-                                            <viz.primitives.Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={colorScale(colorCategory)} x={xBar+boxWidth/2} width={boxWidth}/>
+                                            <Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={colorScale(colorCategory)} x={xBar+boxWidth/2} width={boxWidth}/>
                                         </Group>
                                     )
                                 })
@@ -420,7 +420,7 @@ function Categorical({
                                         onMouseEnter={e => handleMouseOver(e, getTooltipData(subplotDataArray))}
                                         onMouseLeave={hideTooltip}>
                                           
-                                          <viz.primitives.Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={colorScale()} x={xBar+boxWidth/2} width={boxWidth}/>
+                                          <Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={colorScale()} x={xBar+boxWidth/2} width={boxWidth}/>
                                             
                                 </Group>  
                                   )
@@ -448,7 +448,7 @@ function Categorical({
                                     <Group key={`${colorIdx}-${subplotCategory}-${colorCategory}`}
                                         onMouseEnter={e => handleMouseOver(e, getTooltipData(colorCatData))}
                                         onMouseLeave={hideTooltip}>
-                                        <viz.primitives.Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={color} x={xBar+colorBandwidth/2} width={colorBandwidth}/>
+                                        <Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={color} x={xBar+colorBandwidth/2} width={colorBandwidth}/>
                                         
                                     </Group>
                                 )

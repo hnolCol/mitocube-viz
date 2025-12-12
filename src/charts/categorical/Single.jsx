@@ -127,9 +127,10 @@ function SingleCategoricalChart({
     chartType,
 }) {
 
-
+    console.log(chartType)
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     const uniqueColorValues = _.uniqBy(data, colorName).map(d => d[colorName])
+    
     const splitColorScale = useMemo(() => {
         // color scale taking care of the position of the color (e.g horizontal)
         return (
@@ -174,11 +175,11 @@ function SingleCategoricalChart({
                 range : colorRange
             })
         )
-    }, [colorName, uniqueColorValues])
+    }, [colorName, _.join(uniqueColorValues), chartType])
 
     const yScale = useMemo(() => {
-        // y scale 
-        const preDefinedYDomain = minMaxYDomain!==undefined && _.isObject(minMaxYDomain) && _.has(minMaxYDomain,"min") && _.has(minMaxYDomain,"max")
+        // y scale
+        const preDefinedYDomain = minMaxYDomain !== undefined && _.isObject(minMaxYDomain) && _.has(minMaxYDomain, "min") && _.has(minMaxYDomain, "max")
         const yDomain = preDefinedYDomain ? {} : getBoundariesFromArrayOfObjects({ data, keyName: yaxisName })
         const yDomainWithMargin = preDefinedYDomain ? minMaxYDomain : addMarginToBoundaries({ domain: yDomain })
         
@@ -206,12 +207,12 @@ function SingleCategoricalChart({
             yScale,
             chartHeight,
             chartWidth,
+            chartType,
             darkmode,
             colorBandwidth : splitColorScale.bandwidth(),
             xcenter: margins.left + chartWidth/2,
         }
     })
-
     return (
         
         <SVG {...{width,height,svgID,svgRef}}>

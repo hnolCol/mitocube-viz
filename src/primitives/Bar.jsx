@@ -5,8 +5,6 @@ import { memo } from 'react'
 import { areAllValuesNumbers } from '../types/checks/numbers'
 import { isPropHexColorString } from '../types/checks/color'
 
-  
-
 
 Bar.propTypes = {
     x: PropType.number.isRequired,
@@ -62,5 +60,5 @@ function areEqual(prevProps, nextProps) {
 
 }
 
-  
-  export default memo(Bar, areEqual);
+
+export default memo(Bar, areEqual);
