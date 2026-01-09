@@ -23,7 +23,7 @@
  * // Using strings and custom stroke
  * <Rect x="5%" y="10%" width="90%" height="80%" fill="navy" stroke="white" strokeWidth={2} opacity={0.8} />
  */
-export function Rect({x,y,width,height,fill,stroke = "#000000", strokeWidth = 0.5, opacity = 1}) {
+export function Rect({x,y,width,height,fill,stroke = "#000000", strokeWidth = 0.5, opacity = 1, onMouseLeave, onMouseOver}) {
     return (
         <rect 
             {...{
@@ -35,7 +35,9 @@ export function Rect({x,y,width,height,fill,stroke = "#000000", strokeWidth = 0.
                 fill,
                 strokeWidth,
                 fillOpacity: opacity,
-                strokeOpacity: opacity
+                strokeOpacity: opacity,
+                onMouseOver,
+                onMouseLeave
             }} />
     )
 }

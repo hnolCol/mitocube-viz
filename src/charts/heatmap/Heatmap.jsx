@@ -7,9 +7,10 @@ import { useTooltip, useTooltipInPortal } from "@visx/tooltip"
 import { LegendItem, LegendLabel, LegendLinear } from "@visx/legend"
 
 
+
 import { SVG } from "../base/SVG"
 import { getUniqueValuesInArrayOfObjects } from "../../utils/arrays"
-import { getRedBlueColorScale, getColorPalette } from "../../colors/palette"
+import { getRedBlueColorScale, getColorPalette, getAxisStrokeColor } from "../../colors/palette"
 import { roundNumber } from "../../transforms/numbers"
 import HeatmapRow from "./Row"
 
@@ -52,7 +53,8 @@ Heatmap.defaultProps = {
     searchIndices: new Set(),
     hoverIndices: new Set(),
     setHoverDataByDataIndex: () => {},
-    minMax: [-6, 6]
+    minMax: [-6, 6],
+    darkmode : false
 }
 
 /**
@@ -64,6 +66,7 @@ Heatmap.defaultProps = {
  * @param {Number} props.binHeight - The pixel height of rectangle in the heatmap 
  * @param {Boolean} props.matchWidth - If the width of the SVG should be matched. If enabled the binHeight will not be used for the width of the rectangle. Which is otherwise done to
  * achieve rectangles.
+ * @param {Function} props.setHoverDataByDataIndex - Function to set the hover data by data index.
  * @returns {React.ReactElement} - The heatmap JSX Element.
  */
 function Heatmap({
@@ -80,7 +83,8 @@ function Heatmap({
     searchIndices,
     hoverIndices,
     setHoverDataByDataIndex,
-    minMax
+    minMax,
+    darkmode
 }) {
     
     
@@ -105,8 +109,6 @@ function Heatmap({
         // when tooltip containers are scrolled, this will correctly update the Tooltip position
         scroll: true,
     })
-
-
 
     //value scale 
     /**
@@ -178,17 +180,18 @@ function Heatmap({
         <div className="flex flex-column">
             <div className="margin--medium flex flex-column" style={{maxHeight:"12rem"}}>
                 <div><h4>Z-Scores</h4></div>
-                <div className="flex">
+                <div className="flex flex-column">
                 <LegendLinear scale={valueScale}>
                     {(labels) => labels.map(label => {
-                        return <LegendItem key={label.value}>
-                                <svg width={legendElementSize} height={legendElementSize}><rect width={legendElementSize} height={legendElementSize} fill={label.value} /></svg>
-                                <LegendLabel>{roundNumber({ number: label.datum, limit : {min : minMax[0], max : minMax[1]}})}</LegendLabel>
+                        return <LegendItem key={label.value} className="flex flex-row align-items-center">
+                            <svg width={legendElementSize} height={legendElementSize}><rect width={legendElementSize} height={legendElementSize} fill={label.value} stroke={getAxisStrokeColor(darkmode)} /></svg>
+                                <LegendLabel style={{ marginLeft: "0.5rem" }}>{roundNumber({ number: label.datum, limit : {min : minMax[0], max : minMax[1]}})}</LegendLabel>
                         </LegendItem>
                     })}
                     </LegendLinear>
                     </div>
             </div>
+            
             {/* The actual heatmap with values */}
             <div style={{ overflowY: "scroll", maxHeight: "80vh" }} onScroll={(e) => setScrollPos(e.target.scrollTop)} ref={refScrollContainer}>
             
@@ -226,7 +229,8 @@ function Heatmap({
                             clusterIndexColor : clusterColorScale(data[index]["cluster"]),
                             opacity : hoverIndices.size === 0 ? 1 : hoverIndices.has(index) ? 1 : 0.4,
                             handleMouseEnter: handleMouseEntersRow,
-                            handleMouseLeave : handleMouseLeavesRow
+                            handleMouseLeave: handleMouseLeavesRow,
+                            darkmode
                         }} />
                     )
                 })}

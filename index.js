@@ -6,7 +6,8 @@ import ScatterPoints from "./src/primitives/ScatterPoints"
 import Categorical from "./src/charts/categorical/Chart"
 import { TextLabel } from "./src/text/TextLabel"
 import ScatterLabel from "./src/text/ScatterLabel"
-
+import Heatmap from "./src/charts/heatmap/Heatmap"
+import { HeatmapGrouping } from "./src/charts/heatmap/Grouping" 
 
 export default {
 
@@ -24,6 +25,8 @@ export default {
         "ScatterPoints": ScatterPoints
     },
     charts : {
-        "Categorical" : Categorical
+        "Categorical": Categorical,
+        "Heatmap": Heatmap,
+        "HeatmapGrouping": HeatmapGrouping
     }
 }

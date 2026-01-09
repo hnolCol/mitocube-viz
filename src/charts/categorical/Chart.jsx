@@ -234,7 +234,6 @@ function Categorical({
                         colorBandwidth,
                         darkmode
                         }, didx) => {
-                            console.log("HAPPENS", data, colorCategories)
                         return (
                             <g key={`singleCat-bar-${idx}-${didx}`}>
                                 <XYAxisWithBackground 

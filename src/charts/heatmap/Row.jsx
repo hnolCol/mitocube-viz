@@ -5,6 +5,8 @@ import _ from "lodash"
 import { Rect } from '../../primitives/Rect';
 import { RowLabel } from '../../text/RowLabel';
 import { isPropHexColorString } from '../../types/checks/color';
+import { getFillColor } from '../../colors/fill';
+import { getStrokeColor } from '../../colors/stroke';
 
 
 HeatmapRow.propTypes = {
@@ -49,7 +51,8 @@ HeatmapRow.defaultProps = {
     colorValuesExist: false,
     labelsExist: true,
     handleMouseEnter: undefined,
-    handleMouseLeave: undefined
+    handleMouseLeave: undefined,
+    darkmode: false
 };
 
 /**
@@ -82,7 +85,8 @@ function HeatmapRow({
     nanFill = "#fafafa",
     clusterIndexColor,
     showLabel = true,
-    isLabelProteinTag = false
+    isLabelProteinTag = false,
+    darkmode
 }) {
 
     if (!_.inRange(rowNumber,minIdx,maxIdx)) return null 
@@ -97,7 +101,8 @@ function HeatmapRow({
                 width={binHeight} 
                 opacity={opacity}
                 height = {binHeight} 
-                fill = {clusterIndexColor}
+                fill={clusterIndexColor}
+                stroke={getStrokeColor(darkmode)}
                 />
             
             {valueNames.map((valueName, valueIdx) =>
@@ -108,6 +113,7 @@ function HeatmapRow({
                     opacity={opacity}
                     width={binHeight}
                     height={binHeight}
+                    stroke={getStrokeColor(darkmode)}
                     fill={data[valueName]===undefined ? nanFill : valueScale(data[valueName])}
                 />)}
             
@@ -115,6 +121,7 @@ function HeatmapRow({
                     colorNames.map((colorName, colorIdx) => {
                         return (
                             <Rect
+                                key={`${colorName}-${colorIdx}`}
                                 x={xValuesEnd + marginBetweenValuesAndColors + colorIdx * binHeight}
                                 width={binHeight}
                                 height={binHeight}
@@ -127,6 +134,7 @@ function HeatmapRow({
                         x={xValuesEnd + binHeight/4 + marginBetweenValuesAndLabels + binHeight}
                         fontSize={binHeight*0.80}
                         y={y + binHeight / 2}
+                        fill={getFillColor(darkmode)}
                         isLabelProteinTag={isLabelProteinTag}
                         text={labelString} /> : null}
                     </g>

@@ -40,3 +40,48 @@ export function getAxisStrokeColor(){
 }
 
 
+
+
+// /**
+//  * Generates a color scale based on a palette name and number of colors needed
+//  * @param {string} paletteName - The name of the color palette from visx
+//  * @param {number} numColors - The number of colors needed
+//  * @returns {function} A scale function that maps index to color
+//  */
+// export function createColorScale(paletteName = 'schemeCategory10', values = [], numColors = 10) {
+//     const palette = allColors[paletteName] || allColors.schemeCategory10;
+    
+//     if (values.length > 0) {
+//         return scaleOrdinal({
+//             domain: values,
+//             range: palette
+//         });
+//     }
+
+//     return scaleOrdinal({
+//         domain: Array.from({ length: numColors }, (_, i) => i),
+//         range: palette
+//     });
+// }
+
+// /**
+//  * Get color by index from a specific palette
+//  * @param {number} colorIndex - The index of the color
+//  * @param {string} paletteName - The name of the palette
+//  * @returns {string} The color value
+//  */
+// export function getColorByIndex(colorIndex, paletteName = 'schemeCategory10') {
+//     const palette = allColors[paletteName] || allColors.schemeCategory10;
+//     return palette[colorIndex % palette.length];
+// }
+
+// /**
+//  * Get palette name by index from available palettes
+//  * @param {number} paletteIndex - The index of the palette
+//  * @returns {string} The palette name
+//  */
+// export function getPaletteNameByIndex(paletteIndex) {
+//     const paletteNames = Object.keys(allColors);
+//     return paletteNames[paletteIndex % paletteNames.length];
+// }
+

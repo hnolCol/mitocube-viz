@@ -32,7 +32,7 @@ import hooks from "@mitocube/api-hooks"
  * - Ensure provided x/y coordinates correspond to the same coordinate system as the heatmap.
  * - Adjust dx and fontSize to avoid overlap with heatmap cells.
  */
-export function RowLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAnchor = "middle", textAnchor = "start", isLabelProteinTag = false }) {
+export function RowLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAnchor = "middle", textAnchor = "start", isLabelProteinTag = false, fill = "#000000" }) {
 
     const { data: protein, isSuccess } = hooks.features.proteins.useGetProteinByTag({ tag: text }, { enabled: isLabelProteinTag && typeof text === "string" })
     
@@ -44,7 +44,8 @@ export function RowLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAn
             dy,
             textAnchor,
             verticalAnchor,
-            fontSize
+            fontSize,
+            fill
         }}>
             {isLabelProteinTag && isSuccess ? protein.gene_name : text}
         </Text>
