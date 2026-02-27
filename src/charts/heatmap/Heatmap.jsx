@@ -30,7 +30,8 @@ Heatmap.propTypes = {
     searchIndices: PropTypes.instanceOf(Set),
     hoverIndices: PropTypes.instanceOf(Set),
     setHoverDataByDataIndex: PropTypes.func,
-    minMax: PropTypes.arrayOf(PropTypes.number)
+    minMax: PropTypes.arrayOf(PropTypes.number),
+    selectedClusters : PropTypes.arrayOf(PropTypes.number)
 }
 
 Heatmap.defaultProps = {
@@ -54,7 +55,8 @@ Heatmap.defaultProps = {
     hoverIndices: new Set(),
     setHoverDataByDataIndex: () => {},
     minMax: [-6, 6],
-    darkmode : false
+    darkmode: false,
+    selectedClusters : []
 }
 
 /**
@@ -84,7 +86,10 @@ function Heatmap({
     hoverIndices,
     setHoverDataByDataIndex,
     minMax,
-    darkmode
+    darkmode,
+    isLabelFeatureTag,
+    isLabelProteinTag,
+    selectedClusters
 }) {
     
     
@@ -165,8 +170,10 @@ function Heatmap({
     }
     //
 
-
-    const dataIdcs = searchIndices.size > 0 ? _.range(numberRows).filter(idx => searchIndices.has(idx)) : _.range(numberRows)
+    let dataIdcs = searchIndices.size > 0 ? _.range(numberRows).filter(idx => searchIndices.has(idx)) : _.range(numberRows)
+    if (selectedClusters.length > 0) {
+        dataIdcs = dataIdcs.filter(idx => selectedClusters.includes(data[idx]["cluster"]))
+    }
 
 
     if (refScrollContainer.current !== null){
@@ -177,20 +184,8 @@ function Heatmap({
 
     return (
         
-        <div className="flex flex-column">
-            <div className="margin--medium flex flex-column" style={{maxHeight:"12rem"}}>
-                <div><h4>Z-Scores</h4></div>
-                <div className="flex flex-column">
-                <LegendLinear scale={valueScale}>
-                    {(labels) => labels.map(label => {
-                        return <LegendItem key={label.value} className="flex flex-row align-items-center">
-                            <svg width={legendElementSize} height={legendElementSize}><rect width={legendElementSize} height={legendElementSize} fill={label.value} stroke={getAxisStrokeColor(darkmode)} /></svg>
-                                <LegendLabel style={{ marginLeft: "0.5rem" }}>{roundNumber({ number: label.datum, limit : {min : minMax[0], max : minMax[1]}})}</LegendLabel>
-                        </LegendItem>
-                    })}
-                    </LegendLinear>
-                    </div>
-            </div>
+        <div className="flex">
+            
             
             {/* The actual heatmap with values */}
             <div style={{ overflowY: "scroll", maxHeight: "80vh" }} onScroll={(e) => setScrollPos(e.target.scrollTop)} ref={refScrollContainer}>
@@ -230,13 +225,28 @@ function Heatmap({
                             opacity : hoverIndices.size === 0 ? 1 : hoverIndices.has(index) ? 1 : 0.4,
                             handleMouseEnter: handleMouseEntersRow,
                             handleMouseLeave: handleMouseLeavesRow,
-                            darkmode
+                            darkmode,
+                            isLabelProteinTag,
+                            isLabelFeatureTag
                         }} />
                     )
                 })}
 
                 </SVG>
-                </div>
+            </div>
+            <div className="margin--medium flex flex-column" style={{maxHeight:"12rem"}}>
+                <div><h4>Z-Scores</h4></div>
+                <div className="flex flex-column">
+                <LegendLinear scale={valueScale}>
+                    {(labels) => labels.map(label => {
+                        return <LegendItem key={label.value} className="flex flex-row align-items-center">
+                            <svg width={legendElementSize} height={legendElementSize}><rect width={legendElementSize} height={legendElementSize} fill={label.value} stroke={getAxisStrokeColor(darkmode)} /></svg>
+                                <LegendLabel style={{ marginLeft: "0.5rem" }}>{roundNumber({ number: label.datum, limit : {min : minMax[0], max : minMax[1]}})}</LegendLabel>
+                        </LegendItem>
+                    })}
+                    </LegendLinear>
+                    </div>
+            </div>
             {tooltipOpen ? <TooltipInPortal left={tooltipLeft} top={tooltipTop} key={Math.random()}>
                 <p>BUM</p>
 

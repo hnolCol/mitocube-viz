@@ -40,7 +40,10 @@ HeatmapRow.propTypes = {
     valueScale: PropTypes.func.isRequired,
     xValuesEnd: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
-    labelsExist: PropTypes.bool
+    labelsExist: PropTypes.bool,
+    isLabelFeatureTag: PropTypes.bool,
+    isLabelProteinTag: PropTypes.bool,
+    darkmode: PropTypes.bool
 };
 
 HeatmapRow.defaultProps = {
@@ -52,6 +55,8 @@ HeatmapRow.defaultProps = {
     labelsExist: true,
     handleMouseEnter: undefined,
     handleMouseLeave: undefined,
+    isLabelFeatureTag: false,
+    isLabelProteinTag: false,
     darkmode: false
 };
 
@@ -86,6 +91,7 @@ function HeatmapRow({
     clusterIndexColor,
     showLabel = true,
     isLabelProteinTag = false,
+    isLabelFeatureTag = false,
     darkmode
 }) {
 
@@ -136,6 +142,7 @@ function HeatmapRow({
                         y={y + binHeight / 2}
                         fill={getFillColor(darkmode)}
                         isLabelProteinTag={isLabelProteinTag}
+                        isLabelFeatureTag={isLabelFeatureTag}
                         text={labelString} /> : null}
                     </g>
 

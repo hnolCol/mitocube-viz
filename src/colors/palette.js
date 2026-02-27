@@ -1,5 +1,5 @@
 
-const STD_CHART_COLOR_PALETTE_DARK = [
+export const STD_CHART_COLOR_PALETTE_DARK = [
     "#61dafb", // light blue
     "#06d6a0", // teal
     "#ffd166", // warm yellow
@@ -9,7 +9,7 @@ const STD_CHART_COLOR_PALETTE_DARK = [
     "#ff7b00", // orange
     "#2dd4bf"  // mint
 ]
-const STD_CHART_COLOR_PALETTE = [
+export const STD_CHART_COLOR_PALETTE = [
     "#466688",
     "#79c29e",
     "#e7ad00",

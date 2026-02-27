@@ -39,7 +39,7 @@ Point.propTypes = {
  * @param {Object} props.mouseOverParams Additional parameters to pass to the mouse over event handler
  * @returns 
  */
-function Point({idx, p, r, opacity,  fill, stroke, strokeWidth, circleProps, mouseOver, mouseOverParams}) {
+function Point({idx, p, r, opacity,  fill, stroke, strokeWidth, circleProps, mouseOver, mouseOverParams, onMouseDown, mouseDownParams}) {
     const xValue = p[0]
     const yValue = p[1]
     return( 
@@ -47,13 +47,15 @@ function Point({idx, p, r, opacity,  fill, stroke, strokeWidth, circleProps, mou
             key={`${idx}-pp`} 
             cx={xValue}  
             cy={yValue}  
-            onMouseOver={_.isFunction(mouseOver)?e => mouseOver(e,idx,mouseOverParams):undefined}
+            onMouseOver={_.isFunction(mouseOver) ? e => mouseOver(e, idx, mouseOverParams) : undefined}
+            onMouseDown={_.isFunction(onMouseDown) ? e => onMouseDown(e, idx, mouseDownParams) : undefined}
             {...{
                 opacity,
                 fill,
                 r,
                 stroke,
-                strokeWidth
+                strokeWidth,
+                onMouseDown
             }}
             {...circleProps}/>
     )

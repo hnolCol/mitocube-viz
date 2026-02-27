@@ -87,7 +87,8 @@ Categorical.defaultProps = {
     innerSplitPadding: 0.2,
     innerColorPadding: 0.0,
     svgID: undefined,
-    darkmode : false
+    darkmode: false,
+    bottomTicksAreConditionApplicationLabels : true
 }
 
 function Categorical({
@@ -110,7 +111,8 @@ function Categorical({
     innerColorPadding,
     svgID,
     darkmode,
-    chartType
+    chartType,
+    bottomTicksAreConditionApplicationLabels
 }) {
 
     // Fetch attribute info for labels
@@ -153,7 +155,6 @@ function Categorical({
         else if (chartType === "barplot") {
             barInfo = [{ text: yaxisName, value: _.round(value, 2), type : "default" }, { text: "Error", type : "default" , value: _.isNaN(errorValue) ? "NaN" : _.round(errorValue, 2) }]
         }
-        console.log(tooltipNames)
         const tooltipInfo = _.map(tooltipNames,
                 tooltipName => {
                 let tooltipValue = data[tooltipName.text]
@@ -246,7 +247,8 @@ function Categorical({
                                     {...{
                                         chartHeight,
                                         chartWidth,
-                                        darkmode
+                                        darkmode,
+                                        bottomTicksAreConditionApplicationLabels
                                     }} />
                                 {/* x axis label */}
                                 <Text
@@ -293,11 +295,8 @@ function Categorical({
                                                             y1={yPosition > 0 ? yScale(yPosition + errorValue) : yScale(yPosition - errorValue)}
                                                             width={colorBandwidth*0.5} /> : null}
                                                     </Group>
-                                                :
+                                                :   
                                                 null}
-        
-                                        
-
                                         </Group>
                                     )
                                 })}

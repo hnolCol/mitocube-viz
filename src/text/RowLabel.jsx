@@ -21,7 +21,9 @@ import hooks from "@mitocube/api-hooks"
  *                                                   "start", "middle", "end".
  * @param {string} [props.textAnchor="start"] - Horizontal alignment of the text. Common values:
  *                                              "start", "middle", "end".
- *
+ * @param {boolean} [props.isLabelProteinTag=false] - If true, treat the text as a protein tag and fetch the corresponding gene name to display.
+ * @param {boolean} [props.isLabelFeatureTag=false] - If true, treat the text as a feature tag and fetch the corresponding gene name to display.
+ * @param {string} [props.fill="#000000"] - Text color for the label.   
  * @returns {JSX.Element} A Text element positioned and aligned for a heatmap row label.
  *
  * @example
@@ -32,9 +34,10 @@ import hooks from "@mitocube/api-hooks"
  * - Ensure provided x/y coordinates correspond to the same coordinate system as the heatmap.
  * - Adjust dx and fontSize to avoid overlap with heatmap cells.
  */
-export function RowLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAnchor = "middle", textAnchor = "start", isLabelProteinTag = false, fill = "#000000" }) {
+export function RowLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAnchor = "middle", textAnchor = "start", isLabelFeatureTag, isLabelProteinTag = false, fill = "#000000" }) {
 
     const { data: protein, isSuccess } = hooks.features.proteins.useGetProteinByTag({ tag: text }, { enabled: isLabelProteinTag && typeof text === "string" })
+    const { data: feature } = hooks.features.useGetFeatureByTag({ tag: text }, { enabled: isLabelFeatureTag && typeof text === "string" })
     
     return (
         <Text {...{
@@ -47,7 +50,7 @@ export function RowLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAn
             fontSize,
             fill
         }}>
-            {isLabelProteinTag && isSuccess ? protein.gene_name : text}
+            {isLabelProteinTag && isSuccess ? protein.gene_name : isLabelFeatureTag && feature ? feature.gene_name : text}
         </Text>
     )
 }

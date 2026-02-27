@@ -14,3 +14,6 @@ export function getUniqueValuesInArrayOfObjects({ data, keyName }) {
 
     return _.uniq(_.map(data, d => d[keyName])).filter(i => i !== undefined)
 }
+
+
+

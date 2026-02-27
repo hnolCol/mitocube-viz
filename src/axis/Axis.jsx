@@ -9,6 +9,7 @@ import { AxisBackground } from "./Background"
 import { getAxisStrokeColor } from "../colors/stroke"
 import { getNumberTicks } from "./ticks"
 import { ConditionApplicationLabel } from "./ConditionApplicationLabel"
+import { Text } from "@visx/text"
 
 
 
@@ -27,10 +28,12 @@ function XYAxisWithBackground({
     moveBottomToLeft = true,
     leftTickLabelProps = {},
     bottomTickLabelProps = {},
+    bottomTicksAreConditionApplicationLabels = false,
     bandwidth,
     chartHeight,
     chartWidth,
-    darkmode = false
+    darkmode = false,
+    rerenderDependency = []
     }) {
 
 
@@ -71,10 +74,11 @@ function XYAxisWithBackground({
                 numTicks={getNumberTicks(chartHeight)}
                 stroke={getAxisStrokeColor(darkmode)}
                 tickLength={3} />
+        
             
             <AxisBottom
                 left={moveBottomToLeft ? leftStart : 0}
-                tickComponent={({x,y,formattedValue}) => bottomHideTickLabels ? null : <ConditionApplicationLabel x={x} y={y} tag={formattedValue} textProps={bottomTickLabelProps} />}
+                tickComponent={({ x, y, formattedValue }) => bottomHideTickLabels ? null : bottomTicksAreConditionApplicationLabels ? <ConditionApplicationLabel x={x} y={y} tag={formattedValue} textProps={bottomTickLabelProps} /> : <Text x={x} y={y} textAnchor="middle" fontSize="0.8rem" verticalAnchor="middle" {...bottomTickLabelProps}>{formattedValue}</Text>}
                 top={topStart}
                 label={bottomLabel}
                 hideTicks={bottomHideTicks}
@@ -100,6 +104,7 @@ function areEqual(prevProps, nextProps) {
     the same result as passing prevProps to render,
     otherwise return false
     */
+    if (_.some(prevProps.rerenderDependency, (value, idx) => nextProps.rerenderDependency[idx] !== value)) return false 
     if (prevProps.bottomScale !== nextProps.bottomScale) return false 
     if (prevProps.leftScale !== nextProps.leftScale) return false 
 

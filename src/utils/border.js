@@ -37,7 +37,7 @@ export function getDomainWithBoundaries({ data, keyName, frac = 0.08}) {
  * @param {Object} props
  * @param {Object[]} props.data - The data array each item must contain the keyName for which the boundaries (e.g. most likely axis limits)
  * should be calculated.
- * @param {String} props.keyName - The keyName(s) to get the data to calculate boundaries /e.g min and max.
+ * @param {String|String[]} props.keyName - The keyName(s) to get the data to calculate boundaries /e.g min and max.
  * @returns {Object} The minimum and maximum of the data accessed by the keyName(s). If multiple keyNames
  * are provided, the minimum in flattened data are provided. 
  * @returns {import("../../types/calculations").MinMaxResult} - The min max in the data array. 
@@ -64,7 +64,7 @@ export function getBoundariesFromArrayOfObjects({ data = [{ x: 1 }, { x: 2 }], k
 export function addMarginToBoundaries({ domain = { min: 1, max: 2 }, frac = 0.1 }) {
     //adds some margin to a domain which can be used for plotting.
     var m = Math.sqrt(Math.pow(domain.max-domain.min, 2)) * frac
-    if (m === 0) m += 1 // add 1 if boundary is zero. 
+    if (m === 0) m += domain.max * 0.01 // add 10% of max if boundary is zero. 
     return (
         {
             min: domain.min - m,

@@ -3,6 +3,8 @@ import _ from "lodash"
 import React from "react"
 import { isPropHexColorString } from "../types/checks/color"
 import { isPropSet } from "../types/checks/set"
+import { isInRange } from "../utils/inrange" 
+
 
 ScatterPoints.propTypes = {
     data : PropTypes.array.isRequired,
@@ -89,17 +91,24 @@ function ScatterPoints({
     checkPolyMap = false,
     polyMapKeyName = "node_type",
     rerenderDependency = [], 
+    defaultOpacity = 0.8,
     searchIndices = new Set() ,
     filterIndices =  new Set()}){
  
     const filterByIdx = filterIndices.size !== 0
     const opacityBySearch = searchIndices.size !== 0
-    
-    const colorScaleDefined = colorName !== undefined && _.has(data[0], colorName) && _.isFunction(colorScale)
-    let validIdcs = indices === undefined ?_.range(data.length).filter(idx => valid[idx]) : Array.from(indices).filter(idx => valid[idx]) 
-    const opacity = opacityBySearch ? 0.3 : 1.0
-    
 
+    const colorScaleDefined = colorName !== undefined && _.has(data[0], colorName) && _.isFunction(colorScale)
+
+    const [minX, maxX] = xScale.domain()
+    const [maxY, minY] = yScale.domain()
+    const yRange = [minY, maxY]
+    const xRange = [minX, maxX]
+
+    let validIdcs = indices === undefined ?
+        _.range(data.length).filter(idx => valid[idx] && isInRange({ value: data[idx][xaxisName], range: xRange }) && isInRange({ value: data[idx][yaxisName], range: yRange})) :
+        Array.from(indices).filter(idx => valid[idx] && isInRange({ value: data[idx][xaxisName], range: xRange }) && isInRange({ value: data[idx][yaxisName], range: yRange }))
+    const opacity = opacityBySearch ? 0.3 : defaultOpacity
     const getCircle = (idx, d, colorScaleValid, props, scaleSize = 1) => {
         if (!checkPolyMap || !_.has(d,polyMapKeyName) || !_.has(glyphMap,d[polyMapKeyName]) || glyphMap[d[polyMapKeyName]] === "circle") return <circle 
         //dont use opacity, very very slow on safari, instead fillOpacity and strokeOpacity 

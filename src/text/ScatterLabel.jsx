@@ -59,7 +59,6 @@ import hooks from "@mitocube/api-hooks"
             fillOpacity={opacity}
         >
             {labelText}
-            <span>hllo</span>
         </Text>
     )}
 

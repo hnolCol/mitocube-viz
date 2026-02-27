@@ -120,15 +120,14 @@ HeatmapGrouping.defaultProps = {
 export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, verticalMargin, keyNames, stroke, tooltipNames, is_condition_application}) {
 
     const N = keyNames.length // number of grouping rows 
-    const heatmapSVGHeight = N * (binHeight + verticalMargin)
+    const heatmapSVGHeight = (N+1) * (binHeight + verticalMargin)
     const heatmapSVGWidth = data.length * binWidth + 200 // extra space for labels
     const { tooltipData, tooltipOpen, tooltipLeft, tooltipTop, hideTooltip, showTooltip } = useTooltip()
     const { containerRef, TooltipInPortal } = useTooltipInPortal({
-        // use TooltipWithBounds
         detectBounds: true,
-        // when tooltip containers are scrolled, this will correctly update the Tooltip position
         scroll: true,
     })
+
     /**
      * 
      * @param {MouseEvent} event 
@@ -174,21 +173,21 @@ export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, vert
             </g>
             </SVG>
             {tooltipOpen ? <TooltipInPortal left={tooltipLeft} top={tooltipTop} key={Math.random()}>
-                
-                <h3>{tooltipData.is_condition_application ? <Attribute attribute_tag={tooltipData.keyName} /> : tooltipData.keyName}</h3>
-                
-                <div>{tooltipData.is_condition_application ?
-                    tooltipData[tooltipData.keyName].map(ca_tag =>
-                        <ConditionApplicationsView key={ca_tag} tag={ca_tag} />)
-                    : tooltipData[tooltipData.keyName]}</div>
-                {/* Check the number of samples with the string. */}
-                
-                <div>N: {data.map(d => _.join(d[tooltipData.keyName], ",")).filter(di => di === _.join(tooltipData[tooltipData.keyName], ",")).length}</div>
-                
-                {_.isArray(tooltipNames) && tooltipNames.length > 0 ? tooltipNames.map((tooltipName, idx) => (
-                    <div key={`tooltip-${idx}`}>{`${tooltipName} : ${tooltipData[tooltipName]}`}</div>
-                )) : null}
-
+                <div style={{maxWidth: "20rem", wordWrap: "break-word", overflowWrap: "break-word"}}>
+                    <h3 style={{wordWrap: "break-word"}}>{tooltipData.is_condition_application ? <Attribute attribute_tag={tooltipData.keyName} /> : tooltipData.keyName}</h3>
+                    
+                    <div style={{wordWrap: "break-word"}}>{tooltipData.is_condition_application ?
+                        tooltipData[tooltipData.keyName].map(ca_tag =>
+                            <ConditionApplicationsView key={ca_tag} tag={ca_tag} />)
+                        : tooltipData[tooltipData.keyName]}</div>
+                    {/* Check the number of samples with the string. */}
+                    
+                    <div style={{wordWrap: "break-word"}}>N: {data.map(d => _.join(d[tooltipData.keyName], ",")).filter(di => di === _.join(tooltipData[tooltipData.keyName], ",")).length}</div>
+                    <div style={{wordWrap: "break-word"}}>Sample: {tooltipData.tag}</div>
+                    {_.isArray(tooltipNames) && tooltipNames.length > 0 ? tooltipNames.map((tooltipName, idx) => (
+                        <div key={`tooltip-${idx}`} style={{wordWrap: "break-word"}}>{`${tooltipName} : ${tooltipData[tooltipName]}`}</div>
+                    )) : null}
+                </div>
             </TooltipInPortal> : null}
         </div>
     )
