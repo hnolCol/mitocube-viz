@@ -5,6 +5,7 @@ import { Group } from "@visx/group"
 import { Text } from "@visx/text"
 import Margins from "../types/Margins"
 import { isPropHexColorString } from "../types/checks/color"
+import { ProteinLabel } from "./ProteinLabel"
 
 
 
@@ -17,7 +18,8 @@ TextLabel.propTypes = {
     dy: PropTypes.number,
     totalYOffset: PropTypes.number,
     fontSize: PropTypes.number,
-    color: PropTypes.arrayOf(isPropHexColorString).isRequired
+    color: PropTypes.arrayOf(isPropHexColorString).isRequired,
+    isProtein : PropTypes.arrayOf(PropTypes.bool)
 }
 TextLabel.defaultProps = {
     x: 0,
@@ -27,28 +29,37 @@ TextLabel.defaultProps = {
     dy: 0,
     totalYOffset: 4,
     fontSize: 14,
-    color: ["#00000"]
+    color: ["#00000"],
+    isProtein: [false],
+    verticalAnchor: "start",
+    textAnchor : "start"
 }
 
-export function TextLabel({x, y, margins, labelTexts, dx, dy, totalYOffset, fontSize, color}) {
+export function TextLabel({x, y, margins, labelTexts, dx, dy, totalYOffset, fontSize, color, isProtein, verticalAnchor, textAnchor}) {
 
     return (
         <Group left={margins.left} top={margins.top + totalYOffset}>
 
             {labelTexts.map((text, textIdx) => {
-                const fill = color.length < textIdx ? color[textIdx] : "#000000"
+                const textProps = {
+                    key: `${text}-${textIdx}`,
+                    fill : color ? color[textIdx] : "#000000",
+                    x : x,
+                    dx: dx,
+                    dy : dy,
+                    fontSize,
+                    y : y + fontSize * textIdx,
+                    verticalAnchor,
+                    textAnchor
+                }
+                if (isProtein[textIdx]) return <ProteinLabel text={text} {...textProps} />
                 return <Text
-                    key={`${text}-${textIdx}`}
-                    fill={fill}
-                    x={x}
-                    y={y + fontSize * textIdx}
-                    dx={dx}
-                    dy={dy}
-                    fontSize={fontSize}
-                    verticalAnchor="start"
-                    textAnchor="start">
+                    {...textProps}>
                     {text}
                 </Text>
             })}
     </Group>) 
 }
+
+
+

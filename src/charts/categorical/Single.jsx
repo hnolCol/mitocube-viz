@@ -127,7 +127,6 @@ function SingleCategoricalChart({
     chartType,
 }) {
 
-    console.log(chartType)
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     const uniqueColorValues = _.uniqBy(data, colorName).map(d => d[colorName])
     

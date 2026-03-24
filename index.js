@@ -10,6 +10,10 @@ import Heatmap from "./src/charts/heatmap/Heatmap"
 import { HeatmapGrouping } from "./src/charts/heatmap/Grouping" 
 import { Network } from "./src/charts/network/Network"
 import { STD_CHART_COLOR_PALETTE, STD_CHART_COLOR_PALETTE_DARK } from "./src/colors/palette"
+import { ProfileChart } from "./src/charts/profile/ProfileChart"
+import { linearRegression } from "./src/utils/stats"
+import Line from "./src/primitives/Line"
+import { MinimalBoxplot } from "./src/charts/minimal/Boxplot"
 
 export default {
 
@@ -30,12 +34,19 @@ export default {
         'Box': Box,
         "Bar": Bar,
         "Point": Point,
-        "ScatterPoints": ScatterPoints
+        "ScatterPoints": ScatterPoints,
+        "Line" : Line
     },
-    charts : {
+    charts: {
+        "minimal": {
+            "MinimalBoxplot" : MinimalBoxplot
+        },
         "Categorical": Categorical,
         "Heatmap": Heatmap,
         "HeatmapGrouping": HeatmapGrouping,
-        "Network" : Network
-    }
-}
+        "Network": Network,
+        "ProfileChart": ProfileChart
+    },
+    utils: {
+        "linearRegression" : linearRegression
+    }}
