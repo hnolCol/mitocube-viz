@@ -7,6 +7,7 @@ import { RowLabel } from '../../text/RowLabel';
 import { isPropHexColorString } from '../../types/checks/color';
 import { getFillColor } from '../../colors/fill';
 import { getStrokeColor } from '../../colors/stroke';
+import { Annotations } from './Annotations';
 
 
 HeatmapRow.propTypes = {
@@ -89,9 +90,10 @@ function HeatmapRow({
     handleMouseLeave,
     nanFill = "#fafafa",
     clusterIndexColor,
-    showLabel = true,
-    isLabelProteinTag = false,
-    isLabelFeatureTag = false,
+    showLabel,
+    isLabelProteinTag,
+    isLabelFeatureTag,
+    annotation_tags = ["dXtpH"],
     darkmode
 }) {
 
@@ -135,9 +137,21 @@ function HeatmapRow({
                                 fill = {extraColorScale(data[colorName])} />)
                     })
                 : null}
+            
+            {_.isArray(annotation_tags) && annotation_tags.length > 0 ?
+                <Annotations
+                    x={xValuesEnd + binHeight / 2 + marginBetweenValuesAndLabels + binHeight} 
+                    y={y}
+                    annotation_tags={annotation_tags}
+                    width={binHeight}
+                    height={binHeight}
+                    protein_tag={labelString}
+                    isLabelProteinTag={isLabelProteinTag}
+                    darkmode={darkmode} /> : null}
+
                 {labelsExist && showLabel ?
                     <RowLabel
-                        x={xValuesEnd + binHeight/4 + marginBetweenValuesAndLabels + binHeight}
+                        x={xValuesEnd + binHeight/2 + marginBetweenValuesAndLabels + binHeight + annotation_tags.length * binHeight + marginBetweenValuesAndLabels}
                         fontSize={binHeight*0.80}
                         y={y + binHeight / 2}
                         fill={getFillColor(darkmode)}
@@ -182,6 +196,10 @@ function HeatmapRow({
         return false
     }
     if (prevProps.showLabel !== prevProps.showLabel) {
+        return false
+    }
+      
+      if (prevProps.annotation_tags !== nextProps.annotation_tags) {
         return false
     }
       

@@ -6,6 +6,7 @@ import _ from "lodash"
 import { addMarginToBoundaries, getBoundariesFromArrayOfObjects, getChartWidthAndHeightWithMargins } from "../../utils/border"
 import { getColorPalette } from "../../colors/palette"
 import { SVG } from "../base/SVG"
+import { CategoricalLegend } from "../../legend/CategoricalLegend"
 
 // import { CategoricalLegend } from "./Legend"
 
@@ -204,14 +205,14 @@ function MultiCategoricalChart({
         <div>
         <SVG {...{width,height,svgID,svgRef}}>
             <>{children(categoricalSplit)}</>
-                </SVG>
-            </div>
-            <div>{_.isFunction(colorScale) && _.has(colorScale, "domain") ? <CategoricalLegend {...{
+        </SVG>
+        </div>
+        <div>{_.isFunction(colorScale) && _.has(colorScale, "domain") ? <CategoricalLegend {...{
                 colorName,
                 colorScale,
             }} /> : null}</div>
             
-            </div>
+        </div>
        
     )   
 }

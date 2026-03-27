@@ -36,8 +36,8 @@ import hooks from "@mitocube/api-hooks"
  */
 export function RowLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAnchor = "middle", textAnchor = "start", isLabelFeatureTag, isLabelProteinTag = false, fill = "#000000" }) {
 
-    const { data: protein, isSuccess } = hooks.features.proteins.useGetProteinByTag({ tag: text }, { enabled: isLabelProteinTag && typeof text === "string" })
-    const { data: feature } = hooks.features.useGetFeatureByTag({ tag: text }, { enabled: isLabelFeatureTag && typeof text === "string" })
+    const { data: protein, isSuccess } = hooks.features.proteins.useGetProteinByTag({ tag: text }, { enabled: isLabelProteinTag && typeof text === "string", staleTime : Infinity })
+    const { data: feature } = hooks.features.useGetFeatureByTag({ tag: text }, { enabled: isLabelFeatureTag && typeof text === "string", staleTime : Infinity })
     
     return (
         <Text {...{

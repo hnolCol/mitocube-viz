@@ -21,6 +21,7 @@ import Box from "../../primitives/Box"
 import Bar from "../../primitives/Bar"
 import ErrorBar from "../base/Error"
 import MetricTable from "../../tooltip/MetricTable"
+import { ConditionApplicationLabel } from "../../axis/ConditionApplicationLabel"
 
 
 Categorical.propTypes = {
@@ -359,7 +360,8 @@ function Categorical({
                                 margins={margins}
                                 leftScale={yScale}
                                 leftTickLabelsVisible={didx === 0}
-                                bottomScale={splitScale}
+                              bottomScale={splitScale}
+                              bottomTicksAreConditionApplicationLabels={bottomTicksAreConditionApplicationLabels}
                                 bottomLabel={""}
                                 bandwidth={splitScale.bandwidth() * 1.1}
                                 leftLabel={didx === 0 ? _.isString(yaxisLabel)?yaxisLabel:yaxisName : ""}
@@ -367,14 +369,9 @@ function Categorical({
                         
                           {subplotCategoryFound ?
                               <g>
-                                  <Text
-                                    x={xcenter}
-                                    y={margins.top + 12}
-                                    width={subplotWidth}
-                                    verticalAnchor="middle"
-                                    textAnchor="middle">
-                                    {"CA?"}
-                                </Text>
+                              
+                                      <ConditionApplicationLabel x={xcenter} y={margins.top + 12} tag={subplotCategory} />
+                                
                               </g> : null}
                           
                           {didx === 0 ? <Text

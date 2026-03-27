@@ -115,7 +115,6 @@ function MetricTable({
                     {data
                         .filter(d => _.has(d, "text") && _.has(d, "type"))
                         .map((d, idx) => {
-                            console.log(d, d.type, d.type === "attribute")
                             if (d.type === "attribute") return <AttributeConditionApplication
                                     key={`${idx}-metric-table-row`}
                                     idx={idx} attribute_tag={d.text}
