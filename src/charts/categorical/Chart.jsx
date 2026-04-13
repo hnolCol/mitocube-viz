@@ -74,7 +74,7 @@ Categorical.defaultProps = {
         bottom: 35,
         top: 8
     },
-    yaxisName: "y",
+    yaxisName: "value",
     colorName: undefined,
     splitName: undefined,
     subplotName: undefined,

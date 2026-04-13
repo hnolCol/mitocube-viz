@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useState, useEffect, useRef, Suspense } from "react";
 import { SVG } from "../base/SVG"
 import PropTypes from 'prop-types'; 
@@ -7,9 +7,7 @@ import Line from "../../primitives/Line";
 import Point from "../../primitives/Point"; 
 import { scaleLinear } from "@visx/scale";
 import { localPoint } from "@visx/event"
-// const CytoscapeComponent = React.lazy(() =>
-//   import("react-cytoscapejs").then((mod) => ({ default: mod.default }))
-// );
+
 
 
 
