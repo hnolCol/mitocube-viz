@@ -7,7 +7,9 @@ import { copyTextToClipboardFromArrayOfObjects } from "../utils/copy"
 import hooks from "@mitocube/api-hooks" 
 
 
-function AttributeConditionApplication({idx, attribute_tag, condition_application_tag}) {
+function AttributeConditionApplication({ idx, attribute_tag, condition_application_tag }) {
+    
+    return <tr></tr>
     const { data : attribute, isSuccess : isSuccessAttribute } =  hooks.attributes.useGetAttribute({ tag : attribute_tag }, { enabled: _.isString(attribute_tag) })
     const { data: condition_application_text, isSuccess: isSuccessConditionApplication } = hooks.condition_applications.useGetConditionApplicationText({ tag: condition_application_tag }, { enabled: !!condition_application_tag })
     console.log(attribute_tag, "???", condition_application_text, condition_application_tag)

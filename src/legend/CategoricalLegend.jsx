@@ -3,12 +3,10 @@ import { LegendItem, LegendLabel, LegendOrdinal } from "@visx/legend";
 import { Tooltip, useTooltip } from "@visx/tooltip";
 import _ from "lodash"
 
-import hooks from "@mitocube/api-hooks" 
 
 
-export function ConditionApplicationLegendLabel({ tag, props }) {
-    const { data : condition_application_text } =  hooks.condition_applications.useGetConditionApplicationText({ tag }, { enabled: !!tag })
-        
+export function ConditionApplicationLegendLabel({ tag, props, caTagToText }) {
+    const condition_application_text = caTagToText.get(tag)     
     return <LegendLabel {...props}>
         {_.isString(condition_application_text) ? condition_application_text : "" }
     </LegendLabel>
@@ -49,9 +47,12 @@ const CategoricalLegend = React.memo(
         filterDataInKeyByValue,
         resetSearchIdcs,
         size = 25,
+        caTagToText,
+        attributeTagToText
 
     }) {
-        
+
+        console.log(attributeTagToText)
 
         const {
         tooltipData,
@@ -63,8 +64,6 @@ const CategoricalLegend = React.memo(
     
     } = useTooltip();
 
-        
-    const {data : colorAttribute} = hooks.attributes.useGetAttribute({ tag: colorName }, { enabled: _.isString(colorName) })
         
     /**
      * 
@@ -101,17 +100,17 @@ const CategoricalLegend = React.memo(
     return (
         <div>
             <div className="flex" style={{maxWidth, maxHeight : "900px", overflowY:"scroll"}}>
-                {_.has(colorScale, "domain") ? _.isObject(colorAttribute) ?
+                {_.has(colorScale, "domain") ? attributeTagToText.get(colorName) ?
                     <div className="margin-left--little">
                     {/* //onMouseLeave={() => resetSearchIdcs(chartIdx)} */}
-                        <div style={{maxWidth : "10rem"}}><h4>{colorAttribute.text}</h4></div>
+                        <div style={{maxWidth : "10rem"}}><h4>{attributeTagToText.get(colorName)}</h4></div>
                         <LegendOrdinal scale={colorScale}>
                             {(labels) => labels.map((label, idx) => {
                                 if (idx > 25) return null
                                 return (
                                     <LegendItem key={`${idx}-${label}`} >
                                         {renderLegendRectangle(size, label.value, size / 3)}
-                                        <ConditionApplicationLegendLabel tag={label.text} props={{ align: "left", margin: "0 4px", onMouseEnter: (e) => handleTooltip(e, [label.text], colorAttribute), onMouseLeave: hideTooltip }} />
+                                        <ConditionApplicationLegendLabel caTagToText={caTagToText} tag={label.text} props={{ align: "left", margin: "0 4px", onMouseEnter: (e) => handleTooltip(e, [label.text], attributeTagToText.get(colorName)), onMouseLeave: hideTooltip }} />
                                     </LegendItem>
                                 )
                             })}
@@ -120,13 +119,8 @@ const CategoricalLegend = React.memo(
             </div>
             {tooltipOpen && _.isObject(tooltipData) ?
                 <Tooltip top={tooltipTop} left={tooltipLeft} key={Math.random()}>
-                    <div>{tooltipData.attributeValues.map(attributeValue => <div>
-                        <h4>{tooltipData.has_features_value ? attributeValue.gene_names : attributeValue.text }</h4>
-                        <div style={{ maxWidth: "min(33vw,400px)" }}>
-                            <p>{tooltipData.has_features_value ? attributeValue.tag: null}</p>
-                            {tooltipData.has_features_value ? attributeValue.protein_name : attributeValue.description}
-                        </div>
-                    </div>)}
+                    <div style={{ maxWidth: "300px", maxHeight: "400px", overflowY: "scroll" }}>
+                        <span> this is a nice tool tip</span>
                     </div>
             </Tooltip> : null}
 

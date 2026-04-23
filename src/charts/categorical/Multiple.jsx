@@ -1,14 +1,13 @@
 import { useMemo } from "react"
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale"
 import PropTypes from "prop-types"
-import _ from "lodash"
+import _, { get } from "lodash"
 
 import { addMarginToBoundaries, getBoundariesFromArrayOfObjects, getChartWidthAndHeightWithMargins } from "../../utils/border"
 import { getColorPalette } from "../../colors/palette"
 import { SVG } from "../base/SVG"
 import { CategoricalLegend } from "../../legend/CategoricalLegend"
 
-// import { CategoricalLegend } from "./Legend"
 
 
 MultiCategoricalChart.propTypes = {
@@ -26,7 +25,9 @@ MultiCategoricalChart.propTypes = {
     outerSubplotPadding : PropTypes.number,
     innerSplitPadding : PropTypes.number,
     innerColorPadding: PropTypes.number,
-    colorPalette : PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string),PropTypes.object])
+    colorPalette: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.object]),
+    caTagToText: PropTypes.object,
+    attributeTagToText : PropTypes.object
 }
 
 function MultiCategoricalChart({
@@ -70,6 +71,8 @@ function MultiCategoricalChart({
     colorPalette = [],
     minMaxYDomain = undefined,
     yScaleStartsAtZero = true,
+    caTagToText,
+    attributeTagToText,
     children
 }) {
     
@@ -196,6 +199,8 @@ function MultiCategoricalChart({
             bandwidth: subplotScale.bandwidth(),
             colorBandwidth : splitColorScale.bandwidth(),
             xcenter: subplotScale(cat) + subplotScale.bandwidth() / 2,
+            caTagToText,
+            attributeTagToText
             
         }
     })
@@ -210,6 +215,8 @@ function MultiCategoricalChart({
         <div>{_.isFunction(colorScale) && _.has(colorScale, "domain") ? <CategoricalLegend {...{
                 colorName,
                 colorScale,
+                caTagToText,
+                attributeTagToText
             }} /> : null}</div>
             
         </div>

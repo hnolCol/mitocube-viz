@@ -14,7 +14,6 @@ import MultiCategoricalChart from "./Multiple"
 
 // import MetricTable from "../../../base/metrictable"
 
-import hooks from "@mitocube/api-hooks"
 import { getColorPalette } from "../../colors/palette"
 import XYAxisWithBackground from "../../axis/Axis"
 import Box from "../../primitives/Box"
@@ -44,7 +43,9 @@ Categorical.propTypes = {
     innerColorPadding: PropTypes.number,
     svgID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     darkmode: PropTypes.bool,
-    chartType: PropTypes.oneOf(["boxplot","barplot","lineplot"])
+    chartType: PropTypes.oneOf(["boxplot","barplot","lineplot"]),
+    caTagToText: PropTypes.object,
+    attributeTagToText : PropTypes.object
 }
 
 Categorical.defaultProps = {
@@ -89,7 +90,8 @@ Categorical.defaultProps = {
     innerColorPadding: 0.0,
     svgID: undefined,
     darkmode: false,
-    bottomTicksAreConditionApplicationLabels : true
+    bottomTicksAreConditionApplicationLabels: true,
+    
 }
 
 function Categorical({
@@ -113,14 +115,21 @@ function Categorical({
     svgID,
     darkmode,
     chartType,
-    bottomTicksAreConditionApplicationLabels
+    bottomTicksAreConditionApplicationLabels,
+    caTagToText,
+    attributeTagToText
 }) {
 
-    // Fetch attribute info for labels
-    const { data: colorAttribute, isSuccess : isColorAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: colorName }, { enabled: _.isString(colorName) && !!colorName })
-    const { data: splitAttribute, isSuccess : isSplitAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: splitName }, { enabled: _.isString(splitName) && !!splitName })
-    const { data: subplotAttribute, isSuccess : isSubplotAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: subplotName }, { enabled: _.isString(subplotName) && !!subplotName })
+    console.log(attributeTagToText)
+    const colorAttribute = { text: colorName }
+    const splitAttribute = { text: splitName }
+    const isSplitAttributeSuccess = true 
+    const isColorAttributeSuccess = true
 
+    // Fetch attribute info for labels
+    // const { data: colorAttribute, isSuccess : isColorAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: colorName }, { enabled: _.isString(colorName) && !!colorName })
+    // const { data: splitAttribute, isSuccess : isSplitAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: splitName }, { enabled: _.isString(splitName) && !!splitName })
+    // const { data: subplotAttribute, isSuccess : isSubplotAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: subplotName }, { enabled: _.isString(subplotName) && !!subplotName })
 
     // get color values for legend/label 
     const uniqueColorValuesFromData = _.uniqBy(data, colorName)
@@ -157,7 +166,8 @@ function Categorical({
             barInfo = [{ text: yaxisName, value: _.round(value, 2), type : "default" }, { text: "Error", type : "default" , value: _.isNaN(errorValue) ? "NaN" : _.round(errorValue, 2) }]
         }
         const tooltipInfo = _.map(tooltipNames,
-                tooltipName => {
+            tooltipName => {
+                    console.log(tooltipName, data)
                 let tooltipValue = data[tooltipName.text]
 
                 return {
@@ -179,7 +189,9 @@ function Categorical({
      * @returns 
      */
     const extractQuantileData = (array, yScale, scale = true, forTooltip = false) => {
-       
+        if (!_.isObject(array) && !_.has(array, yaxisName)) {
+            return forTooltip ? [] : {}
+        }
         if (chartType === "boxplot") {
             if (forTooltip) {
                 return _.map(array[yaxisName], (q, idx) => { return { text: array.labels[idx], type : "default", value: scale ? yScale(q) : _.round(q, 2) } })
@@ -219,6 +231,8 @@ function Categorical({
                     svgRef: containerRef,
                     chartType,
                     yScaleStartsAtZero: chartType === "barplot",
+                    caTagToText,
+                    attributeTagToText,
                     darkmode}}>
                         {(categoricalData) => categoricalData.map(({
                         idx,
@@ -234,7 +248,9 @@ function Categorical({
                         chartHeight,
                         chartWidth,
                         colorBandwidth,
-                        darkmode
+                        darkmode,
+                        caTagToText,
+                        attributeTagToText
                         }, didx) => {
                         return (
                             <g key={`singleCat-bar-${idx}-${didx}`}>
@@ -249,7 +265,9 @@ function Categorical({
                                         chartHeight,
                                         chartWidth,
                                         darkmode,
-                                        bottomTicksAreConditionApplicationLabels
+                                        bottomTicksAreConditionApplicationLabels,
+                                        caTagToText,
+                                        attributeTagToText
                                     }} />
                                 {/* x axis label */}
                                 <Text
@@ -258,7 +276,7 @@ function Categorical({
                                     verticalAnchor="start"
                                     fill={darkmode?"#ffffff":"#000000"}
                                     textAnchor="middle">
-                                    {isColorAttributeSuccess ? colorAttribute.text : ""}
+                                    {attributeTagToText.get(colorName) ? attributeTagToText.get(colorName) : colorName}
                                 </Text>
                                 
                                 {colorCategories.map(colorCategory => {
@@ -269,7 +287,7 @@ function Categorical({
                                     
                                     const yPosition = yScale(dataForColorCategory[yaxisName])
                                     const errorValue = dataForColorCategory[errorName]
-
+                                    console.log(boxQuantiles, "BOXQUANTILES", dataForColorCategory, dataForColorCategory[yaxisName])
                                     return (
                                         <Group
                                             key={`bar-error-${colorCategory}`}
@@ -326,6 +344,8 @@ function Categorical({
                     yScaleStartsAtZero : false,
                     minMaxYDomain,
                     svgRef: containerRef,
+                    caTagToText,
+                    attributeTagToText
                 }}>
             {(categoricalData) => categoricalData.map((
                 {
@@ -347,10 +367,11 @@ function Categorical({
                     xcenter,
                     subplotCategoryFound,
                     colorCategoryFound,
-                    splitCategoryFound}, didx) => {
+                    splitCategoryFound,
+                    caTagToText,
+                    attributeTagToText}, didx) => {
                 const subplotStart = subplotScale(subplotCategory)
                 const subplotWidth = subplotScale.bandwidth()
-                
                   return(
                         <g key={`${subplotCategory}-subplot`}>
 
@@ -360,9 +381,11 @@ function Categorical({
                                 margins={margins}
                                 leftScale={yScale}
                                 leftTickLabelsVisible={didx === 0}
-                              bottomScale={splitScale}
-                              bottomTicksAreConditionApplicationLabels={bottomTicksAreConditionApplicationLabels}
+                                bottomScale={splitScale}
+                                bottomTicksAreConditionApplicationLabels={bottomTicksAreConditionApplicationLabels}
                                 bottomLabel={""}
+                                caTagToText={caTagToText}
+                                attributeTagToText={attributeTagToText}
                                 bandwidth={splitScale.bandwidth() * 1.1}
                                 leftLabel={didx === 0 ? _.isString(yaxisLabel)?yaxisLabel:yaxisName : ""}
                                 {...{ chartHeight, chartWidth :  subplotWidth }} />
@@ -370,7 +393,7 @@ function Categorical({
                           {subplotCategoryFound ?
                               <g>
                               
-                                      <ConditionApplicationLabel x={xcenter} y={margins.top + 12} tag={subplotCategory} />
+                                      <ConditionApplicationLabel caTagToText={caTagToText} x={xcenter} y={margins.top + 12} tag={subplotCategory} />
                                 
                               </g> : null}
                           
@@ -378,7 +401,7 @@ function Categorical({
                               x={margins.left + chartWidth / 2}
                               y={margins.top + chartHeight + 25}
                               verticalAnchor="start"
-                              textAnchor="middle">{isSplitAttributeSuccess && _.isObject(splitAttribute) ? splitAttribute.text : splitName}</Text> : null}
+                              textAnchor="middle">{_.isObject(attributeTagToText) && _.isString(attributeTagToText.get(splitName)) ? attributeTagToText.get(splitName): splitName}</Text> : null}
                         
                           
                         {/* {If there is not split but a subplot} */}
@@ -391,7 +414,7 @@ function Categorical({
                                     const boxQuantiles = extractQuantileData(subplotDataArray, yScale)
                                     return (
                                         <Group left={subplotStart}
-                                            onMouseEnter={e => handleMouseOver(e, getTooltipData(subplotDataArray))}
+                                            onMouseEnter={e => handleMouseOver(e, getTooltipData({ data: subplotDataArray, value : subplotDataArray[yaxisName], errorValue: subplotDataArray[errorName] }))}
                                             onMouseLeave={hideTooltip}>
 
                                             <Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={colorScale(colorCategory)} x={xBar+boxWidth/2} width={boxWidth}/>
@@ -412,7 +435,7 @@ function Categorical({
                                   return (
                                       <Group
                                         left={subplotStart}
-                                        onMouseEnter={e => handleMouseOver(e, getTooltipData(subplotDataArray))}
+                                        onMouseEnter={e => handleMouseOver(e, getTooltipData({ data: subplotDataArray, value : subplotDataArray[yaxisName], errorValue: subplotDataArray[errorName] }))}
                                         onMouseLeave={hideTooltip}>
                                           
                                           <Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={colorScale()} x={xBar+boxWidth/2} width={boxWidth}/>
@@ -441,7 +464,7 @@ function Categorical({
                                     
                                 return (
                                     <Group key={`${colorIdx}-${subplotCategory}-${colorCategory}`}
-                                        onMouseEnter={e => handleMouseOver(e, getTooltipData(colorCatData))}
+                                        onMouseEnter={e => handleMouseOver(e, getTooltipData({ data: colorCatData, value : colorCatData[yaxisName], errorValue: colorCatData[errorName] }))}
                                         onMouseLeave={hideTooltip}>
                                         <Box stroke={darkmode?"#ffffff":"#000000"} {...boxQuantiles} fill={color} x={xBar+colorBandwidth/2} width={colorBandwidth}/>
                                         

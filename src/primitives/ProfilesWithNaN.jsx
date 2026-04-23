@@ -49,7 +49,7 @@ function SplitProfile({ ys, xs, yScale, xScale, stroke, strokeWidth }) {
                     r={2}
                     fill={stroke} />
                 
-                const linePoints = split.map(i => ({ x: xScale(xs[i]), y: yScale(ys[i]) }))
+                const linePoints = split.map(i => ({ x: xScale(xs[i]), y: yScale(ys[i]) })).filter(p => _.isFinite(p.x) && _.isFinite(p.y))
                 return <polyline key={`${idx}`} points={linePoints.map(p => `${p.x},${p.y}`).join(" ")}
                     fill="none"
                     stroke={stroke}

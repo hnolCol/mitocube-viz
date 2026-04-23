@@ -26,7 +26,8 @@ SingleCategoricalChart.propTypes = {
     yScaleStartsAtZero: PropTypes.bool,
     darkmode: PropTypes.bool,
     children: PropTypes.func,
-    chartType: PropTypes.oneOf(["boxplot","barplot","lineplot"])
+    chartType: PropTypes.oneOf(["boxplot", "barplot", "lineplot"]),
+    caTagToText : PropTypes.object
 }
 
 SingleCategoricalChart.defaultProps = {
@@ -125,6 +126,8 @@ function SingleCategoricalChart({
     darkmode,
     children,
     chartType,
+    caTagToText,
+    attributeTagToText
 }) {
 
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
@@ -209,7 +212,9 @@ function SingleCategoricalChart({
             chartType,
             darkmode,
             colorBandwidth : splitColorScale.bandwidth(),
-            xcenter: margins.left + chartWidth/2,
+            xcenter: margins.left + chartWidth / 2,
+            caTagToText,
+            attributeTagToText
         }
     })
     return (

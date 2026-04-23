@@ -10,7 +10,6 @@ import { getColorPalette } from "../../colors/palette";
 import { useTooltip, useTooltipInPortal } from "@visx/tooltip";
 import { localPoint } from "@visx/event"
 import { ConditionApplicationsView } from "../../../../mitocube-frontend/src/comps/core/base/condition_applications/ConditionApplicationView";
-import hooks from "@mitocube/api-hooks"
 import { Attribute } from "../../../../mitocube-frontend/src/comps/core/base/attributes/Attribute";
 
 
@@ -30,12 +29,9 @@ import { Attribute } from "../../../../mitocube-frontend/src/comps/core/base/att
  * the tooltip will fetch data from the mitocube backend to get the required information. 
  * @returns 
  */
-function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOver, handleMouseLeave, is_condition_application }) {
-    
+function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOver, handleMouseLeave, is_condition_application, attributeTagMap }) {
     const uniqueValues = _.uniq(data.map(d => _.isArray(d[keyName]) ? _.join(d[keyName], ",") : d[keyName]));
-    const { data: attribute, isSuccess } = hooks.attributes.useGetAttribute({tag : keyName}, {enabled : is_condition_application})    
-
-    
+    const isSuccess = true
     /**
      * @description The colorScale for the individual groups of the grouping. 
      */
@@ -73,7 +69,7 @@ function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOv
                 verticalAnchor="middle"
                 fontSize={height * 0.8}
                 fill="#000000">
-                {is_condition_application ? isSuccess ? attribute.text : '' : keyName}
+                {is_condition_application ? isSuccess ? attributeTagMap.get(keyName).text : '' : keyName}
             </Text>
         </g>
     )
@@ -117,7 +113,7 @@ HeatmapGrouping.defaultProps = {
  * the tooltip will fetch data from the mitocube backend to get the required information.
  * @returns 
  */
-export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, verticalMargin, keyNames, stroke, tooltipNames, is_condition_application}) {
+export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, verticalMargin, keyNames, stroke, tooltipNames, is_condition_application, caTagMap, attributeTagMap}) {
 
     const N = keyNames.length // number of grouping rows 
     const heatmapSVGHeight = (N+1) * (binHeight + verticalMargin)
@@ -168,18 +164,19 @@ export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, vert
                     stroke={stroke}
                     handleMouseOver={handleMouseOver}
                     handleMouseLeave={hideTooltip}
+                    attributeTagMap={attributeTagMap}
                     colorIndex={index} N={N} is_condition_application={is_condition_application[index]} />
             ))}
             </g>
             </SVG>
             {tooltipOpen ? <TooltipInPortal left={tooltipLeft} top={tooltipTop} key={Math.random()}>
                 <div style={{maxWidth: "20rem", wordWrap: "break-word", overflowWrap: "break-word"}}>
-                    <h3 style={{wordWrap: "break-word"}}>{tooltipData.is_condition_application ? <Attribute attribute_tag={tooltipData.keyName} /> : tooltipData.keyName}</h3>
+                    <h3 style={{wordWrap: "break-word"}}>{tooltipData.is_condition_application ? <span>{attributeTagMap.get(tooltipData.keyName).text}</span> : tooltipData.keyName}</h3>
                     
                     <div style={{wordWrap: "break-word"}}>{tooltipData.is_condition_application ?
                         tooltipData[tooltipData.keyName].map(ca_tag =>
-                            <ConditionApplicationsView key={ca_tag} tag={ca_tag} />)
-                        : tooltipData[tooltipData.keyName]}</div>
+                            <span key={ca_tag}><strong>{caTagMap.get(ca_tag)}</strong></span>
+                        ) : tooltipData[tooltipData.keyName]}</div>
                     {/* Check the number of samples with the string. */}
                     
                     <div style={{wordWrap: "break-word"}}>N: {data.map(d => _.join(d[tooltipData.keyName], ",")).filter(di => di === _.join(tooltipData[tooltipData.keyName], ",")).length}</div>

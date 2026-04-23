@@ -50,7 +50,6 @@ export function MinimalBoxplot({ q, boxWidth, width, height, margins, yaxisLabel
     
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     const checkedBoxWidth = _.isNumber(boxWidth) && boxWidth < chartWidth ? boxWidth : chartWidth / 2
-    console.log(q)
     const yScale = useMemo(() => { 
         return scaleLinear(
                 {

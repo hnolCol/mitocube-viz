@@ -36,7 +36,8 @@ import hooks from "@mitocube/api-hooks"
  */
 export function ProteinLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAnchor = "middle", textAnchor = "start", fill = "#000000" }) {
 
-    const { data: protein, isSuccess } = hooks.features.proteins.useGetProteinByTag({ tag: text }, { enabled: typeof text === "string" })
+    // const { data: protein, isSuccess } = hooks.features.proteins.useGetProteinByTag({ tag: text }, { enabled: typeof text === "string" })
+    
     return (
         <Text {...{
             x,
@@ -48,7 +49,7 @@ export function ProteinLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, vertic
             fontSize,
             fill
         }}>
-            {isSuccess ? protein.gene_name : text}
+            {isSuccess ? text : text}
         </Text>
     )
 }

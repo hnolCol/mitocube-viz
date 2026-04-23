@@ -2,9 +2,6 @@ import React from "react"
 import { AxisBottom, AxisLeft } from "@visx/axis"
 import _ from "lodash"
 
-
-
-
 import { AxisBackground } from "./Background"
 import { getAxisStrokeColor } from "../colors/stroke"
 import { getNumberTicks } from "./ticks"
@@ -29,6 +26,7 @@ function XYAxisWithBackground({
     leftTickLabelProps = {},
     bottomTickLabelProps = {},
     bottomTicksAreConditionApplicationLabels = false,
+    caTagToText,
     bandwidth,
     chartHeight,
     chartWidth,
@@ -61,6 +59,7 @@ function XYAxisWithBackground({
                 width={chartWidth}
                 fill={darkmode ? "#2b2b2b" : "#fafafa"}
             />   
+
             <AxisLeft
                 label={leftLabel} //label only first axis
                 labelOffset={30}
@@ -78,7 +77,7 @@ function XYAxisWithBackground({
             
             <AxisBottom
                 left={moveBottomToLeft ? leftStart : 0}
-                tickComponent={({ x, y, formattedValue }) => bottomHideTickLabels ? null : bottomTicksAreConditionApplicationLabels ? <ConditionApplicationLabel x={x} y={y} tag={formattedValue} textProps={bottomTickLabelProps} /> : <Text x={x} y={y} textAnchor="middle" fontSize="0.8rem" verticalAnchor="middle" {...bottomTickLabelProps}>{formattedValue}</Text>}
+                tickComponent={({ x, y, formattedValue }) => bottomHideTickLabels ? null : bottomTicksAreConditionApplicationLabels ? <ConditionApplicationLabel x={x} y={y} tag={formattedValue} textProps={bottomTickLabelProps} caTagToText={caTagToText} /> : <Text x={x} y={y} textAnchor="middle" fontSize="0.8rem" verticalAnchor="middle" {...bottomTickLabelProps}>{formattedValue}</Text>}
                 top={topStart}
                 label={bottomLabel}
                 hideTicks={bottomHideTicks}
@@ -96,6 +95,7 @@ function XYAxisWithBackground({
         </g>
     )
 }
+
 
 
 function areEqual(prevProps, nextProps) {

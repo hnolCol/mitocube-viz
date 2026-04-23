@@ -35,7 +35,11 @@ import hooks from "@mitocube/api-hooks"
     }) {
     
     
-    const { data: protein, isSuccess } = hooks.features.proteins.useGetProteinByTag({ tag: data[index]["tag"] }, { enabled: _.isNumber(index) && isProtein && _.isString(data[index]["tag"]) })
+    // const { data: protein, isSuccess } = hooks.features.proteins.useGetProteinByTag({ tag: data[index]["tag"] }, { enabled: _.isNumber(index) && isProtein && _.isString(data[index]["tag"]) })
+    const protein = { gene_name: `ata[index]["tag"]` }
+    const isSuccess = true
+        
+
 
     let labelText = ""
     const labelStrings = labelNames.map(labelName => data[index][labelName]).filter(text => _.isString(text))
