@@ -49,7 +49,7 @@ export function ProteinLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, vertic
             fontSize,
             fill
         }}>
-            {isSuccess ? text : text}
+            {text}
         </Text>
     )
 }

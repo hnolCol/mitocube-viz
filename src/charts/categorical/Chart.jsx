@@ -120,7 +120,6 @@ function Categorical({
     attributeTagToText
 }) {
 
-    console.log(attributeTagToText)
     const colorAttribute = { text: colorName }
     const splitAttribute = { text: splitName }
     const isSplitAttributeSuccess = true 
@@ -167,7 +166,6 @@ function Categorical({
         }
         const tooltipInfo = _.map(tooltipNames,
             tooltipName => {
-                    console.log(tooltipName, data)
                 let tooltipValue = data[tooltipName.text]
 
                 return {
@@ -287,7 +285,6 @@ function Categorical({
                                     
                                     const yPosition = yScale(dataForColorCategory[yaxisName])
                                     const errorValue = dataForColorCategory[errorName]
-                                    console.log(boxQuantiles, "BOXQUANTILES", dataForColorCategory, dataForColorCategory[yaxisName])
                                     return (
                                         <Group
                                             key={`bar-error-${colorCategory}`}
