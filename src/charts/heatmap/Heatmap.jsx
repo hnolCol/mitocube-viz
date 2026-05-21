@@ -84,6 +84,7 @@ function Heatmap({
     handleSearchByDataIndex,
     resetSearchIdcs,
     searchIndices,
+    rerenderBackground,
     hoverIndices,
     setHoverDataByDataIndex,
     minMax,
@@ -93,8 +94,10 @@ function Heatmap({
     selectedClusters,
     setRequiredProteinTags,
     proteinTagMap,
-    refetchedTrigger
+    refetchedTrigger,
+    proteinIsLoading
 }) {
+
     const [scrollPos, setScrollPos] = useState(0)
     const uniqueColorValues = useMemo(() => colorNames.length > 0 ? getUniqueValuesInArrayOfObjects({data, keyName : colorNames}) : [], [_.join(colorNames),data.length])
     const uniqueClusterValues = useMemo(() => getUniqueValuesInArrayOfObjects({ data, keyName : clusterName }).filter(v => v!==undefined), [clusterName])
@@ -115,6 +118,13 @@ function Heatmap({
         // when tooltip containers are scrolled, this will correctly update the Tooltip position
         scroll: true,
     })
+
+
+    useEffect(() => {
+        if (searchIndices.size > 0 && !proteinIsLoading) {
+            setRequiredProteinTags([...searchIndices].map(idx => data[idx]["tag"]).filter(d => _.isString(d)))
+        }
+     }, [rerenderBackground])
 
     //value scale 
     /**
