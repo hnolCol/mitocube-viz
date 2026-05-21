@@ -6,7 +6,7 @@ import { getStrokeColor } from "../../colors/stroke"
 export function AnnotationRectangle({ x, y, width, height, stroke, tag, protein_tag, darkmode }) {
     
     // const { data : protein_in_annotation, isLoading } = hooks.annotations.proteins.useGetIsProteinInAnnotation({tag, protein_tag : protein_tag}, { enabled: _.isString(tag) && _.isString(protein_tag) })
-    const protein_in_annotation = true
+    const protein_in_annotation = false
     return (
         <rect
             x={x}
@@ -19,7 +19,7 @@ export function AnnotationRectangle({ x, y, width, height, stroke, tag, protein_
 }
 
 
-export function Annotations({ x, protein_tag, annotation_tags = ["dXtpH"], width, height, y, darkmode = false}) {
+export function Annotations({ x, protein_tag, annotation_tags = [], width, height, y, darkmode = false}) {
     
 
 

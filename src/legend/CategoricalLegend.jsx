@@ -52,7 +52,6 @@ const CategoricalLegend = React.memo(
 
     }) {
 
-        console.log(attributeTagToText)
 
         const {
         tooltipData,

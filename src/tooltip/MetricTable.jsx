@@ -12,7 +12,6 @@ function AttributeConditionApplication({ idx, attribute_tag, condition_applicati
     return <tr></tr>
     const { data : attribute, isSuccess : isSuccessAttribute } =  hooks.attributes.useGetAttribute({ tag : attribute_tag }, { enabled: _.isString(attribute_tag) })
     const { data: condition_application_text, isSuccess: isSuccessConditionApplication } = hooks.condition_applications.useGetConditionApplicationText({ tag: condition_application_tag }, { enabled: !!condition_application_tag })
-    console.log(attribute_tag, "???", condition_application_text, condition_application_tag)
     return (
         <tr key={`${idx}-metric-table-row`}>
             <td
@@ -59,7 +58,6 @@ function MetricTable({
     isConditionApplication = false,
     isGenotype = false 
 }) {
-    console.log(data)
     // Small default renderers for different contexts. You can replace these
     // with imports of real components if you have them elsewhere.
     const DefaultValue = ({ value }) => (

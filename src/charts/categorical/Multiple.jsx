@@ -75,15 +75,53 @@ function MultiCategoricalChart({
     attributeTagToText,
     children
 }) {
-    
-    const {chartHeight,chartWidth} = getChartWidthAndHeightWithMargins({width,height,margins})
+
+    const uniqueColorValues = _.uniqBy(data, colorName).map(d => d[colorName])
     const colorCategoryFound = _.isString(colorName) && _.has(data[0], colorName)
     const subplotCategoryFound = _.isString(subplotName) && _.has(data[0], subplotName)
     const splitCategoryFound = _.isString(splitName) && _.has(data[0], splitName)
 
     const subplotCategories =subplotCategoryFound?_.uniqBy(data, subplotName).map(d => d[subplotName]):[""]
-    const uniqueColorValues = _.uniqBy(data, colorName).map(d => d[colorName])
+    
     const splitCategories = splitCategoryFound?_.uniqBy(data, splitName).map(d => d[splitName]):[]
+    const colorScale = useMemo(() => {
+        // scale taking care of the fill color.
+        if (!colorCategoryFound) return () => getColorPalette(1)[0] //return a function that color the by in the default color if no colorName given
+        
+        var colorRange = []
+        if (colorPalette === undefined){
+            colorRange = getColorPalette(uniqueColorValues.length)
+        }
+        else if (_.isArray(colorPalette)) {
+            //check if colorPalette is same length? 
+            colorRange = colorPalette.slice()
+        }
+        else if (_.isObject(colorPalette)) {
+            // if an object is provided each colorValue must be in the color Palette
+            if (uniqueColorValues.filter(uniqueColorValue => !_.has(colorPalette, uniqueColorValue)).length !== 0) {
+                colorRange  = getColorPalette(uniqueColorValues.length)
+            }
+            else {
+                colorRange = uniqueColorValues.map(uniqueColorValue => colorPalette[uniqueColorValue])
+            }
+        }
+        else {
+            colorRange = getColorPalette(uniqueColorValues.length)
+        }
+
+        return (
+            scaleOrdinal({
+                domain: uniqueColorValues, 
+                range : colorRange
+            })
+        )
+    }, [colorName, uniqueColorValues])
+
+    const hasLegend = _.isFunction(colorScale) && _.has(colorScale, "domain")
+    const adjustedWidth = hasLegend  ? width - 150 : width
+    const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width: adjustedWidth, height, margins })
+    
+   
     
     const subplotScale = useMemo(() => {
         //scale for the subplot
@@ -126,38 +164,7 @@ function MultiCategoricalChart({
         )
     }, [splitScale, splitName, colorName, splitCategoryFound])
 
-    const colorScale = useMemo(() => {
-        // scale taking care of the fill color.
-        if (!colorCategoryFound) return () => getColorPalette(1)[0] //return a function that color the by in the default color if no colorName given
-        
-        var colorRange = []
-        if (colorPalette === undefined){
-            colorRange = getColorPalette(uniqueColorValues.length)
-        }
-        else if (_.isArray(colorPalette)) {
-            //check if colorPalette is same length? 
-            colorRange = colorPalette.slice()
-        }
-        else if (_.isObject(colorPalette)) {
-            // if an object is provided each colorValue must be in the color Palette
-            if (uniqueColorValues.filter(uniqueColorValue => !_.has(colorPalette, uniqueColorValue)).length !== 0) {
-                colorRange  = getColorPalette(uniqueColorValues.length)
-            }
-            else {
-                colorRange = uniqueColorValues.map(uniqueColorValue => colorPalette[uniqueColorValue])
-            }
-        }
-        else {
-            colorRange = getColorPalette(uniqueColorValues.length)
-        }
 
-        return (
-            scaleOrdinal({
-                domain: uniqueColorValues, 
-                range : colorRange
-            })
-        )
-    }, [colorName, uniqueColorValues])
 
     const yScale = useMemo(() => {
         // y scale 
@@ -205,14 +212,16 @@ function MultiCategoricalChart({
         }
     })
 
+    
+
     return (
         <div className="flex">
         <div>
-        <SVG {...{width,height,svgID,svgRef}}>
+        <SVG {...{width : adjustedWidth ,height,svgID,svgRef}}>
             <>{children(categoricalSplit)}</>
         </SVG>
         </div>
-        <div>{_.isFunction(colorScale) && _.has(colorScale, "domain") ? <CategoricalLegend {...{
+        <div>{hasLegend ? <CategoricalLegend {...{
                 colorName,
                 colorScale,
                 caTagToText,

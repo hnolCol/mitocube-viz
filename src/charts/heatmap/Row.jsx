@@ -94,6 +94,7 @@ function HeatmapRow({
     isLabelProteinTag,
     isLabelFeatureTag,
     annotation_tags = ["dXtpH"],
+    proteinTagMap,
     darkmode
 }) {
 
@@ -157,7 +158,7 @@ function HeatmapRow({
                         fill={getFillColor(darkmode)}
                         isLabelProteinTag={isLabelProteinTag}
                         isLabelFeatureTag={isLabelFeatureTag}
-                        text={labelString} /> : null}
+                        text={_.isMap(proteinTagMap) && proteinTagMap.has(labelString) ? proteinTagMap.get(labelString).text : labelString} /> : null}
                     </g>
 
 

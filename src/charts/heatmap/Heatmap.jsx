@@ -1,7 +1,7 @@
 import PropTypes from "prop-types"
 import _ from "lodash"
 
-import React, { useMemo, useState, useRef } from "react"
+import React, { useMemo, useState, useRef, useEffect } from "react"
 import { scaleLinear, scaleOrdinal } from "@visx/scale"
 import { useTooltip, useTooltipInPortal } from "@visx/tooltip"
 import { LegendItem, LegendLabel, LegendLinear } from "@visx/legend"
@@ -45,7 +45,7 @@ Heatmap.defaultProps = {
     valueNames: ["v", "v1"],
     clusterName: "c",
     colorNames: ["B", "C"],
-    labelNames: ["B"],
+    labelNames: ["tag"],
     binHeight: 15,
     legendElementSize: 20,
     matchWidth: true,
@@ -56,7 +56,8 @@ Heatmap.defaultProps = {
     setHoverDataByDataIndex: () => {},
     minMax: [-6, 6],
     darkmode: false,
-    selectedClusters : []
+    selectedClusters: [],
+    
 }
 
 /**
@@ -89,10 +90,11 @@ function Heatmap({
     darkmode,
     isLabelFeatureTag,
     isLabelProteinTag,
-    selectedClusters
+    selectedClusters,
+    setRequiredProteinTags,
+    proteinTagMap,
+    refetchedTrigger
 }) {
-    
-    
     const [scrollPos, setScrollPos] = useState(0)
     const uniqueColorValues = useMemo(() => colorNames.length > 0 ? getUniqueValuesInArrayOfObjects({data, keyName : colorNames}) : [], [_.join(colorNames),data.length])
     const uniqueClusterValues = useMemo(() => getUniqueValuesInArrayOfObjects({ data, keyName : clusterName }).filter(v => v!==undefined), [clusterName])
@@ -107,7 +109,6 @@ function Heatmap({
     const refScrollContainer = useRef(null)
     let minIdx = 0
     let maxIdx = 20
-
     const { containerRef, TooltipInPortal } = useTooltipInPortal({
         // use TooltipWithBounds
         detectBounds: true,
@@ -181,6 +182,12 @@ function Heatmap({
         maxIdx = _.toInteger(minIdx + refScrollContainer.current.clientHeight / binHeight)
     }
 
+    useEffect(() => {
+        const tags = labels.filter((l, idx) => idx >= minIdx && idx <= maxIdx).map(label => label.includes(";") ?  label.split(";") : label).flat() 
+        setRequiredProteinTags(tags)
+    }, [minIdx,maxIdx])
+
+
 
     return (
         
@@ -202,8 +209,9 @@ function Heatmap({
                     var labelString = labelsExist ? labels[index] : undefined
 
                     return (
-                        <HeatmapRow {...{
-                            key: `${index}-${rowNumber}-${labelString}`,
+                        <HeatmapRow
+                            key={`${index}-${rowNumber}-${labelString}`}
+                            {...{
                             data : data[index],
                             valueNames,
                             rowNumber,
@@ -227,7 +235,8 @@ function Heatmap({
                             handleMouseLeave: handleMouseLeavesRow,
                             darkmode,
                             isLabelProteinTag,
-                            isLabelFeatureTag
+                            isLabelFeatureTag,
+                            proteinTagMap
                         }} />
                     )
                 })}
