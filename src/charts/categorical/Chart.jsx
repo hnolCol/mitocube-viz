@@ -133,6 +133,7 @@ function Categorical({
         : getColorPalette(uniqueColorValuesFromData.length, darkmode)
     // map colors to color attribute values 
     const legendColors = Object.fromEntries(uniqueColorValuesFromData.map((d, idx) => [d[colorName], colorValues[idx]]))
+    
     const {
         tooltipData,
         tooltipLeft,
@@ -479,10 +480,8 @@ function Categorical({
                 top={tooltipTop}
                 left={tooltipLeft}
                 >   
-                    {_.isArray(tooltipData) ? <MetricTable data={tooltipData} /> : null}
-                    {/* <div className="flex flex-column">
-                        {Object.keys(tooltipData).map(qLabel => <div key={qLabel}>{qLabel} : <span className="h0-span">{tooltipData[qLabel]}</span></div>)}
-                         */}
+                    {_.isArray(tooltipData) ? <MetricTable data={tooltipData} caTagToText={caTagToText} attributeTagToText={attributeTagToText} colorMap={legendColors} /> : null}
+
 
                 </TooltipInPortal>
             )}            

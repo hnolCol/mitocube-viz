@@ -7,22 +7,24 @@ import { copyTextToClipboardFromArrayOfObjects } from "../utils/copy"
 import hooks from "@mitocube/api-hooks" 
 
 
-function AttributeConditionApplication({ idx, attribute_tag, condition_application_tag }) {
-    
-    return <tr></tr>
-    const { data : attribute, isSuccess : isSuccessAttribute } =  hooks.attributes.useGetAttribute({ tag : attribute_tag }, { enabled: _.isString(attribute_tag) })
-    const { data: condition_application_text, isSuccess: isSuccessConditionApplication } = hooks.condition_applications.useGetConditionApplicationText({ tag: condition_application_tag }, { enabled: !!condition_application_tag })
+function AttributeConditionApplication({ idx, attribute_tag, condition_application_tag, caTagToText, attributeTagToText, colorMap }) {
+    const hexColor = colorMap?.[condition_application_tag] || "#000000" 
+    console.log(hexColor)
+    const attributeText = attributeTagToText.get(attribute_tag)
+    const conditionApplicationText = condition_application_tag.includes(";") ? condition_application_tag.split(";").map(tag => caTagToText.get(tag)).join(";") : caTagToText.get(condition_application_tag)
+
+   
     return (
         <tr key={`${idx}-metric-table-row`}>
             <td
                 className="table__item table__item--align-right table__item--wrap"
             >
-                {isSuccessAttribute ? attribute.text : "..."}
+                {attributeText ? attributeText : "..."}
             </td>
             <td
                 className="table__item table__item--align-left bg--lightgrey table__item--wrap"
             >
-                {isSuccessConditionApplication ? condition_application_text : "..."}
+                <strong style={{ color: hexColor }}>{conditionApplicationText ? conditionApplicationText : "..."}</strong>
             </td>
         </tr>
     )
@@ -34,7 +36,9 @@ MetricTable.propTypes = {
     data: PropTypes.array,
     showClipboard: PropTypes.bool,
     round: PropTypes.bool,
-    roundPrecision: PropTypes.number
+    roundPrecision: PropTypes.number,
+    caTagToText: PropTypes.object,
+    attributeTagToText: PropTypes.object
 }
 
 /**
@@ -56,7 +60,10 @@ function MetricTable({
     roundPrecision = 2,
     isAttribute = false,
     isConditionApplication = false,
-    isGenotype = false 
+    isGenotype = false,
+    caTagToText = {},
+    attributeTagToText = {},
+    colorMap = {}
 }) {
     // Small default renderers for different contexts. You can replace these
     // with imports of real components if you have them elsewhere.
@@ -108,7 +115,7 @@ function MetricTable({
     }
 
     return (
-        <div className="table__container" style={{ maxWidth: "15rem", fontSize: "0.75rem" }}>
+        <div className="table__container" style={{ maxWidth: "20rem", fontSize: "0.75rem" }}>
             {showClipboard ? <button onClick={() => copyTextToClipboardFromArrayOfObjects({ data })}> Copy to Clipboard </button> : null}
             <table>
                 <tbody>
@@ -118,7 +125,10 @@ function MetricTable({
                             if (d.type === "attribute") return <AttributeConditionApplication
                                     key={`${idx}-metric-table-row`}
                                     idx={idx} attribute_tag={d.text}
-                                    condition_application_tag={d.value} />
+                                    condition_application_tag={d.value}
+                                    caTagToText={caTagToText}
+                                    attributeTagToText={attributeTagToText}
+                                    colorMap={colorMap} />
                             return (
                                 <tr key={`${idx}-metric-table-row`}>
                                     <td className="table__item table__item--align-right">
