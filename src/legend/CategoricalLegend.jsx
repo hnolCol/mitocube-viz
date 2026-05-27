@@ -6,7 +6,7 @@ import _ from "lodash"
 
 
 export function ConditionApplicationLegendLabel({ tag, props, caTagToText }) {
-    const condition_application_text = caTagToText.get(tag)     
+    const condition_application_text = tag.includes(";") ? tag.split(";").map(t => caTagToText.get(t)).join(", ") : caTagToText.get(tag)
     return <LegendLabel {...props}>
         {_.isString(condition_application_text) ? condition_application_text : "" }
     </LegendLabel>
@@ -46,7 +46,7 @@ const CategoricalLegend = React.memo(
         colorName,
         filterDataInKeyByValue,
         resetSearchIdcs,
-        size = 25,
+        size = 20,
         caTagToText,
         attributeTagToText
 
@@ -54,14 +54,14 @@ const CategoricalLegend = React.memo(
 
 
         const {
-        tooltipData,
-        tooltipLeft,
-        tooltipTop,
-        tooltipOpen,
-        showTooltip,
-        hideTooltip,
-    
-    } = useTooltip();
+            tooltipData,
+            tooltipLeft,
+            tooltipTop,
+            tooltipOpen,
+            showTooltip,
+            hideTooltip,
+        
+        } = useTooltip();
 
         
     /**
@@ -98,18 +98,18 @@ const CategoricalLegend = React.memo(
 
     return (
         <div>
-            <div className="flex" style={{maxWidth, maxHeight : "900px", overflowY:"scroll"}}>
+            <div className="flex" style={{maxWidth, maxHeight : "400px", overflowY:"scroll"}}>
                 {_.has(colorScale, "domain") ? attributeTagToText.get(colorName) ?
                     <div className="margin-left--little">
                     {/* //onMouseLeave={() => resetSearchIdcs(chartIdx)} */}
-                        <div style={{maxWidth : "10rem"}}><h4>{attributeTagToText.get(colorName)}</h4></div>
+                        <div style={{maxWidth : "12rem"}}><h5>{attributeTagToText.get(colorName)}</h5></div>
                         <LegendOrdinal scale={colorScale}>
                             {(labels) => labels.map((label, idx) => {
                                 if (idx > 25) return null
                                 return (
                                     <LegendItem key={`${idx}-${label}`} >
-                                        {renderLegendRectangle(size, label.value, size / 3)}
-                                        <ConditionApplicationLegendLabel caTagToText={caTagToText} tag={label.text} props={{ align: "left", margin: "0 4px", onMouseEnter: (e) => handleTooltip(e, [label.text], attributeTagToText.get(colorName)), onMouseLeave: hideTooltip }} />
+                                        {renderLegendRectangle(size, label.value, size / 3.5)}
+                                        <ConditionApplicationLegendLabel caTagToText={caTagToText}  tag={label.text} props={{margin: "0 12px", onMouseEnter: (e) => handleTooltip(e, [label.text], attributeTagToText.get(colorName)), onMouseLeave: hideTooltip, style : {fontSize : "0.75rem"} }} />
                                     </LegendItem>
                                 )
                             })}

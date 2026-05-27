@@ -9,7 +9,6 @@ import hooks from "@mitocube/api-hooks"
 
 function AttributeConditionApplication({ idx, attribute_tag, condition_application_tag, caTagToText, attributeTagToText, colorMap }) {
     const hexColor = colorMap?.[condition_application_tag] || "#000000" 
-    console.log(hexColor)
     const attributeText = attributeTagToText.get(attribute_tag)
     const conditionApplicationText = condition_application_tag.includes(";") ? condition_application_tag.split(";").map(tag => caTagToText.get(tag)).join(";") : caTagToText.get(condition_application_tag)
 
