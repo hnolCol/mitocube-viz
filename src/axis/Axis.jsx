@@ -81,11 +81,11 @@ function XYAxisWithBackground({
                 top={topStart}
                 label={bottomLabel}
                 hideTicks={bottomHideTicks}
-                labelProps={{fontSize: "0.8rem", verticalAnchor:"middle", textAnchor :"middle", dy:5, width : 0.8 * chartWidth, fill : darkmode ? "#FFFFFF" : "#000000"}}
+                labelProps={{fontSize: "0.8rem", verticalAnchor:"middle", textAnchor :"middle", dy: 5, width : 0.8 * chartWidth, fill : darkmode ? "#FFFFFF" : "#000000"}}
                 tickLabelProps={{ fontSize: "0.8rem", dy : -2, verticalAnchor: "middle", ...bottomTickLabelProps }}
-                labelOffset={16}
+                labelOffset={25}
                 tickLineProps={{stroke : darkmode ? "#FFFFFF" : "#000000"}}
-                numTicks={getNumberTicks(chartWidth)}
+                numTicks={bottomTicksAreConditionApplicationLabels ? bottomScale.domain().length : getNumberTicks(chartWidth)}
                 scale={bottomScale}
                 stroke={getAxisStrokeColor(darkmode)}
                 tickLength={3}

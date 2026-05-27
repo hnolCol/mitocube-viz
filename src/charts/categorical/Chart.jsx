@@ -125,11 +125,6 @@ function Categorical({
     const isSplitAttributeSuccess = true 
     const isColorAttributeSuccess = true
 
-    // Fetch attribute info for labels
-    // const { data: colorAttribute, isSuccess : isColorAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: colorName }, { enabled: _.isString(colorName) && !!colorName })
-    // const { data: splitAttribute, isSuccess : isSplitAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: splitName }, { enabled: _.isString(splitName) && !!splitName })
-    // const { data: subplotAttribute, isSuccess : isSubplotAttributeSuccess } = hooks.attributes.useGetAttribute({ tag: subplotName }, { enabled: _.isString(subplotName) && !!subplotName })
-
     // get color values for legend/label 
     const uniqueColorValuesFromData = _.uniqBy(data, colorName)
     const useCustomPalette = _.isArray(colorPalette) && colorPalette.length === uniqueColorValuesFromData.length
@@ -270,7 +265,7 @@ function Categorical({
                                 {/* x axis label */}
                                 <Text
                                     x={margins.left + chartWidth / 2}
-                                    y={margins.top + chartHeight + 25}
+                                    y={margins.top + chartHeight + 35}
                                     verticalAnchor="start"
                                     fill={darkmode?"#ffffff":"#000000"}
                                     textAnchor="middle">
