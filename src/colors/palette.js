@@ -20,8 +20,37 @@ export const STD_CHART_COLOR_PALETTE = [
     "#d97a4b"
     ]
 
-export function getColorPalette(n, darkmode = false) {
-    const colorPalette = darkmode ? STD_CHART_COLOR_PALETTE_DARK : STD_CHART_COLOR_PALETTE;
+
+export const STD_CHART_COLOR_PALETTE_2 = [
+        "#A6CEE3",
+        "#1F78B4",
+        "#B2DF8A",
+        "#33A02C",
+        "#FB9A99",
+        "#E31A1C",
+        "#FDBF6F",
+        "#FF7F00",
+        "#CAB2D6",
+        "#6A3D9A",
+        "#FFFF99",
+        "#B15928"]
+
+export const STD_CHART_COLOR_PALETTE_3 = [
+    ["#BF616A", "#D08770", "#EBCB8B", "#A3BE8C", "#B48EAD"]
+]
+
+export const STD_CHART_COLOR_PALETTE_4 =  ["#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F", "#EDC948", "#B07AA1", "#FF9DA7", "#9C755F", "#BAB0AC"]
+
+
+const colorPalettes = new Map([
+  [0, STD_CHART_COLOR_PALETTE],
+  [1, STD_CHART_COLOR_PALETTE_2],
+  [2, STD_CHART_COLOR_PALETTE_3],
+  [3, STD_CHART_COLOR_PALETTE_4]
+]);
+
+export function getColorPalette(n, darkmode = false, paletteIndex = 0) {
+    const colorPalette = darkmode ? STD_CHART_COLOR_PALETTE_DARK : colorPalettes.get(paletteIndex) || STD_CHART_COLOR_PALETTE;
     return colorPalette.slice(0,n)
 }
 

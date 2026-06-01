@@ -225,7 +225,8 @@ function MultiCategoricalChart({
                 colorName,
                 colorScale,
                 caTagToText,
-                attributeTagToText
+                attributeTagToText,
+                maxWidth : 150
             }} /> : null}</div>
             
         </div>

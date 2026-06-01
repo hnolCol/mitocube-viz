@@ -29,7 +29,7 @@ import { Attribute } from "../../../../mitocube-frontend/src/comps/core/base/att
  * the tooltip will fetch data from the mitocube backend to get the required information. 
  * @returns 
  */
-function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOver, handleMouseLeave, is_condition_application, attributeTagMap }) {
+function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOver, handleMouseLeave, is_condition_application, attributeTagMap, colorIndex, darkmode = false }) {
     const uniqueValues = _.uniq(data.map(d => _.isArray(d[keyName]) ? _.join(d[keyName], ",") : d[keyName]));
     const isSuccess = true
     /**
@@ -40,9 +40,9 @@ function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOv
         if (uniqueValues.length === 0) return () => "#fafafa"
         return scaleOrdinal({
             domain: uniqueValues,
-            range : getColorPalette(uniqueValues.length)
+            range : getColorPalette(uniqueValues.length,darkmode,colorIndex)
         })
-    }, [keyName, _.join(uniqueValues, "-")])
+    }, [keyName, _.join(uniqueValues, "-"), darkmode, colorIndex])
     
 
     return (
@@ -113,7 +113,7 @@ HeatmapGrouping.defaultProps = {
  * the tooltip will fetch data from the mitocube backend to get the required information.
  * @returns 
  */
-export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, verticalMargin, keyNames, stroke, tooltipNames, is_condition_application, caTagMap, attributeTagMap}) {
+export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, verticalMargin, keyNames, stroke, tooltipNames, is_condition_application, caTagMap, attributeTagMap, darkmode = false }) {
 
     const N = keyNames.length // number of grouping rows 
     const heatmapSVGHeight = (N+1) * (binHeight + verticalMargin)
@@ -165,7 +165,7 @@ export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, vert
                     handleMouseOver={handleMouseOver}
                     handleMouseLeave={hideTooltip}
                     attributeTagMap={attributeTagMap}
-                    colorIndex={index} N={N} is_condition_application={is_condition_application[index]} />
+                    colorIndex={index} N={N} is_condition_application={is_condition_application[index]} darkmode={darkmode} />
             ))}
             </g>
             </SVG>
