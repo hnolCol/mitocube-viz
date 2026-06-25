@@ -4,13 +4,11 @@ import XYAxisWithBackground from "../../axis/Axis"
 import { useMemo, useRef } from "react";
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale";
 
-// import ProfileLine from "./Line"
-// import ProfileBars from "./Bars"
 
 import { QuantileBackground } from "./QuantileBackground";
 import { Group } from "@visx/group";
 import { Text } from "@visx/text";
-// import { FilterIndicator } from "../annotations/Filter";
+
 import _, { get } from "lodash"
 import { getQuantilesInArrayByKeyNames } from "../../utils/stats";
 import { addMarginToBoundaries, getChartWidthAndHeightWithMargins } from "../../utils/border";
@@ -53,7 +51,9 @@ export function ProfileChart({
     showQuantileBackground = false,
     showSplits = true,
     containsNaN = false,
-    darkmode = false
+    darkmode = false,
+    proteinTagMap,
+    splitByProtein = false
 }) {  
 
 
@@ -61,14 +61,15 @@ export function ProfileChart({
 
     // if (mergeHoverWithSearch && (hoverIndices.size > 0 || searchIndices.size > 0)) {
 
-    //     hoverIdcsInSubset = Array.from([...hoverIndices, ...searchIndices].filter(idx => subsetIndices.has(idx)))
+    //     hoverIdcsInSubset = Array.from([...hover Indices, ...searchIndices].filter(idx => subsetIndices.has(idx)))
     // } else {
     //     hoverIdcsInSubset = hoverIndices.size > 0 ? Array.from([...hoverIndices].filter(idx => subsetIndices.has(idx))) : []
     // }
 
 
     const uniqueSplitValues = _.isString(splitName) ? _.uniqBy(data, splitName).map(d => d[splitName]) : []
-
+    const B = uniqueSplitValues.map(val => proteinTagMap.has(val))
+    const uniqueSplitText = splitByProtein && proteinTagMap ? uniqueSplitValues.map(val => proteinTagMap.has(val) ?  proteinTagMap.get(val).text : val) : uniqueSplitValues
     const indexesBySplit = useMemo(() => {
         const groups = {};
         data.forEach((item, index) => {
@@ -180,7 +181,7 @@ export function ProfileChart({
                     <TextLabel
                         dx={1}
                         margins={margins}
-                        labelTexts={uniqueSplitValues}
+                        labelTexts={uniqueSplitText}
                         color={uniqueSplitValues.map(splitValue => colorScale(splitValue))}
                         isProtein={uniqueSplitValues.map(v => true)}/> 
                         

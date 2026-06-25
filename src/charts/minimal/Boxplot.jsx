@@ -46,11 +46,12 @@ MinimalBoxplot.defaultProps = {
  * @param {*} param0 
  * @returns 
  */
-export function MinimalBoxplot({ q, boxWidth, width, height, margins, yaxisLabel , rerender, showMedian, medianSuffix, roundToDigits }) {
+export function MinimalBoxplot({ q, boxWidth, width, height, margins, yaxisLabel ,  rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill="#efefef" }) {
     
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     const checkedBoxWidth = _.isNumber(boxWidth) && boxWidth < chartWidth ? boxWidth : chartWidth / 2
     const yScale = useMemo(() => { 
+        if (_.isFunction(preYScale)) return preYScale
         return scaleLinear(
                 {
                     domain: [q.max, q.min],
@@ -58,11 +59,12 @@ export function MinimalBoxplot({ q, boxWidth, width, height, margins, yaxisLabel
                     nice: true
                 }
             )
-        }, [chartHeight, rerender])
+    }, [chartHeight, rerender])
+    
     return (
         <SVG {...{ width, height }}>
 
-            <Box x={margins.left + checkedBoxWidth/2} q25={yScale(q.q1)} q75={yScale(q.q3)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.median)} fill={"#efefef"} width={checkedBoxWidth} />
+            <Box x={margins.left + checkedBoxWidth/2} q25={yScale(q.q1)} q75={yScale(q.q3)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.median)}  width={checkedBoxWidth} fill={fill} />
             {showMedian ? <TextLabel x={margins.left + checkedBoxWidth} dx={2} y={yScale(q.median)} labelTexts={[`${_.round(q.median, roundToDigits)} ${medianSuffix}`]} verticalAnchor={"middle"} textAnchor={"start"} totalYOffset={0} /> : null}
             <Text x={margins.left} dx={-4} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text> 
         </SVG>

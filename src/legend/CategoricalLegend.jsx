@@ -1,6 +1,6 @@
 import React from "react";
 import { LegendItem, LegendLabel, LegendOrdinal } from "@visx/legend";
-import { Tooltip, useTooltip } from "@visx/tooltip";
+import { Tooltip, useTooltip, useTooltipInPortal } from "@visx/tooltip";
 import _ from "lodash"
 
 
@@ -53,15 +53,24 @@ const CategoricalLegend = React.memo(
     }) {
 
 
-        const {
-            tooltipData,
-            tooltipLeft,
-            tooltipTop,
-            tooltipOpen,
-            showTooltip,
-            hideTooltip,
-        
-        } = useTooltip();
+    const {
+        tooltipData,
+        tooltipLeft,
+        tooltipTop,
+        tooltipOpen,
+        showTooltip,
+        hideTooltip,
+    } = useTooltip();
+    
+    const { containerRef, TooltipInPortal } = useTooltipInPortal({
+        // use TooltipWithBounds
+        detectBounds: true,
+        // when tooltip containers are scrolled, this will correctly update the Tooltip position
+        scroll: true,
+    })
+
+
+
 
         
     /**
@@ -98,9 +107,9 @@ const CategoricalLegend = React.memo(
 
     return (
         <div>
-            <div className="flex" style={{maxWidth : "150px", maxHeight : "400px", overflowY:"scroll"}}>
+            <div  className="flex" style={{maxWidth : "150px", maxHeight : "400px", overflowY:"scroll"}}>
                 {_.has(colorScale, "domain") ? attributeTagToText.get(colorName) ?
-                    <div className="margin-left--little">
+                    <div ref={containerRef}  className="margin-left--little">
                     {/* //onMouseLeave={() => resetSearchIdcs(chartIdx)} */}
                         <div style={{maxWidth : "12rem"}}><h5>{attributeTagToText.get(colorName)}</h5></div>
                         <LegendOrdinal scale={colorScale}>
@@ -116,12 +125,13 @@ const CategoricalLegend = React.memo(
                         </LegendOrdinal></div> : null  : null }
 
             </div>
+        
             {tooltipOpen && _.isObject(tooltipData) ?
-                <Tooltip top={tooltipTop} left={tooltipLeft} key={Math.random()}>
+                <TooltipInPortal top={tooltipTop} left={tooltipLeft} key={Math.random()}>
                     <div style={{ maxWidth: "300px", maxHeight: "400px", overflowY: "scroll" }}>
                         <span> this is a nice tool tip</span>
                     </div>
-            </Tooltip> : null}
+            </TooltipInPortal> : null}
 
         </div>
     )

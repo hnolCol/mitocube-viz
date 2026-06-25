@@ -42,7 +42,7 @@ export function TextLabel({x, y, margins, labelTexts, dx, dy, totalYOffset, font
 
             {labelTexts.map((text, textIdx) => {
                 const textProps = {
-                    key: `${text}-${textIdx}`,
+                    
                     fill : color ? color[textIdx] : "#000000",
                     x : x,
                     dx: dx,
@@ -54,6 +54,7 @@ export function TextLabel({x, y, margins, labelTexts, dx, dy, totalYOffset, font
                 }
                 if (isProtein[textIdx]) return <ProteinLabel text={text} {...textProps} />
                 return <Text
+                key = {`${text}-${textIdx}`}
                     {...textProps}>
                     {text}
                 </Text>

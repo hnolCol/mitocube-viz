@@ -14,7 +14,7 @@ import { ProfileChart } from "./src/charts/profile/ProfileChart"
 import { linearRegression } from "./src/utils/stats"
 import Line from "./src/primitives/Line"
 import { MinimalBoxplot } from "./src/charts/minimal/Boxplot"
-
+import { MinimalBoxplots } from "./src/charts/minimal/Boxplots"
 export default {
 
     axis: {
@@ -39,7 +39,8 @@ export default {
     },
     charts: {
         "minimal": {
-            "MinimalBoxplot" : MinimalBoxplot
+            "MinimalBoxplot": MinimalBoxplot,
+            "MinimalBoxplots": MinimalBoxplots
         },
         "Categorical": Categorical,
         "Heatmap": Heatmap,

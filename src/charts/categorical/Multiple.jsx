@@ -118,7 +118,7 @@ function MultiCategoricalChart({
     }, [colorName, uniqueColorValues])
 
     const hasLegend = _.isFunction(colorScale) && _.has(colorScale, "domain")
-    const adjustedWidth = hasLegend  ? width - 150 : width
+    const adjustedWidth = width
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width: adjustedWidth, height, margins })
     
    
@@ -215,13 +215,13 @@ function MultiCategoricalChart({
     
 
     return (
-        <div className="flex">
+        <div style={{position : "relative", }}>
         <div>
         <SVG {...{width : adjustedWidth ,height,svgID,svgRef}}>
             <>{children(categoricalSplit)}</>
         </SVG>
         </div>
-        <div>{hasLegend ? <CategoricalLegend {...{
+        <div style={{position : "absolute", top: 0, right: 0}}>{hasLegend ? <CategoricalLegend {...{
                 colorName,
                 colorScale,
                 caTagToText,
