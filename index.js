@@ -15,6 +15,8 @@ import { linearRegression } from "./src/utils/stats"
 import Line from "./src/primitives/Line"
 import { MinimalBoxplot } from "./src/charts/minimal/Boxplot"
 import { MinimalBoxplots } from "./src/charts/minimal/Boxplots"
+import { CrosslinkViewer, computeCrosslinkLayout, featureColor } from "./src/charts/crosslinks/Crosslinks"
+
 export default {
 
     axis: {
@@ -46,7 +48,10 @@ export default {
         "Heatmap": Heatmap,
         "HeatmapGrouping": HeatmapGrouping,
         "Network": Network,
-        "ProfileChart": ProfileChart
+        "ProfileChart": ProfileChart,
+        "CrosslinkViewer": CrosslinkViewer,
+        "computeCrosslinkLayout": computeCrosslinkLayout,
+        "featureColor": featureColor,
     },
     utils: {
         "linearRegression" : linearRegression
