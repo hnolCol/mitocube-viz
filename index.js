@@ -15,7 +15,9 @@ import { linearRegression } from "./src/utils/stats"
 import Line from "./src/primitives/Line"
 import { MinimalBoxplot } from "./src/charts/minimal/Boxplot"
 import { MinimalBoxplots } from "./src/charts/minimal/Boxplots"
-import { CrosslinkViewer, computeCrosslinkLayout, featureColor } from "./src/charts/crosslinks/Crosslinks"
+import { CrosslinkViewer } from "./src/charts/crosslinks/Crosslinks"
+import { computeCrosslinkLayout } from "./src/utils/crosslinks"
+import { featureColor } from "./src/colors/crosslinks"
 
 export default {
 
@@ -26,6 +28,9 @@ export default {
         palette: {
             STD_CHART_COLOR_PALETTE,
             STD_CHART_COLOR_PALETTE_DARK
+        },
+        crosslinks: {
+            featureColor
         }
     },
     text: {
@@ -49,10 +54,9 @@ export default {
         "HeatmapGrouping": HeatmapGrouping,
         "Network": Network,
         "ProfileChart": ProfileChart,
-        "CrosslinkViewer": CrosslinkViewer,
-        "computeCrosslinkLayout": computeCrosslinkLayout,
-        "featureColor": featureColor,
+        "CrosslinkViewer": CrosslinkViewer
     },
     utils: {
-        "linearRegression" : linearRegression
+        "linearRegression" : linearRegression,
+        "computeCrosslinkLayout": computeCrosslinkLayout
     }}
