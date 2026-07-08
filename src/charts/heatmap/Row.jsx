@@ -43,7 +43,6 @@ HeatmapRow.propTypes = {
     y: PropTypes.number.isRequired,
     labelsExist: PropTypes.bool,
     isLabelFeatureTag: PropTypes.bool,
-    isLabelProteinTag: PropTypes.bool,
     darkmode: PropTypes.bool
 };
 

@@ -20,10 +20,10 @@ export function ConditionApplicationLabel({ x, y, tag, textProps, caTagToText })
         return (
             <g>
                 {tags.map((t, idx) => (
-                    <Text key={idx} x={x} y={y + idx * 14} {...{ fill: "#333", fontSize: 12, textAnchor: "middle", verticalAnchor: "middle", fontSize: 12, ...textProps }}>{caTagToText.get(t)}</Text>
+                    <Text key={idx} x={x} y={y + idx * 14} {...{ fill: "#333",  textAnchor: "middle", verticalAnchor: "middle", fontSize: 12, ...textProps }}>{caTagToText.get(t)}</Text>
                 ))}
             </g>
         )
     }
-    return <Text x={x} y={y}  {...{ fill: "#333", fontSize: 12, textAnchor: "middle", verticalAnchor: "middle", fontSize: 12, ...textProps }}>{caTagToText.get(tag)}</Text>
+    return <Text x={x} y={y}  {...{ fill: "#333",  textAnchor: "middle", verticalAnchor: "middle", fontSize: 12, ...textProps }}>{caTagToText.get(tag)}</Text>
 }
