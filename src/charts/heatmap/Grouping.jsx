@@ -13,6 +13,16 @@ import { ConditionApplicationsView } from "../../../../mitocube-frontend/src/com
 import { Attribute } from "../../../../mitocube-frontend/src/comps/core/base/attributes/Attribute";
 
 
+function getGroupKey(d, keyName) {
+    return _.isArray(d[keyName]) ? _.join(d[keyName], ",") : d[keyName]
+}
+
+function getGroupLabel(value, is_condition_application, caTagMap) {
+    if (!is_condition_application) return value
+    if (!_.isString(value)) return value
+    return value.split(",").map(tag => (caTagMap && caTagMap.get(tag)) ? caTagMap.get(tag) : tag).join(", ")
+}
+
 /**
  * 
  * @param {Object} props 
@@ -29,21 +39,8 @@ import { Attribute } from "../../../../mitocube-frontend/src/comps/core/base/att
  * the tooltip will fetch data from the mitocube backend to get the required information. 
  * @returns 
  */
-function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOver, handleMouseLeave, is_condition_application, attributeTagMap, colorIndex, darkmode = false }) {
-    const uniqueValues = _.uniq(data.map(d => _.isArray(d[keyName]) ? _.join(d[keyName], ",") : d[keyName]));
+function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOver, handleMouseLeave, is_condition_application, attributeTagMap, colorScale }) {
     const isSuccess = true
-    /**
-     * @description The colorScale for the individual groups of the grouping. 
-     */
-    const colorScale = useMemo(() => {
-        
-        if (uniqueValues.length === 0) return () => "#fafafa"
-        return scaleOrdinal({
-            domain: uniqueValues,
-            range : getColorPalette(uniqueValues.length,darkmode,colorIndex)
-        })
-    }, [keyName, _.join(uniqueValues, "-"), darkmode, colorIndex])
-    
 
     return (
         <g>
@@ -56,7 +53,7 @@ function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOv
                         width={width}
                         height={height}
                         stroke={stroke}
-                        fill={colorScale(_.join(d[keyName], ","))}
+                        fill={colorScale(getGroupKey(d, keyName))}
                         onMouseOver={(event) => handleMouseOver(event, {...d, keyName: keyName, is_condition_application})}
                         onMouseLeave={handleMouseLeave}
                         />
@@ -75,6 +72,36 @@ function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOv
     )
 }
 
+
+function GroupingLegend({ keyNames, colorScales, is_condition_application, caTagMap, attributeTagMap, legendElementSize = 12 }) {
+    return (
+        <div className="flex flex-column" style={{ gap: "0.35rem" }}>
+            {keyNames.map((keyName, idx) => {
+                const scale = colorScales[idx]
+                const domain = scale.domain()
+                const title = is_condition_application[idx] && attributeTagMap && attributeTagMap.get(keyName)
+                    ? attributeTagMap.get(keyName).text
+                    : keyName
+
+                return (
+                    <div key={keyName} className="flex center-items flex-wrap" style={{ gap: "0.6rem" }}>
+                        <div style={{ fontWeight: 600, fontSize: "0.8rem", minWidth: "10rem" }}>{title}</div>
+                        <div className="flex center-items flex-wrap" style={{ gap: "0.75rem" }}>
+                            {domain.map(value => (
+                                <div key={value} className="flex center-items" style={{ gap: "0.3rem" }}>
+                                    <svg width={legendElementSize} height={legendElementSize}>
+                                        <rect width={legendElementSize} height={legendElementSize} fill={scale(value)} stroke="#000000" />
+                                    </svg>
+                                    <span style={{ fontSize: "0.75rem" }}>{getGroupLabel(value, is_condition_application[idx], caTagMap)}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )
+            })}
+        </div>
+    )
+}
 
 
 HeatmapGrouping.propTypes = {
@@ -124,13 +151,22 @@ export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, vert
         scroll: true,
     })
 
-    /**
-     * 
-     * @param {MouseEvent} event 
-     * @param {Object[]} tooltipData
-     */
-    const handleMouseOver = (event, tooltipData) => {
+    
+    const colorScales = useMemo(() => {
+        return keyNames.map((keyName, index) => {
+            const uniqueValues = _.uniq(data.map(d => getGroupKey(d, keyName)))
+            if (uniqueValues.length === 0) return scaleOrdinal({ domain: [], range: [] })
+            var colorPalette = getColorPalette(uniqueValues.length, darkmode, index)
+            const dashIdx = uniqueValues.indexOf("-")
+            if (dashIdx !== -1) colorPalette[dashIdx] = "#fafafa"
+            return scaleOrdinal({
+                domain: uniqueValues,
+                range: colorPalette
+            })
+        })
+    }, [_.join(keyNames, "-"), data.length, darkmode])
 
+    const handleMouseOver = (event, tooltipData) => {
         const coords = localPoint(event.target.ownerSVGElement, event);
         showTooltip({
             tooltipLeft: coords.x,
@@ -149,43 +185,48 @@ export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, vert
         return null
     }
     return (
-        <div>
-        <SVG {...{ width: heatmapSVGWidth, height: heatmapSVGHeight, svgRef: containerRef }}>
-        <g>
-            {keyNames.map((keyName, index) => (
-                <GroupingRow 
-                    data={data}
-                    key={`${index}-${keyName}`}
-                    x={startX}
-                    y={startY + index * (binHeight + verticalMargin)}
-                    width={binWidth}
-                    height={binHeight}
-                    keyName={keyName}
-                    stroke={stroke}
-                    handleMouseOver={handleMouseOver}
-                    handleMouseLeave={hideTooltip}
-                    attributeTagMap={attributeTagMap}
-                    colorIndex={index} N={N} is_condition_application={is_condition_application[index]} darkmode={darkmode} />
-            ))}
-            </g>
-            </SVG>
-            {tooltipOpen ? <TooltipInPortal left={tooltipLeft} top={tooltipTop} key={Math.random()}>
-                <div style={{maxWidth: "20rem", wordWrap: "break-word", overflowWrap: "break-word"}}>
-                    <h3 style={{wordWrap: "break-word"}}>{tooltipData.is_condition_application ? <span>{attributeTagMap.get(tooltipData.keyName).text}</span> : tooltipData.keyName}</h3>
-                    
-                    <div style={{wordWrap: "break-word"}}>{tooltipData.is_condition_application ?
-                        tooltipData[tooltipData.keyName].map(ca_tag =>
-                            <span key={ca_tag}><strong>{caTagMap.get(ca_tag)}</strong></span>
-                        ) : tooltipData[tooltipData.keyName]}</div>
-                    {/* Check the number of samples with the string. */}
-                    
-                    <div style={{wordWrap: "break-word"}}>N: {data.map(d => _.join(d[tooltipData.keyName], ",")).filter(di => di === _.join(tooltipData[tooltipData.keyName], ",")).length}</div>
-                    <div style={{wordWrap: "break-word"}}>Sample: {tooltipData.tag}</div>
-                    {_.isArray(tooltipNames) && tooltipNames.length > 0 ? tooltipNames.map((tooltipName, idx) => (
-                        <div key={`tooltip-${idx}`} style={{wordWrap: "break-word"}}>{`${tooltipName} : ${tooltipData[tooltipName]}`}</div>
-                    )) : null}
-                </div>
-            </TooltipInPortal> : null}
+        <div className="flex flex-column">
+            <div className="margin--medium">
+                <GroupingLegend keyNames={keyNames} colorScales={colorScales} is_condition_application={is_condition_application} caTagMap={caTagMap} attributeTagMap={attributeTagMap} />
+            </div>
+            <div>
+                <SVG {...{ width: heatmapSVGWidth, height: heatmapSVGHeight, svgRef: containerRef }}>
+                <g>
+                    {keyNames.map((keyName, index) => (
+                        <GroupingRow 
+                            data={data}
+                            key={`${index}-${keyName}`}
+                            x={startX}
+                            y={startY + index * (binHeight + verticalMargin)}
+                            width={binWidth}
+                            height={binHeight}
+                            keyName={keyName}
+                            stroke={stroke}
+                            handleMouseOver={handleMouseOver}
+                            handleMouseLeave={hideTooltip}
+                            attributeTagMap={attributeTagMap}
+                            colorScale={colorScales[index]}
+                            is_condition_application={is_condition_application[index]} />
+                    ))}
+                    </g>
+                    </SVG>
+                {tooltipOpen ? <TooltipInPortal left={tooltipLeft} top={tooltipTop} key={Math.random()}>
+                    <div style={{maxWidth: "20rem", wordWrap: "break-word", overflowWrap: "break-word"}}>
+                        <h3 style={{wordWrap: "break-word"}}>{tooltipData.is_condition_application ? <span>{attributeTagMap.get(tooltipData.keyName).text}</span> : tooltipData.keyName}</h3>
+                        
+                        <div style={{wordWrap: "break-word"}}>{tooltipData.is_condition_application ?
+                            tooltipData[tooltipData.keyName].map(ca_tag =>
+                                <span key={ca_tag}><strong>{caTagMap.get(ca_tag)}</strong></span>
+                            ) : tooltipData[tooltipData.keyName]}</div>
+                        
+                        <div style={{wordWrap: "break-word"}}>N: {data.map(d => _.join(d[tooltipData.keyName], ",")).filter(di => di === _.join(tooltipData[tooltipData.keyName], ",")).length}</div>
+                        <div style={{wordWrap: "break-word"}}>Sample: {tooltipData.tag}</div>
+                        {_.isArray(tooltipNames) && tooltipNames.length > 0 ? tooltipNames.map((tooltipName, idx) => (
+                            <div key={`tooltip-${idx}`} style={{wordWrap: "break-word"}}>{`${tooltipName} : ${tooltipData[tooltipName]}`}</div>
+                        )) : null}
+                    </div>
+                </TooltipInPortal> : null}
+            </div>
         </div>
     )
 }
