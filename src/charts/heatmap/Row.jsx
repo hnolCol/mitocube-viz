@@ -56,7 +56,6 @@ HeatmapRow.defaultProps = {
     handleMouseEnter: undefined,
     handleMouseLeave: undefined,
     isLabelFeatureTag: false,
-    isLabelProteinTag: false,
     darkmode: false
 };
 
