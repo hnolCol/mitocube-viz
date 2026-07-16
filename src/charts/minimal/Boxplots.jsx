@@ -47,7 +47,7 @@ MinimalBoxplots.defaultProps = {
  * @param {*} param0 
  * @returns 
  */
-export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLabel, rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true }) {
+export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLabel, rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true, xtickLabels = [] }) {
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     const checkedBoxWidth = _.isNumber(boxWidth) && boxWidth < chartWidth ? boxWidth : chartWidth / qs.length
     const fills = _.isArray(fill) && fill.length === qs.length ? fill : qs.map(() => fill)
@@ -66,6 +66,9 @@ export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLab
             }
         )
     }, [chartHeight, rerender])
+
+    console.log(xtickLabels)
+
     return (
         <SVG {...{ width, height }}>
 
@@ -74,6 +77,7 @@ export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLab
             {qs.map((q, i) => {
                 return <Box key={`boxplot-${i}`} x={margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween) } q25={yScale(q.q25)} q75={yScale(q.q75)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.m)} width={checkedBoxWidth} fill={fills[i]} />
             })}
+            {xtickLabels.map((label, i) => <Text key={`boxplot-xtick-${i}`} x={margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween)} y={height - margins.bottom} dy={0} fontSize={10} verticalAnchor={"middle"} textAnchor={"end"} angle={-90}  totalYOffset={0}>{label}</Text>)}
             {indicateN ? qs.map((q, i) => <Text
                 key={`idnicate-n-boxplot${i}`}
                 x={margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween)}
