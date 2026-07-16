@@ -77,7 +77,7 @@ function Heatmap({
     valueNames,
     clusterName,
     colorNames,
-    labelNames,
+    //labelNames,
     binHeight,
     legendElementSize,
     matchWidth,
@@ -99,19 +99,18 @@ function Heatmap({
 }) {
 
     const [scrollPos, setScrollPos] = useState(0)
-    const uniqueColorValues = useMemo(() => colorNames.length > 0 ? getUniqueValuesInArrayOfObjects({data, keyName : colorNames}) : [], [_.join(colorNames),data.length])
-    const uniqueClusterValues = useMemo(() => getUniqueValuesInArrayOfObjects({ data, keyName : clusterName }).filter(v => v!==undefined), [clusterName])
-    const heatmapValues = useMemo(() => _.map(data, d => _.map(valueNames, valueName => d[valueName])), [_.join(valueNames),data.length])
-    const labels = useMemo(() => { return labelNames.length > 0?_.map(data, d => _.join(_.map(labelNames, labelName => d[labelName])," | ")) : undefined}, [_.join(labelNames),data.length])
-    const labelsExist = _.isArray(labels)
+    const uniqueColorValues = useMemo(() => colorNames.length > 0 ? getUniqueValuesInArrayOfObjects({ data, keyName: colorNames }) : [], [_.join(colorNames), data.length])
+    const uniqueClusterValues = useMemo(() => getUniqueValuesInArrayOfObjects({ data, keyName: clusterName }).filter(v => v !== undefined), [clusterName])
+    const heatmapValues = useMemo(() => _.map(data, d => _.map(valueNames, valueName => d[valueName])), [_.join(valueNames), data.length])
+    //const labels = useMemo(() => { return labelNames.length > 0?_.map(data, d => _.join(_.map(labelNames, labelName => d[labelName])," | ")) : undefined}, [_.join(labelNames),data.length])
+    //const labelsExist = _.isArray(labels)
     const colorValuesExist = uniqueColorValues.length > 0
     const numberRows = data.length
     const heatmapSVGHeight = numberRows * binHeight
     const heatmapSVGWidth = valueNames.length * binHeight + colorNames.length * binHeight + 300
     const { tooltipData, tooltipOpen, tooltipLeft, tooltipTop, hideTooltip, showTooltip } = useTooltip()
     const refScrollContainer = useRef(null)
-    let minIdx = 0
-    let maxIdx = 20
+    
     const { containerRef, TooltipInPortal } = useTooltipInPortal({
         // use TooltipWithBounds
         detectBounds: true,
@@ -119,12 +118,21 @@ function Heatmap({
         scroll: true,
     })
 
+    
+    const {minIdx, maxIdx } = useMemo(() => {
+        if (refScrollContainer.current !== null) {
+            const minIdx = _.toInteger(scrollPos / binHeight)
+            const maxIdx = _.toInteger(minIdx + refScrollContainer.current.clientHeight / binHeight)
+            return { minIdx, maxIdx }
+        }
+        return { minIdx: 0, maxIdx: 20 }
+    }, [scrollPos, refScrollContainer.current, binHeight])
 
     useEffect(() => {
         if (searchIndices.size > 0 && !proteinIsLoading) {
             setRequiredProteinTags([...searchIndices].map(idx => data[idx]["tag"]).filter(d => _.isString(d)))
         }
-     }, [rerenderBackground])
+    }, [rerenderBackground])
 
     //value scale 
     /**
@@ -134,9 +142,10 @@ function Heatmap({
      */
     const valueScale = useMemo(() => {
         return scaleLinear({
-            domain: [minMax[0],0,minMax[1]],
-            range : getRedBlueColorScale()
-    })},[minMax,heatmapValues])
+            domain: [minMax[0], 0, minMax[1]],
+            range: getRedBlueColorScale()
+        })
+    }, [minMax, heatmapValues])
 
     /**
      * @description The colorScale for the individual clusters. 
@@ -147,7 +156,7 @@ function Heatmap({
         
         return scaleOrdinal({
             domain: uniqueClusterValues,
-            range : getColorPalette(uniqueClusterValues.length)
+            range: getColorPalette(uniqueClusterValues.length)
         })
     }, [clusterName])
 
@@ -171,13 +180,13 @@ function Heatmap({
 
         hoverIndices.clear()
         hoverIndices.add(index)
-        setHoverDataByDataIndex(undefined,hoverIndices)
+        setHoverDataByDataIndex(undefined, hoverIndices)
     }
 
     const handleMouseLeavesRow = () => {
 
         hoverIndices.clear()
-        setHoverDataByDataIndex(undefined,hoverIndices)
+        setHoverDataByDataIndex(undefined, hoverIndices)
     }
     //
 
@@ -187,16 +196,12 @@ function Heatmap({
     }
 
 
-    if (refScrollContainer.current !== null){
-        minIdx = _.toInteger(scrollPos / binHeight)
-        maxIdx = _.toInteger(minIdx + refScrollContainer.current.clientHeight / binHeight)
-    }
-
     useEffect(() => {
-        const tags = labels.filter((l, idx) => idx >= minIdx && idx <= maxIdx).map(label => label.includes(";") ?  label.split(";") : label).flat() 
-        setRequiredProteinTags(tags)
-    }, [minIdx,maxIdx])
-
+        
+        const proteinTagsDisplayInRange = dataIdcs.filter((dataIdx,idx) => idx >= minIdx && idx <= maxIdx).map(dataIdx => data[dataIdx]["tag"]).filter(tag => _.isString(tag)).map(tag => tag.includes(";") ? tag.split(";") : tag).flat()
+        setRequiredProteinTags(prevValues => [...new Set([...prevValues, ...proteinTagsDisplayInRange])])
+        
+    }, [minIdx,maxIdx, selectedClusters.length, _.join(selectedClusters)])
 
 
     return (
@@ -216,7 +221,7 @@ function Heatmap({
                     var xValuesEnd = rowValues.length * binHeight + 1 //+1 for cluster label
                     var marginBetweenValuesAndColors = colorValuesExist ? binHeight : 0
                     var marginBetweenValuesAndLabels = colorValuesExist ? colorNames.length * binHeight + marginBetweenValuesAndColors : marginBetweenValuesAndColors 
-                    var labelString = labelsExist ? labels[index] : undefined
+                    var labelString = data[index]["tag"]
 
                     return (
                         <HeatmapRow
@@ -237,7 +242,6 @@ function Heatmap({
                             marginBetweenValuesAndLabels,
                             colorValuesExist,
                             colorNames,
-                            labelsExist,
                             labelString,
                             clusterIndexColor : clusterColorScale(data[index]["cluster"]),
                             opacity : hoverIndices.size === 0 ? 1 : hoverIndices.has(index) ? 1 : 0.4,

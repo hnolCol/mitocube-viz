@@ -59,6 +59,7 @@ HeatmapRow.defaultProps = {
     darkmode: false
 };
 
+
 /**
  * HeatmapRow - A single row in the heatmap. The 
  *
@@ -78,7 +79,6 @@ function HeatmapRow({
     valueNames,
     colorNames,
     colorValuesExist,
-    labelsExist,
     opacity = 1,
     binHeight,
     marginBetweenValuesAndColors,
@@ -148,7 +148,7 @@ function HeatmapRow({
                     isLabelProteinTag={isLabelProteinTag}
                     darkmode={darkmode} /> : null}
 
-                {labelsExist && showLabel ?
+                {showLabel ?
                     <RowLabel
                         x={xValuesEnd + binHeight/2 + marginBetweenValuesAndLabels + binHeight + annotation_tags.length * binHeight + marginBetweenValuesAndLabels}
                         fontSize={binHeight*0.80}
@@ -156,7 +156,7 @@ function HeatmapRow({
                         fill={getFillColor(darkmode)}
                         isLabelProteinTag={isLabelProteinTag}
                         isLabelFeatureTag={isLabelFeatureTag}
-                        text={_.isMap(proteinTagMap) && proteinTagMap.has(labelString) ? proteinTagMap.get(labelString).text : labelString} /> : null}
+                        text={_.isMap(proteinTagMap) ? labelString.includes(";") ? labelString.split(";").map(tag => proteinTagMap.has(tag) ? proteinTagMap.get(tag).text : tag).join(";") : proteinTagMap.has(labelString) ? proteinTagMap.get(labelString).text : labelString : labelString} /> : null}
                     </g>
 
 

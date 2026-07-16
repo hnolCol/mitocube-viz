@@ -88,7 +88,7 @@ export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLab
                 dx={2}
                 y={yScale(q.m)}
                 labelTexts={[`${_.round(q.m, roundToDigits)} ${medianSuffix}`]} verticalAnchor={"middle"} textAnchor={"start"} totalYOffset={0} />) : null}
-            <Text x={margins.left} dx={-4} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text>
+            <Text x={margins.left} dx={-8} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text>
         </SVG>
     )
 }
