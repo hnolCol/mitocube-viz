@@ -10,6 +10,7 @@ import { TextLabel } from "../../text/TextLabel";
 import _ from "lodash"
 import { Text } from "@visx/text";
 import { abbreviateNumber } from "../../transforms/numbers";
+import { AxisLeft } from "@visx/axis";
 
 MinimalBoxplots.propTypes = {
     qs: PropTypes.arrayOf(PropTypes.object),
@@ -47,7 +48,7 @@ MinimalBoxplots.defaultProps = {
  * @param {*} param0 
  * @returns 
  */
-export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLabel, rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true, xtickLabels = [] }) {
+export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLabel, rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true, xtickLabels = [], showYAxis = true }) {
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     const checkedBoxWidth = _.isNumber(boxWidth) && boxWidth < chartWidth ? boxWidth : chartWidth / qs.length
     const fills = _.isArray(fill) && fill.length === qs.length ? fill : qs.map(() => fill)
@@ -66,12 +67,15 @@ export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLab
             }
         )
     }, [chartHeight, rerender])
-
-    console.log(xtickLabels)
-
     return (
         <SVG {...{ width, height }}>
-
+            {showYAxis && <AxisLeft  scale={yScale}
+                left={margins.left-spaceBetween}
+                top={0}
+                label={yaxisLabel}
+                labelProps={{ fontSize: 10, textAnchor: "middle", verticalAnchor: "end" }}
+                tickLabelProps={() => ({ fontSize: 10, textAnchor: "end", verticalAnchor: "middle" })}
+                />}
             {verticalLineAtZero ? <line x1={margins.left} x2={margins.left + chartWidth} y1={yScale(0)} y2={yScale(0)} stroke={"#000000"} strokeWidth={1} /> : null}
 
             {qs.map((q, i) => {
@@ -92,7 +96,7 @@ export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLab
                 dx={2}
                 y={yScale(q.m)}
                 labelTexts={[`${_.round(q.m, roundToDigits)} ${medianSuffix}`]} verticalAnchor={"middle"} textAnchor={"start"} totalYOffset={0} />) : null}
-            <Text x={margins.left} dx={-8} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text>
+            {!showYAxis && _.isString(yaxisLabel) && <Text x={margins.left} dx={-8} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text>}
         </SVG>
     )
 }

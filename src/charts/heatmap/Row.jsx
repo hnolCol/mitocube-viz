@@ -156,7 +156,7 @@ function HeatmapRow({
                         fill={getFillColor(darkmode)}
                         isLabelProteinTag={isLabelProteinTag}
                         isLabelFeatureTag={isLabelFeatureTag}
-                        text={_.isMap(proteinTagMap) ? labelString.includes(";") ? labelString.split(";").map(tag => proteinTagMap.has(tag) ? proteinTagMap.get(tag).text : tag).join(";") : proteinTagMap.has(labelString) ? proteinTagMap.get(labelString).text : labelString : labelString} /> : null}
+                        text={_.isMap(proteinTagMap) ? labelString.includes(";") ? labelString.split(";").map(tag => proteinTagMap.has(tag) ? proteinTagMap.get(tag).text : tag).join(";") : proteinTagMap.has(labelString) && proteinTagMap.get(labelString).text.length > 0 ? proteinTagMap.get(labelString).text : labelString : labelString} /> : null}
                     </g>
 
 
