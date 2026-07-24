@@ -95,7 +95,8 @@ function Heatmap({
     setRequiredProteinTags,
     proteinTagMap,
     refetchedTrigger,
-    proteinIsLoading
+    proteinIsLoading,
+    scrollContainerRef
 }) {
 
     const [scrollPos, setScrollPos] = useState(0)
@@ -109,7 +110,7 @@ function Heatmap({
     const heatmapSVGHeight = numberRows * binHeight
     const heatmapSVGWidth = valueNames.length * binHeight + colorNames.length * binHeight + 300
     const { tooltipData, tooltipOpen, tooltipLeft, tooltipTop, hideTooltip, showTooltip } = useTooltip()
-    const refScrollContainer = useRef(null)
+    //const refScrollContainer = useRef(null)
     
     const { containerRef, TooltipInPortal } = useTooltipInPortal({
         // use TooltipWithBounds
@@ -120,13 +121,13 @@ function Heatmap({
 
     
     const {minIdx, maxIdx } = useMemo(() => {
-        if (refScrollContainer.current !== null) {
+        if (scrollContainerRef.current !== null) {
             const minIdx = _.toInteger(scrollPos / binHeight)
-            const maxIdx = _.toInteger(minIdx + refScrollContainer.current.clientHeight / binHeight)
+            const maxIdx = _.toInteger(minIdx + scrollContainerRef.current.clientHeight / binHeight)
             return { minIdx, maxIdx }
         }
         return { minIdx: 0, maxIdx: 20 }
-    }, [scrollPos, refScrollContainer.current, binHeight])
+    }, [scrollPos, scrollContainerRef.current, binHeight])
 
     useEffect(() => {
         if (searchIndices.size > 0 && !proteinIsLoading) {
@@ -210,7 +211,7 @@ function Heatmap({
             
             
             {/* The actual heatmap with values */}
-            <div style={{ overflowY: "scroll", maxHeight: "80vh" }} onScroll={(e) => setScrollPos(e.target.scrollTop)} ref={refScrollContainer}>
+            <div style={{ overflowY: "scroll", maxHeight: "85vh" }} onScroll={(e) => setScrollPos(e.target.scrollTop)} ref={scrollContainerRef}>
             
             <SVG {...{ width: heatmapSVGWidth, height: heatmapSVGHeight, svgRef: containerRef }}>
                 
