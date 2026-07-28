@@ -48,7 +48,7 @@ MinimalBoxplots.defaultProps = {
  * @param {*} param0 
  * @returns 
  */
-export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLabel, rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true, xtickLabels = [], showYAxis = true }) {
+export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLabel, rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true, xtickLabels = [], showYAxis = true, markerValues, markerLabels }) {
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     const checkedBoxWidth = _.isNumber(boxWidth) && boxWidth < chartWidth ? boxWidth : chartWidth / qs.length
     const fills = _.isArray(fill) && fill.length === qs.length ? fill : qs.map(() => fill)
@@ -96,6 +96,19 @@ export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLab
                 dx={2}
                 y={yScale(q.m)}
                 labelTexts={[`${_.round(q.m, roundToDigits)} ${medianSuffix}`]} verticalAnchor={"middle"} textAnchor={"start"} totalYOffset={0} />) : null}
+            {_.isArray(markerValues) ? qs.map((q, i) => {
+                const markerValue = markerValues[i]
+                if (!_.isNumber(markerValue)) return null
+                const cx = margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween)
+                const cy = yScale(markerValue)
+                const markerLabel = _.isArray(markerLabels) ? markerLabels[i] : undefined
+                const labelText = _.isString(markerLabel) ? `${markerLabel} (${_.round(markerValue, roundToDigits)})` : `${_.round(markerValue, roundToDigits)}${medianSuffix}`
+                return <g key={`boxplot-marker-${i}`}>
+                    <circle cx={cx} cy={cy} r={4} fill="none" stroke="#ae0000" strokeWidth={2} />
+                    <TextLabel x={cx} dx={checkedBoxWidth / 2 + 4} y={cy} labelTexts={[labelText]} verticalAnchor="middle" textAnchor="start" totalYOffset={0} />
+                </g>
+            }) : null}
+            <Text x={margins.left} dx={-8} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text>
             {!showYAxis && _.isString(yaxisLabel) && <Text x={margins.left} dx={-8} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text>}
         </SVG>
     )
