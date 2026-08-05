@@ -6,82 +6,60 @@ import { isInRange } from "../utils/inrange"
 import React from "react"
 import PropTypes from "prop-types"
 import { isPropHexColorString } from "../types/checks/color"
+const isValidNumber = value => Number.isFinite(value)
 
+function buildPolylineSegments(ds) {
+    const segments = []
+    const singlePoints = []
 
-function splitArrayByNaN({ ys  }) {
-    const indices = _.range(ys.length)
-    return _.reduce(indices, (acc, idx, index) => {
+    let current = []
 
-        const yIsNaN = _.isNaN(ys[idx]) 
-        if (index === 0) acc.push([])
-        if (yIsNaN) {
-            acc.push([])
-        } 
-        else {
-            acc.at(-1).push(idx)
+    const flush = () => {
+        if (current.length > 1) {
+            segments.push(current)
+        } else if (current.length === 1) {
+            singlePoints.push(current[0])
         }
-        return acc
-     }, [])
+        current = []
+    }
+
+    ds.forEach(d => {
+        const valid =
+            isValidNumber(d.x) &&
+            isValidNumber(d.y) &&
+            d.valid
+
+        if (valid) {
+            current.push(d)
+        } else {
+            flush()
+        }
+    })
+
+    flush()
+
+    return { segments, singlePoints }
 }
-
-
-/**
- * 
- * @param {Object} param0 
- * @param {Number[]} param0.ys
- * @param {Number[]} param0.xs
- * @param {Function} param0.yScale
- * @param {Function} param0.xScale
- * @returns 
- */
-function SplitProfile({ ys, xs, yScale, xScale, stroke, strokeWidth }) {
-    
-
-    const ySplits = splitArrayByNaN({ ys })
-    return (
-        <g>
-            {ySplits.map((split, idx) => {
-
-                if (split.length === 1) return <circle
-                    key={`${idx}`}
-                    cx={xScale(xs[split[0]])}
-                    cy={yScale(ys[split[0]])}
-                    r={2}
-                    fill={stroke} />
-                
-                const linePoints = split.map(i => ({ x: xScale(xs[i]), y: yScale(ys[i]) })).filter(p => _.isFinite(p.x) && _.isFinite(p.y))
-                return <polyline key={`${idx}`} points={linePoints.map(p => `${p.x},${p.y}`).join(" ")}
-                    fill="none"
-                    stroke={stroke}
-                    strokeWidth={strokeWidth} />
-            })}
-     </g>
- )}
-
 
 
 ProfilesWithNaN.propTypes = {
     stroke: isPropHexColorString,
     strokeWidth : PropTypes.number
  }
-ProfilesWithNaN.defaultProps = {
-    stroke: "#000000",
-    strokeWidth : 2
- }
+
 
 function ProfilesWithNaN({
     data,
     xScale,
     yScale,
-    stroke,
+    stroke = "#000000",
     xaxisName,
     yaxisName,
-    strokeWidth,
+    fill = "none",
+    strokeWidth = 2,
     showPoints = true,
-    rerenderDependency = []
-}) { 
-
-
+    includeXs = [],
+    rerenderDependency = []}) { 
     const [minX, maxX] = xScale.domain()
     const [maxY, minY] = yScale.domain()
     const yRange = [minY, maxY]
@@ -89,19 +67,64 @@ function ProfilesWithNaN({
 
     // const isXInRange = d => isInRange({ value: d[xaxisName], range: xRange })
     const isYInRange = d => isInRange({ value: d[yaxisName], range: yRange })
+    const dscontrolled = includeXs.map(xName => { 
+        const di = data.find(d => d[xaxisName] === xName)
+        if (di) {
+            return { y: yScale(di[yaxisName]), x : xScale(di[xaxisName]), valid : isYInRange(di) }
+        } else {
+            return { y: NaN, x : xScale(xName), valid : false }
+        }
+    }
+    )
+    const ds = data.map(d => ({ y: yScale(d[yaxisName]), x : xScale(d[xaxisName]), valid : isYInRange(d) }))
     return <g>
+        {[data].map((d, idx) => {
+            const { segments, singlePoints } = buildPolylineSegments(dscontrolled)
+            return (
+                <g key={`${idx}-profile-line`}>
+                    {segments.map((segment, i) => (
+                            <polyline
+                                key={i}
+                                points={segment.map(p => `${p.x},${p.y}`).join(", ")}
+                                stroke={stroke}
+                                strokeWidth={strokeWidth}
+                                fill={fill}
+                            />
+                        ))}
+                    {showPoints &&
+                        singlePoints.map((p, i) => (
+                            <circle
+                                key={i}
+                                cx={p.x}
+                                cy={p.y}
+                                r={5}
+                                fill="#fff"
+                                stroke={stroke}
+                            />
+                        ))}
+                    {showPoints &&
+                        _.map([yaxisName], yName => {
+                            const x = xScale(yName)
+                            const y = yScale(d[yName])
 
-        <SplitProfile
-            ys={data.map(d => d[yaxisName])}
-            xs={data.map(d => d[xaxisName])}
-            yScale={yScale}
-            xScale={xScale}
-            stroke={stroke}
-            strokeWidth={strokeWidth} />
-        
-    </g>
+                            if (!Number.isFinite(x) || !Number.isFinite(y)) {
+                                return null
+                            }
+
+                            return (
+                                <circle
+                                    key={`${yName}-${idx}-profile-point`}
+                                    cx={x}
+                                    cy={y}
+                                    r={5}
+                                    fill="#fff"
+                                    stroke={stroke}
+                                />
+                            )
+                        })}
+                </g>)
+        })}</g>
 }
-
 
 function areEqual(prevProps, nextProps) {
     /*
@@ -115,5 +138,5 @@ function areEqual(prevProps, nextProps) {
     if (prevProps.rerenderDependency.length !== nextProps.rerenderDependency.length) return false 
     if (_.some(prevProps.rerenderDependency, (value,idx) => nextProps.rerenderDependency[idx] !== value)) return false 
     return true
-  }
-  export default React.memo(ProfilesWithNaN, areEqual);
+}
+export default React.memo(ProfilesWithNaN, areEqual);

@@ -43,7 +43,8 @@ HeatmapRow.propTypes = {
     y: PropTypes.number.isRequired,
     labelsExist: PropTypes.bool,
     isLabelFeatureTag: PropTypes.bool,
-    darkmode: PropTypes.bool
+    darkmode: PropTypes.bool,
+    marginBetweenValues: PropTypes.number,
 };
 
 HeatmapRow.defaultProps = {
@@ -93,29 +94,29 @@ function HeatmapRow({
     isLabelFeatureTag,
     annotation_tags = ["dXtpH"],
     proteinTagMap,
-    darkmode
+    clusterExists,
+    darkmode,
+    marginBetweenValues = 8
 }) {
-
-    if (!_.inRange(rowNumber,minIdx,maxIdx)) return null 
     return(
         
         <g onMouseEnter={_.isFunction(handleMouseEnter) ? (e) => handleMouseEnter(e, index) : undefined}
             onMouseLeave={_.isFunction(handleMouseLeave) ? handleMouseLeave : undefined}>
-            <Rect 
-                key = {`cluster-${index}`}
-                x = {0} 
-                y={y} 
-                width={binHeight} 
+            {clusterExists ? <Rect
+                key={`cluster-${index}`}
+                x={0}
+                y={y}
+                width={binHeight}
                 opacity={opacity}
-                height = {binHeight} 
+                height={binHeight}
                 fill={clusterIndexColor}
                 stroke={getStrokeColor(darkmode)}
-                />
+            /> : null}
             
             {valueNames.map((valueName, valueIdx) =>
                 <Rect
                     key={`${valueName}-${valueIdx}`}
-                    x={(valueIdx+1) * binHeight + binHeight/4}
+                    x={(valueIdx+1) * binHeight + binHeight/4 + (marginBetweenValues * valueIdx)}
                     y={y}
                     opacity={opacity}
                     width={binHeight}
@@ -137,7 +138,7 @@ function HeatmapRow({
                     })
                 : null}
             
-            {_.isArray(annotation_tags) && annotation_tags.length > 0 ?
+            {/* {_.isArray(annotation_tags) && annotation_tags.length > 0 ?
                 <Annotations
                     x={xValuesEnd + binHeight / 2 + marginBetweenValuesAndLabels + binHeight} 
                     y={y}
@@ -146,7 +147,7 @@ function HeatmapRow({
                     height={binHeight}
                     protein_tag={labelString}
                     isLabelProteinTag={isLabelProteinTag}
-                    darkmode={darkmode} /> : null}
+                    darkmode={darkmode} /> : null} */}
 
                 {showLabel ?
                     <RowLabel
@@ -168,41 +169,20 @@ function HeatmapRow({
     the same result as passing prevProps to render,
     otherwise return false
     */
-    
-    const prevInView = _.range(prevProps.rowNumber, prevProps.minIdx,prevProps.maxIdx)
-    const nextInView = _.range(nextProps.rowNumber, nextProps.minIdx, nextProps.maxIdx)
-      
-    if (prevInView !== nextInView) return false 
-    if (prevProps.labelString !== nextProps.labelString) {
-        return false 
-    }
-    if (prevProps.opacity !== nextProps.opacity) {
-        return false
-    }
-    if (prevProps.valueNames !== prevProps.valueNames) {
-        return false
-    }
-    if (prevProps.y !== prevProps.y) {
-        return false
-    }
-    if (prevProps.binHeight !== prevProps.binHeight) {
-        return false
-    }
-    if (prevProps.minIdx !== prevProps.minIdx) {
-        return false
-          }
-    if (prevProps.maxIdx !== prevProps.maxIdx) {
-        return false
-    }
-    if (prevProps.showLabel !== prevProps.showLabel) {
-        return false
-    }
-      
-      if (prevProps.annotation_tags !== nextProps.annotation_tags) {
-        return false
-    }
-      
-   return true
+    if (prevProps.proteinTagMap.has(prevProps.labelString) !== nextProps.proteinTagMap.has(nextProps.labelString)) return false
+    if (prevProps.rowNumber !== nextProps.rowNumber) return false
+    if (prevProps.marginBetweenValues !== nextProps.marginBetweenValues) return false
+    if (prevProps.minIdx !== nextProps.minIdx) return false
+    if (prevProps.maxIdx !== nextProps.maxIdx) return false
+    if (prevProps.labelString !== nextProps.labelString) return false
+    if (prevProps.opacity !== nextProps.opacity) return false
+    if (prevProps.y !== nextProps.y) return false
+    if (prevProps.binHeight !== nextProps.binHeight) return false
+    if (prevProps.showLabel !== nextProps.showLabel) return false
+    if (prevProps.clusterIndexColor !== nextProps.clusterIndexColor) return false
+    if (prevProps.data !== nextProps.data) return false
+    if (prevProps.annotation_tags !== nextProps.annotation_tags) return false
+    return true
 
   }
   

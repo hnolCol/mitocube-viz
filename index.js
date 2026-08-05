@@ -1,4 +1,5 @@
 import XYAxisWithBackground  from "./src/axis/Axis"
+import { HeatmapColumnNames } from "./src/charts/heatmap/ColumnNames"
 import Bar from "./src/primitives/Bar"
 import Box from "./src/primitives/Box"
 import Point from "./src/primitives/Point"
@@ -52,6 +53,7 @@ export default {
         "Categorical": Categorical,
         "Heatmap": Heatmap,
         "HeatmapGrouping": HeatmapGrouping,
+        "HeatmapColumnNames": HeatmapColumnNames,
         "Network": Network,
         "ProfileChart": ProfileChart,
         "CrosslinkViewer": CrosslinkViewer

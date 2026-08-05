@@ -53,7 +53,8 @@ export function ProfileChart({
     containsNaN = false,
     darkmode = false,
     proteinTagMap,
-    splitByProtein = false
+    splitByProtein = false,
+    includeXs
 }) {  
 
 
@@ -167,6 +168,7 @@ export function ProfileChart({
                                 yaxisName,
                                 yScale,
                                 xScale,
+                                includeXs,
                                 stroke : colorScale(splitData[0][colorName]),
                                 rerenderDependency: _.concat(rerenderHover, rerenderBackground, chartHeight, chartWidth, yScale.domain(), yScale.domain())
                             }} />

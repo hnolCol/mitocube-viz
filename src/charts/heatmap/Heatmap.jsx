@@ -43,7 +43,7 @@ Heatmap.defaultProps = {
         { v: 0, v1: 1.2, B: "-", C: "+" }
     ],
     valueNames: ["v", "v1"],
-    clusterName: "c",
+    clusterName:  undefined,
     colorNames: ["B", "C"],
     labelNames: ["tag"],
     binHeight: 15,
@@ -96,9 +96,12 @@ function Heatmap({
     proteinTagMap,
     refetchedTrigger,
     proteinIsLoading,
-    scrollContainerRef
+    scrollContainerRef,
+    maxHeight = "80vh",
+    marginBetweenValues = 0,
+    svgID = "heatmap-svg",
+    exportMode = false
 }) {
-
     const [scrollPos, setScrollPos] = useState(0)
     const uniqueColorValues = useMemo(() => colorNames.length > 0 ? getUniqueValuesInArrayOfObjects({ data, keyName: colorNames }) : [], [_.join(colorNames), data.length])
     const uniqueClusterValues = useMemo(() => getUniqueValuesInArrayOfObjects({ data, keyName: clusterName }).filter(v => v !== undefined), [clusterName])
@@ -128,6 +131,9 @@ function Heatmap({
         }
         return { minIdx: 0, maxIdx: 20 }
     }, [scrollPos, scrollContainerRef.current, binHeight])
+
+
+
 
     useEffect(() => {
         if (searchIndices.size > 0 && !proteinIsLoading) {
@@ -191,68 +197,70 @@ function Heatmap({
     }
     //
 
+
+    useEffect(() => {
+        const proteinTagsDisplayInRange = dataIdcs.filter((dataIdx, idx) => idx >= minIdx && idx <= maxIdx).map(dataIdx => data[dataIdx]["tag"]).filter(tag => _.isString(tag)).map(tag => tag.includes(";") ? tag.split(";") : tag).flat()
+        setRequiredProteinTags(prevValues => [...new Set([...prevValues, ...proteinTagsDisplayInRange])])
+        
+    }, [minIdx,maxIdx, selectedClusters.length, _.join(selectedClusters)])
+
     let dataIdcs = searchIndices.size > 0 ? _.range(numberRows).filter(idx => searchIndices.has(idx)) : _.range(numberRows)
     if (selectedClusters.length > 0) {
         dataIdcs = dataIdcs.filter(idx => selectedClusters.includes(data[idx]["cluster"]))
     }
 
-
-    useEffect(() => {
-        
-        const proteinTagsDisplayInRange = dataIdcs.filter((dataIdx,idx) => idx >= minIdx && idx <= maxIdx).map(dataIdx => data[dataIdx]["tag"]).filter(tag => _.isString(tag)).map(tag => tag.includes(";") ? tag.split(";") : tag).flat()
-        setRequiredProteinTags(prevValues => [...new Set([...prevValues, ...proteinTagsDisplayInRange])])
-        
-    }, [minIdx,maxIdx, selectedClusters.length, _.join(selectedClusters)])
-
+    // slice to the visible window (+ small buffer) right before rendering
+    const startIdx = Math.max(0, minIdx - 5)
+    const visibleIdcs = exportMode ? dataIdcs : dataIdcs.slice(startIdx, maxIdx + 5)
 
     return (
         
-        <div className="flex">
-            
-            
+        <div className="flex" style={{overflowY: "hidden", maxHeight : maxHeight}}>
             {/* The actual heatmap with values */}
-            <div style={{ overflowY: "scroll", maxHeight: "85vh" }} onScroll={(e) => setScrollPos(e.target.scrollTop)} ref={scrollContainerRef}>
+            <div style={{ overflowY: "scroll", maxHeight: maxHeight}} onScroll={(e) => setScrollPos(e.target.scrollTop)} ref={scrollContainerRef}>
             
-            <SVG {...{ width: heatmapSVGWidth, height: heatmapSVGHeight, svgRef: containerRef }}>
+            <SVG {...{ width: heatmapSVGWidth, height: heatmapSVGHeight, svgRef: containerRef, svgID : svgID}}>
                 
-                {dataIdcs.map((index,rowNumber) => {
-                   // if (searchIndices.size > 0 && !searchIndices.has(rowNumber)) return null 
+                {visibleIdcs.map((index, i) => {
+                    const rowNumber = startIdx + i
                     var rowValues = heatmapValues[index]
                     var y = rowNumber * binHeight
-                    var xValuesEnd = rowValues.length * binHeight + 1 //+1 for cluster label
+                    var xValuesEnd = rowValues.length * binHeight + 1 + (marginBetweenValues * (rowValues.length - 1))
                     var marginBetweenValuesAndColors = colorValuesExist ? binHeight : 0
                     var marginBetweenValuesAndLabels = colorValuesExist ? colorNames.length * binHeight + marginBetweenValuesAndColors : marginBetweenValuesAndColors 
                     var labelString = data[index]["tag"]
-
                     return (
                         <HeatmapRow
-                            key={`${index}-${rowNumber}-${labelString}`}
+                            key={`${index}-${labelString}`}
+                            marginBetweenValues={marginBetweenValues}
                             {...{
-                            data : data[index],
-                            valueNames,
-                            rowNumber,
-                            index,
-                            minIdx,
-                            maxIdx,
-                            y,
-                            binHeight,
-                            valueScale,
-                            xValuesEnd,
-                            extraColorScale,
-                            marginBetweenValuesAndColors,
-                            marginBetweenValuesAndLabels,
-                            colorValuesExist,
-                            colorNames,
-                            labelString,
-                            clusterIndexColor : clusterColorScale(data[index]["cluster"]),
-                            opacity : hoverIndices.size === 0 ? 1 : hoverIndices.has(index) ? 1 : 0.4,
-                            handleMouseEnter: handleMouseEntersRow,
-                            handleMouseLeave: handleMouseLeavesRow,
-                            darkmode,
-                            isLabelProteinTag,
-                            isLabelFeatureTag,
-                            proteinTagMap
-                        }} />
+                                data : data[index],
+                                valueNames,
+                                rowNumber,
+                                index,
+                                minIdx,
+                                maxIdx,
+                                y,
+                                binHeight,
+                                valueScale,
+                                xValuesEnd,
+                                extraColorScale,
+                                marginBetweenValuesAndColors,
+                                marginBetweenValuesAndLabels,
+                                colorValuesExist,
+                                colorNames,
+                                labelString,
+                                clusterIndexColor : clusterColorScale(data[index]["cluster"]),
+                                opacity : hoverIndices.size === 0 ? 1 : hoverIndices.has(index) ? 1 : 0.4,
+                                handleMouseEnter: handleMouseEntersRow,
+                                handleMouseLeave: handleMouseLeavesRow,
+                                darkmode,
+                                isLabelProteinTag,
+                                isLabelFeatureTag,
+                                proteinTagMap,
+                                
+                                clusterExists : clusterName !== undefined && clusterName !== null && clusterName !== "",
+                            }} />
                     )
                 })}
 
@@ -271,10 +279,6 @@ function Heatmap({
                     </LegendLinear>
                     </div>
             </div>
-            {tooltipOpen ? <TooltipInPortal left={tooltipLeft} top={tooltipTop} key={Math.random()}>
-                <p>BUM</p>
-
-            </TooltipInPortal> : null}
         </div>
     )
 }
