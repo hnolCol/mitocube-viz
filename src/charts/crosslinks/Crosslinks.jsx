@@ -27,6 +27,8 @@ CrosslinkViewer.defaultProps = {
     onArcClick: () => {},
     onLayoutComputed: null,
     getLabelText: null,
+    onLinkClick: () => {},
+    onOwnArcClick: () => {},
 }
 
 CrosslinkViewer.propTypes = {
@@ -41,6 +43,8 @@ CrosslinkViewer.propTypes = {
     onArcClick: PropTypes.func,
     onLayoutComputed: PropTypes.func,
     getLabelText: PropTypes.func,
+    onLinkClick: PropTypes.func,
+    onOwnArcClick: PropTypes.func, 
 }
 
 export function CrosslinkViewer({
@@ -55,6 +59,8 @@ export function CrosslinkViewer({
     onArcClick,
     onLayoutComputed,
     getLabelText,
+    onLinkClick,
+    onOwnArcClick, 
 }) {
     const [selected, setSelected] = useState(null)
 
@@ -139,8 +145,8 @@ export function CrosslinkViewer({
                                 opacity={arcOpacity}
                                 stroke={showInterPartner && isInterSelected ? "rgba(156,128,221,0.4)" : "none"}
                                 strokeWidth={2.5}
-                                style={{ cursor: isPartner ? "pointer" : "default" }}
-                                onClick={() => isPartner && onArcClick(p.id)}
+                                style={{ cursor: "pointer" }}
+                                onClick={() => (isPartner ? onArcClick(p.id) : onOwnArcClick(p.id))}
                             />
                             {focusedPartnerTag && features.map((f, fi) => {
                                 const typeIndex = featureTypes.indexOf(f.type)
@@ -250,7 +256,11 @@ export function CrosslinkViewer({
                                 })
                             }}
                             onMouseLeave={showInterPartner ? undefined : hideTooltip}
-                            onClick={showInterPartner ? undefined : () => setSelected(isSel ? null : l.tag)}
+                            onClick={showInterPartner ? undefined : () => {
+                                const next = isSel ? null : l.tag
+                                setSelected(next)
+                                onLinkClick(next ? l : null)
+                            }}
                         />
                     )
                 })}
