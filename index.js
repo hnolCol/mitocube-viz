@@ -16,6 +16,8 @@ import Line from "./src/primitives/Line"
 import { MinimalBoxplot } from "./src/charts/minimal/Boxplot"
 import { MinimalBoxplots } from "./src/charts/minimal/Boxplots"
 import { CrosslinkViewer } from "./src/charts/crosslinks/Crosslinks"
+import { computeTopologyLayout } from "./src/utils/topology"
+import { MembraneTopologyDiagram } from "./src/charts/crosslinks/MembraneTopologyDiagram"
 import { computeCrosslinkLayout } from "./src/utils/crosslinks"
 import { featureColor } from "./src/colors/crosslinks"
 
@@ -54,9 +56,11 @@ export default {
         "HeatmapGrouping": HeatmapGrouping,
         "Network": Network,
         "ProfileChart": ProfileChart,
-        "CrosslinkViewer": CrosslinkViewer
+        "CrosslinkViewer": CrosslinkViewer,
+        "MembraneTopologyDiagram": MembraneTopologyDiagram
     },
     utils: {
         "linearRegression" : linearRegression,
-        "computeCrosslinkLayout": computeCrosslinkLayout
+        "computeCrosslinkLayout": computeCrosslinkLayout,
+        "computeTopologyLayout": computeTopologyLayout
     }}
