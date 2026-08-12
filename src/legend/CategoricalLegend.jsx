@@ -23,6 +23,9 @@ export function ConditionApplicationLegendLabel({ tag, props, caTagToText }) {
  * @returns 
  */
 function areEqual(prevProps, nextProps) {
+    if (prevProps.maxWidth !== nextProps.maxWidth) return false
+    if (prevProps.titleOnly !== nextProps.titleOnly) return false
+    if (prevProps.colorScale !== nextProps.colorScale) return false 
     if (prevProps.colorName !== nextProps.colorName) return false 
     if (prevProps.sizeName !== nextProps.sizeName) return false 
     return true
@@ -41,51 +44,38 @@ const CategoricalLegend = React.memo(
     function CategoricalLegend({
         chartIdx,
         data,
-        maxWidth,
+        maxWidth = "150px",
         colorScale,
         colorName,
         filterDataInKeyByValue,
         resetSearchIdcs,
         size = 20,
         caTagToText,
-        attributeTagToText
+        attributeTagToText,
+        titleOnly = false
 
     }) {
 
-
-    const {
-        tooltipData,
-        tooltipLeft,
-        tooltipTop,
-        tooltipOpen,
-        showTooltip,
-        hideTooltip,
-    } = useTooltip();
+    // const {
+    //     tooltipData,
+    //     tooltipLeft,
+    //     tooltipTop,
+    //     tooltipOpen,
+    //     showTooltip,
+    //     hideTooltip,
+    // } = useTooltip();
     
-    const { containerRef, TooltipInPortal } = useTooltipInPortal({
-        // use TooltipWithBounds
-        detectBounds: true,
-        // when tooltip containers are scrolled, this will correctly update the Tooltip position
-        scroll: true,
-    })
+    // const { containerRef, TooltipInPortal } = useTooltipInPortal({
+    //     // use TooltipWithBounds
+    //     detectBounds: true,
+    //     // when tooltip containers are scrolled, this will correctly update the Tooltip position
+    //     scroll: true,
+    // })
 
 
 
 
-        
-    /**
-     * 
-     * @param {MouseEvent} e 
-     * @param {import("../../../../types/attributes").AttributeValue[]} props.attributeValues
-     */
-    const handleTooltip = (e,attributeValues,attribute) => {
 
-        showTooltip({
-            tooltipTop : e.clientY,
-            tooltipLeft: e.clientX,
-            tooltipData: { attributeValues, attribute, has_features_value : attribute.has_features_value }
-        })
-    }
     /**
      * 
      * @param {Number} size - The size of the SVG 
@@ -107,31 +97,32 @@ const CategoricalLegend = React.memo(
 
     return (
         <div>
-            <div  className="flex" style={{maxWidth : "150px", maxHeight : "400px", overflowY:"scroll"}}>
+            <div  className="flex" style={{width : maxWidth, maxHeight : "400px", overflowY:"scroll"}}>
                 {_.has(colorScale, "domain") ? attributeTagToText.get(colorName) ?
-                    <div ref={containerRef}  className="margin-left--little">
+                    <div  className="margin-left--little">
                     {/* //onMouseLeave={() => resetSearchIdcs(chartIdx)} */}
                         <div style={{maxWidth : "12rem"}}><h5>{attributeTagToText.get(colorName)}</h5></div>
-                        <LegendOrdinal scale={colorScale}>
+                        {titleOnly ? null : <LegendOrdinal scale={colorScale}>
                             {(labels) => labels.map((label, idx) => {
                                 if (idx > 25) return null
                                 return (
                                     <LegendItem key={`${idx}-${label}`} >
                                         {renderLegendRectangle(size, label.value, size / 3.5)}
-                                        <ConditionApplicationLegendLabel caTagToText={caTagToText}  tag={label.text} props={{margin: "0 12px", onMouseEnter: (e) => handleTooltip(e, [label.text], attributeTagToText.get(colorName)), onMouseLeave: hideTooltip, style : {fontSize : "0.75rem"} }} />
+                                        <ConditionApplicationLegendLabel caTagToText={caTagToText} tag={label.text} props={{ margin: "0 12px", style: { fontSize: "0.75rem" } }} />
                                     </LegendItem>
                                 )
                             })}
-                        </LegendOrdinal></div> : null  : null }
+                        </LegendOrdinal>}
+                    </div> : null : null}
 
             </div>
         
-            {tooltipOpen && _.isObject(tooltipData) ?
+            {/* {tooltipOpen && _.isObject(tooltipData) ?
                 <TooltipInPortal top={tooltipTop} left={tooltipLeft} key={Math.random()}>
                     <div style={{ maxWidth: "300px", maxHeight: "400px", overflowY: "scroll" }}>
                         <span> this is a nice tool tip</span>
                     </div>
-            </TooltipInPortal> : null}
+            </TooltipInPortal> : null} */}
 
         </div>
     )

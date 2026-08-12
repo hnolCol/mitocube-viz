@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, useRef } from "react"
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale"
 import PropTypes from "prop-types"
 import _, { get } from "lodash"
@@ -212,31 +212,71 @@ function MultiCategoricalChart({
         }
     })
 
-    
 
     return (
-        <div style={{position : "relative", }}>
-        <div>
-        <SVG {...{width : adjustedWidth ,height,svgID,svgRef}}>
-            <>{children(categoricalSplit)}</>
-        </SVG>
-        </div>
-            <div style={{ position: "absolute", top: -30, right: 0, zIndex : 1000 }}>
-                {hasLegend ? <div><button className="basic-button--no-border" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => {
-                    console.log(e)
-                     e.stopPropagation()
-                     setIsLegendOpen(!isLegendOpen) 
-                }}>Collapse</button>
-                    {isLegendOpen && <CategoricalLegend {...{
+        <div
+    style={{
+        position: "relative",
+        width: adjustedWidth,
+        height: height,
+    }}
+>
+    <SVG
+        {...{
+            width: adjustedWidth,
+            height,
+            svgID,
+            svgRef
+        }}
+    >
+        <>{children(categoricalSplit)}</>
+    </SVG>
+
+    {hasLegend && (
+        <div
+            style={{
+                position: "absolute",
+                right: margins.right,
+                bottom: margins.bottom,
+                zIndex: 10,
+                
+            }}
+        >
+            <div
+                className="padding--little"
+                style={{ position: "relative" }}
+            >
+                <CategoricalLegend
+                    {...{
+                        titleOnly: !isLegendOpen,
                         colorName,
                         colorScale,
                         caTagToText,
                         attributeTagToText,
-                        maxWidth: 150
-                    }} />} </div> : null}
-            
+                        maxWidth: "180px"
+                    }}
+                />
+
+                <button
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        
+                    }}
+                    className="basic-button--no-border"
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        setIsLegendOpen(!isLegendOpen)
+                    }}
+                >
+                    {isLegendOpen ? "▼" : "▲"}
+                </button>
             </div>
-            </div>
+        </div>
+    )}
+</div>
        
     )   
 }
