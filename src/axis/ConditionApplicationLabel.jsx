@@ -5,11 +5,11 @@ import _ from "lodash"
 
 
 ConditionApplicationLabel.propTypes = {
-    x: PropTypes.number,
-    y: PropTypes.number,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
     tag: PropTypes.string,
     textProps: PropTypes.object,
-    caTagToText: PropTypes.objectOf(PropTypes.string)
+    caTagToText: PropTypes.instanceOf(Map).isRequired
     
 };
 
@@ -20,7 +20,7 @@ export function ConditionApplicationLabel({ x, y, tag, textProps, caTagToText })
         return (
             <g>
                 {tags.map((t, idx) => (
-                    <Text key={idx} x={x} y={y + idx * 14} {...{ fill: "#333",  textAnchor: "middle", verticalAnchor: "middle", fontSize: 12, ...textProps }}>{caTagToText.get(t)}</Text>
+                    <Text key={`tag-${idx}`} x={x} y={y + idx * 14} {...{ fill: "#333",  textAnchor: "middle", verticalAnchor: "middle", fontSize: 12, ...textProps }}>{caTagToText.get(t)}</Text>
                 ))}
             </g>
         )

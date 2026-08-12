@@ -7,7 +7,38 @@ import { isInRange } from "../utils/inrange"
 
 
 
-const getCircle = (idx, d, colorScaleValid, props, scaleSize = 1, glyphMap, polyMapKeyName, checkPolyMap, xScale, yScale, colorScale, checkColorMap, colorScaleDefined, xaxisName, yaxisName, sizeName, colorMap, colorMapKeyName, fill, stroke, strokeWidth, opacity, sizeScale, colorName) => {
+const getCircle = ({
+    // data props
+    idx,
+    d,
+    // axis/scale props
+    xaxisName,
+    yaxisName,
+    xScale,
+    yScale,
+    // size props
+    sizeName,
+    sizeScale,
+    scaleSize = 1,
+    // color props
+    colorName,
+    colorScale,
+    colorScaleValid,
+    colorScaleDefined,
+    colorMap,
+    colorMapKeyName,
+    checkColorMap,
+    fill,
+    // glyph/polygon props
+    glyphMap,
+    polyMapKeyName,
+    checkPolyMap,
+    // style props
+    stroke,
+    strokeWidth,
+    opacity,
+    // misc props
+    props}) => {
     if (!checkPolyMap || !_.has(d,polyMapKeyName) || !_.has(glyphMap,d[polyMapKeyName]) || glyphMap[d[polyMapKeyName]] === "circle") return <circle 
     //dont use opacity, very very slow on safari, instead fillOpacity and strokeOpacity 
         key={`${idx}-sc-p`}
@@ -205,13 +236,63 @@ function ScatterPoints({
                 const d = data[idx]
                 // if (!valid[idx]) return null 
                 const colorScaleValid = colorScaleDefined ? _.isString(colorScale(d[colorName])) : false
-                return getCircle(idx, d, colorScaleValid, {strokeWidth, fillOpacity : opacity, strokeOpacity : opacity}, 1.0, glyphMap, polyMapKeyName, checkPolyMap, xScale, yScale, colorScale, checkColorMap, colorScaleDefined, xaxisName, yaxisName, sizeName, colorMap, colorMapKeyName, fill, stroke, strokeWidth, opacity, sizeScale, colorName)
+                return getCircle({
+                    idx,
+                    d,
+                    colorScaleValid,
+                    props: {strokeWidth, fillOpacity : opacity, strokeOpacity : opacity},
+                    scaleSize: 1.0,
+                    glyphMap,
+                    polyMapKeyName,
+                    checkPolyMap,
+                    xScale,
+                    yScale,
+                    colorScale,
+                    checkColorMap,
+                    colorScaleDefined,
+                    xaxisName,
+                    yaxisName,
+                    sizeName,
+                    colorMap,
+                    colorMapKeyName,
+                    fill,
+                    stroke,
+                    strokeWidth,
+                    opacity,
+                    sizeScale,
+                    colorName
+                })
             })}
             {opacityBySearch ? highlightIndices.map(idx => {
                 if (!valid[idx]) return null 
                 const d = data[idx]
                 const colorScaleValid = colorScaleDefined ? _.isString(colorScale(d[colorName])) : false
-                return getCircle(idx, d, colorScaleValid,{strokeWidth : searchStrokeWidth, fillOpacity : 1.0, strokeOpacity : 1.0}, 1.15, glyphMap, polyMapKeyName, checkPolyMap, xScale, yScale, colorScale, checkColorMap, colorScaleDefined, xaxisName, yaxisName, sizeName, colorMap, colorMapKeyName, fill, stroke, strokeWidth, opacity, sizeScale, colorName)
+                return getCircle({
+                    idx,
+                    d,
+                    colorScaleValid,
+                    props: {strokeWidth : searchStrokeWidth, fillOpacity : 1.0, strokeOpacity : 1.0},
+                    scaleSize: 1.15,
+                    glyphMap,
+                    polyMapKeyName,
+                    checkPolyMap,
+                    xScale,
+                    yScale,
+                    colorScale,
+                    checkColorMap,
+                    colorScaleDefined,
+                    xaxisName,
+                    yaxisName,
+                    sizeName,
+                    colorMap,
+                    colorMapKeyName,
+                    fill,
+                    stroke,
+                    strokeWidth,
+                    opacity,
+                    sizeScale,
+                    colorName
+                })
             })
                 : null}
         </g>

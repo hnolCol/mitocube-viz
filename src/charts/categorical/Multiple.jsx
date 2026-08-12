@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { scaleBand, scaleLinear, scaleOrdinal } from "@visx/scale"
 import PropTypes from "prop-types"
 import _, { get } from "lodash"
@@ -75,7 +75,7 @@ function MultiCategoricalChart({
     attributeTagToText,
     children
 }) {
-
+    const [isLegendOpen, setIsLegendOpen] = useState(true)
     const uniqueColorValues = _.uniqBy(data, colorName).map(d => d[colorName])
     const colorCategoryFound = _.isString(colorName) && _.has(data[0], colorName)
     const subplotCategoryFound = _.isString(subplotName) && _.has(data[0], subplotName)
@@ -221,15 +221,22 @@ function MultiCategoricalChart({
             <>{children(categoricalSplit)}</>
         </SVG>
         </div>
-        <div style={{position : "absolute", top: 0, right: 0}}>{hasLegend ? <CategoricalLegend {...{
-                colorName,
-                colorScale,
-                caTagToText,
-                attributeTagToText,
-                maxWidth : 150
-            }} /> : null}</div>
+            <div style={{ position: "absolute", top: -30, right: 0, zIndex : 1000 }}>
+                {hasLegend ? <div><button className="basic-button--no-border" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => {
+                    console.log(e)
+                     e.stopPropagation()
+                     setIsLegendOpen(!isLegendOpen) 
+                }}>Collapse</button>
+                    {isLegendOpen && <CategoricalLegend {...{
+                        colorName,
+                        colorScale,
+                        caTagToText,
+                        attributeTagToText,
+                        maxWidth: 150
+                    }} />} </div> : null}
             
-        </div>
+            </div>
+            </div>
        
     )   
 }
