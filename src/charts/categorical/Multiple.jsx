@@ -599,15 +599,14 @@ function MultiCategoricalChart({
 
                             onClick={(e) => {
                                 e.stopPropagation()
-
                                 setIsLegendOpen(
                                     !isLegendOpen
                                 )
                             }}
                         >
                             {isLegendOpen
-                                ? "▼"
-                                : "▲"}
+                                ? "▲"
+                                : "▼"}
                         </button>
                     </div>
                 </div>
