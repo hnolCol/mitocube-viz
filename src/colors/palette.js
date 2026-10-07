@@ -51,7 +51,7 @@ const colorPalettes = new Map([
 
 export function getColorPalette(n, darkmode = false, paletteIndex = 0) {
     const colorPalette = darkmode ? STD_CHART_COLOR_PALETTE_DARK : colorPalettes.get(paletteIndex) || STD_CHART_COLOR_PALETTE;
-    return colorPalette.slice(0,n)
+    return Array.from({ length: n }, (_, i) => colorPalette[i % colorPalette.length])
 }
 
 export function getRedBlueColorScale() {

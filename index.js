@@ -21,6 +21,13 @@ import { computeTopologyLayout } from "./src/utils/topology"
 import { MembraneTopologyDiagram } from "./src/charts/crosslinks/MembraneTopologyDiagram"
 import { computeCrosslinkLayout } from "./src/utils/crosslinks"
 import { featureColor } from "./src/colors/crosslinks"
+import { RingGauge, ProportionBar } from "./src/charts/state/PrecentChart"
+import { StateDurationPie, StateTimeline } from "./src/charts/state/StateCharts"
+import { MonthlyBarLineChart, MonthlyTrendLine } from "./src/charts/state/MonthlyStats"
+import { SectionLabel, EmptyState, Dot, Legend, PillToggle, ChipMultiSelect } from "./src/text/InstrumentStats"
+import { MONTH_LABELS, DAY_MS, parseYearMonth, groupByYearMonth,totalDurationByState, splitStatesByYear, stateTimeShare } from "./src/utils/time"
+import { median } from "./src/utils/stats"
+import { SERIES_COLORS, seriesColor } from "./src/colors/series"
 
 export default {
 
@@ -34,11 +41,21 @@ export default {
         },
         crosslinks: {
             featureColor
-        }
+        },
+        series: {
+            SERIES_COLORS,
+            seriesColor
+                    }
     },
     text: {
         "TextLabel": TextLabel,
-        "ScatterLabel": ScatterLabel
+        "ScatterLabel": ScatterLabel,
+        "SectionLabel": SectionLabel,
+        "EmptyState": EmptyState,
+        "Dot": Dot,
+        "Legend": Legend,
+        "PillToggle": PillToggle,
+        "ChipMultiSelect": ChipMultiSelect
     },
     primitives: {
         'Box': Box,
@@ -52,6 +69,14 @@ export default {
             "MinimalBoxplot": MinimalBoxplot,
             "MinimalBoxplots": MinimalBoxplots
         },
+        "state": {
+            "RingGauge": RingGauge,
+            "ProportionBar": ProportionBar,
+            "StateDurationPie": StateDurationPie,
+            "StateTimeline": StateTimeline,
+            "MonthlyBarLineChart": MonthlyBarLineChart,
+            "MonthlyTrendLine": MonthlyTrendLine
+                    },
         "Categorical": Categorical,
         "Heatmap": Heatmap,
         "HeatmapGrouping": HeatmapGrouping,
@@ -64,5 +89,13 @@ export default {
     utils: {
         "linearRegression" : linearRegression,
         "computeCrosslinkLayout": computeCrosslinkLayout,
-        "computeTopologyLayout": computeTopologyLayout
+        "computeTopologyLayout": computeTopologyLayout,
+        "median": median,
+        "MONTH_LABELS": MONTH_LABELS,
+        "DAY_MS": DAY_MS,
+        "parseYearMonth": parseYearMonth,
+        "groupByYearMonth": groupByYearMonth,
+        "totalDurationByState": totalDurationByState,
+        "splitStatesByYear": splitStatesByYear,
+        "stateTimeShare": stateTimeShare
     }}
