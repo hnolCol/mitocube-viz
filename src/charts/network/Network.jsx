@@ -59,10 +59,6 @@ export function InteractiveNetwork({
     svgID
 }) {
 
-    const handleNodeMove = (e, nodeID, newPosition) => {
-        console.log(`Node ${nodeID} moved to position:`, newPosition);
-        // Here you can update the state or perform any actions needed when a node is moved
-    }
 
 
     return (

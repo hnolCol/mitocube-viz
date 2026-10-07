@@ -108,7 +108,6 @@ export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLab
                     <TextLabel x={cx} dx={checkedBoxWidth / 2 + 4} y={cy} labelTexts={[labelText]} verticalAnchor="middle" textAnchor="start" totalYOffset={0} />
                 </g>
             }) : null}
-            <Text x={margins.left} dx={-8} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text>
             {!showYAxis && _.isString(yaxisLabel) && <Text x={margins.left} dx={-8} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text>}
         </SVG>
     )

@@ -176,12 +176,12 @@ export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, vert
     };
 
     if (!_.every(keyNames.map(keyName => _.has(data[0], keyName)))) {
-        console.log("All keyNames must exist in the data objects provided to HeatmapGrouping.");
+        console.warn("All keyNames must exist in the data objects provided to HeatmapGrouping.");
         return null 
     }
 
     if (!_.isArray(is_condition_application) || is_condition_application.length !== keyNames.length) {
-        console.log("is_condition_application must be an array of booleans with the same length as keyNames.");
+        console.warn("is_condition_application must be an array of booleans with the same length as keyNames.");
         return null
     }
     return (
