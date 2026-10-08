@@ -432,9 +432,25 @@ function Categorical({
                                                 {chartType === "boxplot" ?
                                                     <Box stroke={strokeColor} {...boxQuantiles} fill={colorScale(colorCategory)} x={xBar + boxWidth / 2} width={boxWidth} /> :
                                                     chartType === "barplot" ?
-                                                        <Bar x={xBar} y1={yScale(subplotDataArray[yaxisName])} y0={yScale(0)} fill={colorScale(colorCategory)} width={boxWidth} /> :
+                                                        <Group>
+                                                            <Bar x={xBar} y1={yScale(subplotDataArray[yaxisName])} y0={yScale(0)} fill={colorScale(colorCategory)} width={boxWidth} />
+                                                            {errorName !== undefined && !_.isNaN(subplotDataArray[errorName]) && _.isNumber(subplotDataArray[errorName]) ?
+                                                                <ErrorBar
+                                                                    x={xBar + boxWidth / 2}
+                                                                    y0={yScale(subplotDataArray[yaxisName])}
+                                                                    y1={subplotDataArray[yaxisName] > 0 ? yScale(subplotDataArray[yaxisName] + subplotDataArray[errorName]) : yScale(subplotDataArray[yaxisName] - subplotDataArray[errorName])}
+                                                                    width={boxWidth * 0.5} /> : null}
+                                                        </Group> :
                                                         chartType === "pointplot" ?
-                                                            <Point p={[xBar + boxWidth / 2, yScale(subplotDataArray[yaxisName])]} fill={colorScale(colorCategory)} r={4} /> :
+                                                            <Group>
+                                                                <Point p={[xBar + boxWidth / 2, yScale(subplotDataArray[yaxisName])]} fill={colorScale(colorCategory)} r={4} />
+                                                                {errorName !== undefined && !_.isNaN(subplotDataArray[errorName]) && _.isNumber(subplotDataArray[errorName]) ?
+                                                                    <ErrorBar
+                                                                        x={xBar + boxWidth / 2}
+                                                                        y0={yScale(subplotDataArray[yaxisName])}
+                                                                        y1={subplotDataArray[yaxisName] > 0 ? yScale(subplotDataArray[yaxisName] + subplotDataArray[errorName]) : yScale(subplotDataArray[yaxisName] - subplotDataArray[errorName])}
+                                                                        width={boxWidth * 0.5} /> : null}
+                                                            </Group> :
                                                             null}
                                             </Group>
                                         )
@@ -462,9 +478,25 @@ function Categorical({
                                                 {chartType === "boxplot" ?
                                                 <Box stroke={strokeColor} {...boxQuantiles} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} x={xBar + boxWidth / 2} width={boxWidth} /> :
                                                 chartType === "barplot" ?
-                                                    <Bar x={xBar} y1={yScale(subplotDataArray[yaxisName])} y0={yScale(0)} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} width={boxWidth} /> :
+                                                    <Group>
+                                                        <Bar x={xBar} y1={yScale(subplotDataArray[yaxisName])} y0={yScale(0)} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} width={boxWidth} />
+                                                        {errorName !== undefined && !_.isNaN(subplotDataArray[errorName]) && _.isNumber(subplotDataArray[errorName]) ?
+                                                            <ErrorBar
+                                                                x={xBar + boxWidth / 2}
+                                                                y0={yScale(subplotDataArray[yaxisName])}
+                                                                y1={subplotDataArray[yaxisName] > 0 ? yScale(subplotDataArray[yaxisName] + subplotDataArray[errorName]) : yScale(subplotDataArray[yaxisName] - subplotDataArray[errorName])}
+                                                                width={boxWidth * 0.5} /> : null}
+                                                    </Group> :
                                                     chartType === "pointplot" ?
-                                                        <Point p={[xBar + boxWidth / 2, yScale(subplotDataArray[yaxisName])]} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} r={4} /> :
+                                                        <Group>
+                                                            <Point p={[xBar + boxWidth / 2, yScale(subplotDataArray[yaxisName])]} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} r={4} />
+                                                            {errorName !== undefined && !_.isNaN(subplotDataArray[errorName]) && _.isNumber(subplotDataArray[errorName]) ?
+                                                                <ErrorBar
+                                                                    x={xBar + boxWidth / 2}
+                                                                    y0={yScale(subplotDataArray[yaxisName])}
+                                                                    y1={subplotDataArray[yaxisName] > 0 ? yScale(subplotDataArray[yaxisName] + subplotDataArray[errorName]) : yScale(subplotDataArray[yaxisName] - subplotDataArray[errorName])}
+                                                                    width={boxWidth * 0.5} /> : null}
+                                                        </Group> :
                                                         null}
 
                                             </Group>
@@ -496,9 +528,25 @@ function Categorical({
                                                         {chartType === "boxplot" ?
                                                             <Box stroke={strokeColor} {...boxQuantiles} fill={color} x={xBar + colorBandwidth / 2} width={colorBandwidth} /> :
                                                             chartType === "barplot" ?
-                                                                <Bar x={xBar} y1={yScale(colorCatData[yaxisName])} y0={yScale(0)} fill={color} width={colorBandwidth} /> :
+                                                                <Group>
+                                                                    <Bar x={xBar} y1={yScale(colorCatData[yaxisName])} y0={yScale(0)} fill={color} width={colorBandwidth} />
+                                                                    {errorName !== undefined && !_.isNaN(colorCatData[errorName]) && _.isNumber(colorCatData[errorName]) ?
+                                                                        <ErrorBar
+                                                                            x={xBar + colorBandwidth / 2}
+                                                                            y0={yScale(colorCatData[yaxisName])}
+                                                                            y1={colorCatData[yaxisName] > 0 ? yScale(colorCatData[yaxisName] + colorCatData[errorName]) : yScale(colorCatData[yaxisName] - colorCatData[errorName])}
+                                                                            width={colorBandwidth * 0.5} /> : null}
+                                                                </Group> :
                                                                 chartType === "pointplot" ?
-                                                                    <Point p={[xBar + colorBandwidth / 2, yScale(colorCatData[yaxisName])]} fill={color} r={4} /> :
+                                                                    <Group>
+                                                                        <Point p={[xBar + colorBandwidth / 2, yScale(colorCatData[yaxisName])]} fill={color} r={4} />
+                                                                        {errorName !== undefined && !_.isNaN(colorCatData[errorName]) && _.isNumber(colorCatData[errorName]) ?
+                                                                            <ErrorBar
+                                                                                x={xBar + colorBandwidth / 2}
+                                                                                y0={yScale(colorCatData[yaxisName])}
+                                                                                y1={colorCatData[yaxisName] > 0 ? yScale(colorCatData[yaxisName] + colorCatData[errorName]) : yScale(colorCatData[yaxisName] - colorCatData[errorName])}
+                                                                                width={colorBandwidth * 0.5} /> : null}
+                                                                    </Group> :
                                                                     null}
 
                                                     </Group>
