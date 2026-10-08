@@ -26,7 +26,7 @@ SingleCategoricalChart.propTypes = {
     yScaleStartsAtZero: PropTypes.bool,
     darkmode: PropTypes.bool,
     children: PropTypes.func,
-    chartType: PropTypes.oneOf(["boxplot", "barplot", "lineplot"]),
+    chartType: PropTypes.oneOf(["boxplot", "barplot", "pointplot", "lineplot"]),
     caTagToText : PropTypes.object
 }
 
