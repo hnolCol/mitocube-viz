@@ -144,7 +144,7 @@ function SingleCategoricalChart({
                 round: true,
             })
         )
-    }, [chartWidth, colorName, chartType])
+    }, [chartWidth, uniqueColorValues, innerColorPadding, outerColorPadding, chartType])
 
     const colorScale = useMemo(() => {
         // scale taking care of the fill color.

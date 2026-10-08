@@ -67,7 +67,7 @@ export function MinimalBoxplots({ qs: rawQs, boxWidth, width, height, margins, y
                 nice: true
             }
         )
-    }, [chartHeight, rerender])
+    }, [qs, preYScale, chartHeight, margins, rerender])
     return (
         <SVG {...{ width, height }}>
             {showYAxis && <AxisLeft  scale={yScale}

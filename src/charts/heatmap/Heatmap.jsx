@@ -153,7 +153,7 @@ function Heatmap({
             domain: [minMax[0], 0, minMax[1]],
             range: getRedBlueColorScale()
         })
-    }, [minMax, heatmapValues])
+    }, [minMax])
 
     /**
      * @description The colorScale for the individual clusters. 
@@ -166,7 +166,7 @@ function Heatmap({
             domain: uniqueClusterValues,
             range: getColorPalette(uniqueClusterValues.length)
         })
-    }, [clusterName])
+    }, [uniqueClusterValues])
 
 
     /**
