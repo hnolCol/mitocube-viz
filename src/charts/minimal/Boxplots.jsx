@@ -52,8 +52,7 @@ export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLab
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     const checkedBoxWidth = _.isNumber(boxWidth) && boxWidth < chartWidth ? boxWidth : chartWidth / qs.length
     const fills = _.isArray(fill) && fill.length === qs.length ? fill : qs.map(() => fill)
-
-    abbreviateNumber
+    const boxX = (i) => margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween)
     const yScale = useMemo(() => {
         if (_.isFunction(preYScale)) return preYScale
         const max = _.maxBy(qs, (q) => q.max).max
@@ -79,12 +78,12 @@ export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLab
             {verticalLineAtZero ? <line x1={margins.left} x2={margins.left + chartWidth} y1={yScale(0)} y2={yScale(0)} stroke={"#000000"} strokeWidth={1} /> : null}
 
             {qs.map((q, i) => {
-                return <Box key={`boxplot-${i}`} x={margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween) } q25={yScale(q.q25)} q75={yScale(q.q75)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.m)} width={checkedBoxWidth} fill={fills[i]} />
+                return <Box key={`boxplot-${i}`} x={boxX(i)} q25={yScale(q.q25)} q75={yScale(q.q75)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.m)} width={checkedBoxWidth} fill={fills[i]} />
             })}
-            {xtickLabels.map((label, i) => <Text key={`boxplot-xtick-${i}`} x={margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween)} y={height - margins.bottom} dy={0} fontSize={10} verticalAnchor={"middle"} textAnchor={"end"} angle={-90}  totalYOffset={0}>{label}</Text>)}
+            {xtickLabels.map((label, i) => <Text key={`boxplot-xtick-${i}`} x={boxX(i)} y={height - margins.bottom} dy={0} fontSize={10} verticalAnchor={"middle"} textAnchor={"end"} angle={-90}  totalYOffset={0}>{label}</Text>)}
             {indicateN ? qs.map((q, i) => <Text
                 key={`idnicate-n-boxplot${i}`}
-                x={margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween)}
+                x={boxX(i)}
                 y={yScale(q.max)}
                 dy={-4}
                 verticalAnchor={"bottom"}
@@ -92,14 +91,14 @@ export function MinimalBoxplots({ qs, boxWidth, width, height, margins, yaxisLab
                 totalYOffset={0}>{abbreviateNumber(q.N)}</Text>) : null}
             
             {showMedian ? qs.map((q, i) => <TextLabel key={`boxplot-median-${i}`} 
-                x={margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween)}
+                x={boxX(i)}
                 dx={2}
                 y={yScale(q.m)}
                 labelTexts={[`${_.round(q.m, roundToDigits)} ${medianSuffix}`]} verticalAnchor={"middle"} textAnchor={"start"} totalYOffset={0} />) : null}
             {_.isArray(markerValues) ? qs.map((q, i) => {
                 const markerValue = markerValues[i]
                 if (!_.isNumber(markerValue)) return null
-                const cx = margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween)
+                const cx = boxX(i)
                 const cy = yScale(markerValue)
                 const markerLabel = _.isArray(markerLabels) ? markerLabels[i] : undefined
                 const labelText = _.isString(markerLabel) ? `${markerLabel} (${_.round(markerValue, roundToDigits)})` : `${_.round(markerValue, roundToDigits)}${medianSuffix}`

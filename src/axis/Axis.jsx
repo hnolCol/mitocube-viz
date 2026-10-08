@@ -3,7 +3,8 @@ import { AxisBottom, AxisLeft } from "@visx/axis"
 import _ from "lodash"
 
 import { AxisBackground } from "./Background"
-import { getAxisStrokeColor } from "../colors/stroke"
+import { getAxisStrokeColor, getStrokeColor } from "../colors/stroke"
+import { getFillColor, getAxisBackgroundFill } from "../colors/fill"
 import { getNumberTicks } from "./ticks"
 import { ConditionApplicationLabel } from "./ConditionApplicationLabel"
 import { Text } from "@visx/text"
@@ -46,8 +47,8 @@ function XYAxisWithBackground({
     }
 
     if (darkmode) {
-        bottomTickLabelProps["fill"] = "#FFFFFF"
-        leftTickLabelProps["fill"] = "#FFFFFF"
+        bottomTickLabelProps["fill"] = getFillColor(darkmode)
+        leftTickLabelProps["fill"] = getFillColor(darkmode)
     }
 
     return (
@@ -57,18 +58,18 @@ function XYAxisWithBackground({
                 y={margins.top}
                 height={chartHeight}
                 width={chartWidth}
-                fill={darkmode ? "#2b2b2b" : "#fafafa"}
+                fill={getAxisBackgroundFill(darkmode)}
             />   
 
             <AxisLeft
                 label={leftLabel} //label only first axis
                 labelOffset={30}
-                labelProps={{fontSize: "0.8rem", textAnchor : "middle", fill : darkmode ? "#FFFFFF" : "#000000", width : 0.8 * chartHeight}}
+                labelProps={{fontSize: "0.8rem", textAnchor : "middle", fill : getFillColor(darkmode), width : 0.8 * chartHeight}}
                 tickLabelProps={{ fontSize: "0.8rem", ...leftTickLabelProps, width : 0.8 * chartHeight}}
                 tickFormat={(tickLabel) => leftTickLabelsVisible ? tickLabel : undefined}
                 left={leftStart}
                 scale={leftScale}
-                tickLineProps={{stroke : darkmode ? "#FFFFFF" : "#000000"}}
+                tickLineProps={{stroke : getStrokeColor(darkmode)}}
                 hideTicks={leftHideTicks}
                 numTicks={getNumberTicks(chartHeight)}
                 stroke={getAxisStrokeColor(darkmode)}
@@ -81,10 +82,10 @@ function XYAxisWithBackground({
                 top={topStart}
                 label={bottomLabel}
                 hideTicks={bottomHideTicks}
-                labelProps={{fontSize: "0.8rem", verticalAnchor:"middle", textAnchor :"middle", dy: 5, width : 0.8 * chartWidth, fill : darkmode ? "#FFFFFF" : "#000000"}}
+                labelProps={{fontSize: "0.8rem", verticalAnchor:"middle", textAnchor :"middle", dy: 5, width : 0.8 * chartWidth, fill : getFillColor(darkmode)}}
                 tickLabelProps={{ fontSize: "0.8rem", dy : -2, verticalAnchor: "middle", ...bottomTickLabelProps }}
                 labelOffset={25}
-                tickLineProps={{stroke : darkmode ? "#FFFFFF" : "#000000"}}
+                tickLineProps={{stroke : getStrokeColor(darkmode)}}
                 numTicks={bottomTicksAreConditionApplicationLabels ? bottomScale.domain().length : getNumberTicks(chartWidth)}
                 scale={bottomScale}
                 stroke={getAxisStrokeColor(darkmode)}
