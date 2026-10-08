@@ -21,12 +21,22 @@ import { computeTopologyLayout } from "./src/utils/topology"
 import { MembraneTopologyDiagram } from "./src/charts/crosslinks/MembraneTopologyDiagram"
 import { computeCrosslinkLayout } from "./src/utils/crosslinks"
 import { featureColor } from "./src/colors/crosslinks"
-import { RingGauge, ProportionBar } from "./src/charts/state/PrecentChart"
+import { randomColor } from "./src/colors/palette"
+import { isHex, isHexColorLight } from "./src/types/checks/color"
+import { areAllValuesNumbers, areAllValuesArrays, arraysInArrayHaveSameLength } from "./src/types/checks/numbers"
+import { copyTextToClipboard, copyTextToClipboardFromArrayOfObjects } from "./src/utils/copy"
+import { downloadSVG } from "./src/export/svg"
+import { getNumberTicks } from "./src/axis/ticks"
+import { getChartWidthAndHeightWithMargins, getBoundariesFromArrayOfObjects, getDomainWithBoundaries, addMarginToBoundaries } from "./src/utils/border"
+import { getUniqueValuesInArrayOfObjects } from "./src/utils/arrays"
+import { abbreviateNumber, roundNumber } from "./src/transforms/numbers"
+import { RingGauge, ProportionBar } from "./src/charts/state/PercentChart"
 import { StateDurationPie, StateTimeline } from "./src/charts/state/StateCharts"
 import { MonthlyBarLineChart, MonthlyTrendLine } from "./src/charts/state/MonthlyStats"
 import { SectionLabel, EmptyState, Dot, Legend, PillToggle, ChipMultiSelect } from "./src/text/InstrumentStats"
 import { MONTH_LABELS, DAY_MS, parseYearMonth, groupByYearMonth,totalDurationByState, splitStatesByYear, stateTimeShare } from "./src/utils/time"
 import { median } from "./src/utils/stats"
+import { normalizeQuantiles } from "./src/utils/quantiles"
 import { SERIES_COLORS, seriesColor } from "./src/colors/series"
 
 export default {
@@ -91,11 +101,29 @@ export default {
         "computeCrosslinkLayout": computeCrosslinkLayout,
         "computeTopologyLayout": computeTopologyLayout,
         "median": median,
+        "normalizeQuantiles": normalizeQuantiles,
         "MONTH_LABELS": MONTH_LABELS,
         "DAY_MS": DAY_MS,
         "parseYearMonth": parseYearMonth,
         "groupByYearMonth": groupByYearMonth,
         "totalDurationByState": totalDurationByState,
         "splitStatesByYear": splitStatesByYear,
-        "stateTimeShare": stateTimeShare
+        "stateTimeShare": stateTimeShare,
+        "getChartWidthAndHeightWithMargins": getChartWidthAndHeightWithMargins,
+        "getBoundariesFromArrayOfObjects": getBoundariesFromArrayOfObjects,
+        "getDomainWithBoundaries": getDomainWithBoundaries,
+        "addMarginToBoundaries": addMarginToBoundaries,
+        "getUniqueValuesInArrayOfObjects": getUniqueValuesInArrayOfObjects,
+        "abbreviateNumber": abbreviateNumber,
+        "roundNumber": roundNumber,
+        "copyTextToClipboard": copyTextToClipboard,
+        "copyTextToClipboardFromArrayOfObjects": copyTextToClipboardFromArrayOfObjects,
+        "downloadSVG": downloadSVG,
+        "getNumberTicks": getNumberTicks,
+        "isHex": isHex,
+        "isHexColorLight": isHexColorLight,
+        "areAllValuesNumbers": areAllValuesNumbers,
+        "areAllValuesArrays": areAllValuesArrays,
+        "arraysInArrayHaveSameLength": arraysInArrayHaveSameLength,
+        "randomColor": randomColor
     }}

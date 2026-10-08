@@ -2,6 +2,21 @@
 import _ from "lodash"
 
 
+/**
+ * @description Returns the value of a sorted array at a (possibly fractional) index using linear interpolation.
+ * @param {Number[]} sortedArray - Array sorted in ascending order.
+ * @param {Number} idx - The (possibly fractional) index into the array.
+ * @returns {Number} The interpolated value.
+ */
+function interpolateAtSortedIndex(sortedArray, idx) {
+    const lower = Math.floor(idx)
+    const frac = idx - lower
+    if (sortedArray[lower + 1] !== undefined) {
+        return sortedArray[lower] + frac * (sortedArray[lower + 1] - sortedArray[lower])
+    }
+    return sortedArray[lower]
+}
+
 export function getQuantiles(
     array,
     qs = [0, 0.25, 0.5, 0.75, 1.0],
@@ -16,16 +31,7 @@ export function getQuantiles(
     if (removeOutlier){
             //remove outlier before calculating quantiles
             let idxsForIQR = [0.25,0.5,0.75].map(q => (N-1) * q)
-            const generousIQR = idxsForIQR.map(idx => {
-                let b = Math.floor(idx)
-                let r = idx - b 
-                if (sortedFilteredArray[b+1]!==undefined) {
-                    return sortedFilteredArray[b] + r * (sortedFilteredArray[b + 1] - sortedFilteredArray[b]);
-                }
-                else {
-                    return sortedFilteredArray[b]
-                }
-            })
+            const generousIQR = idxsForIQR.map(idx => interpolateAtSortedIndex(sortedFilteredArray, idx))
             // get min and max values
             const IQR = generousIQR[2] - generousIQR[0]
             const maxValue = generousIQR[1] + NIQR * IQR
@@ -38,20 +44,11 @@ export function getQuantiles(
     let idxs = qs.map(q => (filteredN-1) * q)
     const numberOutliers = N - filteredN 
     // return filtered quantiles 
-    var caluclatedQuantiles =  idxs.map(idx => {
-        let b = Math.floor(idx)
-        let r = idx - b 
-        if (sortedFilteredArray[b+1]!==undefined) {
-            return sortedFilteredArray[b] + r * (sortedFilteredArray[b + 1] - sortedFilteredArray[b]);
-        }
-        else {
-            return sortedFilteredArray[b]
-        }
-    })    
+    let quantiles = idxs.map(idx => interpolateAtSortedIndex(sortedFilteredArray, idx))
     if (qs.length === 1) {
-        caluclatedQuantiles = caluclatedQuantiles[0]
+        quantiles = quantiles[0]
     }
-    return {[valueName]:caluclatedQuantiles, n_removed:numberOutliers, N: sortedFilteredArray.length, quantiles : qs, labels}
+    return {[valueName]: quantiles, n_removed: numberOutliers, N: sortedFilteredArray.length, quantiles : qs, labels}
 }   
 
 /**

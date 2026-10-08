@@ -10,7 +10,8 @@ import { LegendItem, LegendLabel, LegendLinear } from "@visx/legend"
 
 import { SVG } from "../base/SVG"
 import { getUniqueValuesInArrayOfObjects } from "../../utils/arrays"
-import { getRedBlueColorScale, getColorPalette, getAxisStrokeColor } from "../../colors/palette"
+import { getRedBlueColorScale, getColorPalette } from "../../colors/palette"
+import { getAxisStrokeColor } from "../../colors/stroke"
 import { roundNumber } from "../../transforms/numbers"
 import HeatmapRow from "./Row"
 
@@ -152,7 +153,7 @@ function Heatmap({
             domain: [minMax[0], 0, minMax[1]],
             range: getRedBlueColorScale()
         })
-    }, [minMax, heatmapValues])
+    }, [minMax])
 
     /**
      * @description The colorScale for the individual clusters. 
@@ -165,7 +166,7 @@ function Heatmap({
             domain: uniqueClusterValues,
             range: getColorPalette(uniqueClusterValues.length)
         })
-    }, [clusterName])
+    }, [uniqueClusterValues])
 
 
     /**

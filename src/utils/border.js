@@ -1,3 +1,5 @@
+import _ from "lodash"
+
 
 /**
  * @description Calcultates the ```chartWidth```and ```chartHeight``` based on the defined margins.

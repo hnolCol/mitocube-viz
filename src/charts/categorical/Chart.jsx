@@ -16,6 +16,7 @@ import { getColorPalette } from "../../colors/palette"
 import XYAxisWithBackground from "../../axis/Axis"
 import Box from "../../primitives/Box"
 import Bar from "../../primitives/Bar"
+import Point from "../../primitives/Point"
 import ErrorBar from "../base/Error"
 import MetricTable from "../../tooltip/MetricTable"
 import { ConditionApplicationLabel } from "../../axis/ConditionApplicationLabel"
@@ -41,7 +42,7 @@ Categorical.propTypes = {
     innerColorPadding: PropTypes.number,
     svgID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     darkmode: PropTypes.bool,
-    chartType: PropTypes.oneOf(["boxplot", "barplot", "lineplot"]),
+    chartType: PropTypes.oneOf(["boxplot", "barplot", "pointplot", "lineplot"]),
     bottomTicksAreConditionApplicationLabels: PropTypes.bool,
     caTagToText: PropTypes.object,
     attributeTagToText: PropTypes.object
@@ -156,7 +157,7 @@ function Categorical({
 
             quantileData = extractQuantileData(data, undefined, false, true)
         }
-        else if (chartType === "barplot") {
+        else if (chartType === "barplot" || chartType === "pointplot") {
             barInfo = [{ text: yaxisName, value: _.round(value, 2), type: "default" }, { text: "Error", type: "default", value: _.isNaN(errorValue) ? "NaN" : _.round(errorValue, 2) }]
         }
         const tooltipInfo = _.map(tooltipNames,
@@ -312,6 +313,17 @@ function Categorical({
                                                                 width={colorBandwidth * 0.5} /> : null}
                                                     </Group>
                                                     :
+                                                    chartType === "pointplot" ?
+                                                    <Group>
+                                                        <Point p={[xPosition + colorBandwidth / 2, yPosition]} fill={color} r={4} />
+                                                        {errorName !== undefined && !_.isNaN(errorValue) && _.isNumber(errorValue) ?
+                                                            <ErrorBar
+                                                                x={xPosition + colorBandwidth / 2}
+                                                                y0={yPosition} //point start 
+                                                                y1={yPosition > 0 ? yScale(yPosition + errorValue) : yScale(yPosition - errorValue)}
+                                                                width={colorBandwidth * 0.5} /> : null}
+                                                    </Group>
+                                                    :
                                                     null}
                                         </Group>
                                     )
@@ -417,7 +429,13 @@ function Categorical({
                                                 onMouseEnter={e => handleMouseOver(e, getTooltipData({ data: subplotDataArray, value: subplotDataArray[yaxisName], errorValue: subplotDataArray[errorName] }))}
                                                 onMouseLeave={hideTooltip}>
 
-                                                <Box stroke={strokeColor} {...boxQuantiles} fill={colorScale(colorCategory)} x={xBar + boxWidth / 2} width={boxWidth} />
+                                                {chartType === "boxplot" ?
+                                                    <Box stroke={strokeColor} {...boxQuantiles} fill={colorScale(colorCategory)} x={xBar + boxWidth / 2} width={boxWidth} /> :
+                                                    chartType === "barplot" ?
+                                                        <Bar x={xBar} y1={yScale(subplotDataArray[yaxisName])} y0={yScale(0)} fill={colorScale(colorCategory)} width={boxWidth} /> :
+                                                        chartType === "pointplot" ?
+                                                            <Point p={[xBar + boxWidth / 2, yScale(subplotDataArray[yaxisName])]} fill={colorScale(colorCategory)} r={4} /> :
+                                                            null}
                                             </Group>
                                         )
                                     })
@@ -441,7 +459,13 @@ function Categorical({
 
                                                 {/* fill uses a fixed fallback color -- colorScale() with no argument (no color
                                                     dimension in this branch) previously returned an undefined/default range value */}
-                                                <Box stroke={strokeColor} {...boxQuantiles} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} x={xBar + boxWidth / 2} width={boxWidth} />
+                                                {chartType === "boxplot" ?
+                                                <Box stroke={strokeColor} {...boxQuantiles} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} x={xBar + boxWidth / 2} width={boxWidth} /> :
+                                                chartType === "barplot" ?
+                                                    <Bar x={xBar} y1={yScale(subplotDataArray[yaxisName])} y0={yScale(0)} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} width={boxWidth} /> :
+                                                    chartType === "pointplot" ?
+                                                        <Point p={[xBar + boxWidth / 2, yScale(subplotDataArray[yaxisName])]} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} r={4} /> :
+                                                        null}
 
                                             </Group>
                                         )
@@ -469,7 +493,13 @@ function Categorical({
                                                     <Group key={`${colorIdx}-${subplotCategory}-${colorCategory}`}
                                                         onMouseEnter={e => handleMouseOver(e, getTooltipData({ data: colorCatData, value: colorCatData[yaxisName], errorValue: colorCatData[errorName] }))}
                                                         onMouseLeave={hideTooltip}>
-                                                        <Box stroke={strokeColor} {...boxQuantiles} fill={color} x={xBar + colorBandwidth / 2} width={colorBandwidth} />
+                                                        {chartType === "boxplot" ?
+                                                            <Box stroke={strokeColor} {...boxQuantiles} fill={color} x={xBar + colorBandwidth / 2} width={colorBandwidth} /> :
+                                                            chartType === "barplot" ?
+                                                                <Bar x={xBar} y1={yScale(colorCatData[yaxisName])} y0={yScale(0)} fill={color} width={colorBandwidth} /> :
+                                                                chartType === "pointplot" ?
+                                                                    <Point p={[xBar + colorBandwidth / 2, yScale(colorCatData[yaxisName])]} fill={color} r={4} /> :
+                                                                    null}
 
                                                     </Group>
                                                 )
