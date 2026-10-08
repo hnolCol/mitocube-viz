@@ -5,6 +5,7 @@ import Box from "../../primitives/Box";
 import { SVG } from "../base/SVG";
 import PropTypes from "prop-types";
 import { getChartWidthAndHeightWithMargins } from "../../utils/border";
+import { normalizeQuantiles } from "../../utils/quantiles";
 import { scaleLinear } from "@visx/scale";
 import { TextLabel } from "../../text/TextLabel";
 import _ from "lodash"
@@ -46,7 +47,8 @@ MinimalBoxplot.defaultProps = {
  * @param {*} param0 
  * @returns 
  */
-export function MinimalBoxplot({ q, boxWidth, width, height, margins, yaxisLabel ,  rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill="#efefef" }) {
+export function MinimalBoxplot({ q: rawQ, boxWidth, width, height, margins, yaxisLabel ,  rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill="#efefef" }) {
+    const q = normalizeQuantiles(rawQ)
     
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     const checkedBoxWidth = _.isNumber(boxWidth) && boxWidth < chartWidth ? boxWidth : chartWidth / 2
@@ -64,7 +66,7 @@ export function MinimalBoxplot({ q, boxWidth, width, height, margins, yaxisLabel
     return (
         <SVG {...{ width, height }}>
 
-            <Box x={margins.left + checkedBoxWidth/2} q25={yScale(q.q1)} q75={yScale(q.q3)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.median)}  width={checkedBoxWidth} fill={fill} />
+            <Box x={margins.left + checkedBoxWidth/2} q25={yScale(q.q25)} q75={yScale(q.q75)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.median)}  width={checkedBoxWidth} fill={fill} />
             {showMedian ? <TextLabel x={margins.left + checkedBoxWidth} dx={2} y={yScale(q.median)} labelTexts={[`${_.round(q.median, roundToDigits)} ${medianSuffix}`]} verticalAnchor={"middle"} textAnchor={"start"} totalYOffset={0} /> : null}
             <Text x={margins.left} dx={-4} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text> 
         </SVG>

@@ -27,6 +27,7 @@ import { MonthlyBarLineChart, MonthlyTrendLine } from "./src/charts/state/Monthl
 import { SectionLabel, EmptyState, Dot, Legend, PillToggle, ChipMultiSelect } from "./src/text/InstrumentStats"
 import { MONTH_LABELS, DAY_MS, parseYearMonth, groupByYearMonth,totalDurationByState, splitStatesByYear, stateTimeShare } from "./src/utils/time"
 import { median } from "./src/utils/stats"
+import { normalizeQuantiles } from "./src/utils/quantiles"
 import { SERIES_COLORS, seriesColor } from "./src/colors/series"
 
 export default {
@@ -91,6 +92,7 @@ export default {
         "computeCrosslinkLayout": computeCrosslinkLayout,
         "computeTopologyLayout": computeTopologyLayout,
         "median": median,
+        "normalizeQuantiles": normalizeQuantiles,
         "MONTH_LABELS": MONTH_LABELS,
         "DAY_MS": DAY_MS,
         "parseYearMonth": parseYearMonth,
