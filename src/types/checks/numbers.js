@@ -8,3 +8,22 @@ import _ from "lodash"
 export function areAllValuesNumbers(array) {
     return _.every(array,x=>_.isNumber(x) && !_.isNaN(x))
 }
+
+/**
+ * @description Checks if all values in an object are arrays.
+ * @param {Object.<string, Array>} object
+ * @returns {Boolean} Returns true if all values in the object are arrays.
+ */
+export function areAllValuesArrays(object) {
+    let arrayCheckForValues = _.mapValues(object, v => _.isArray(v))
+    return _.every(arrayCheckForValues)
+}
+
+/**
+ * @description Checks if all arrays in an array (quantitative matrix) have the same length.
+ * @param {Array[]} array The input array.
+ * @returns {Boolean} Returns true if all arrays in the array have the same length.
+ */
+export function arraysInArrayHaveSameLength(array) {
+    return _.every(array, d => d.length === d[0].length)
+}

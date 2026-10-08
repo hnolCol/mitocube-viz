@@ -107,3 +107,7 @@ export const HIGHLIGHT_COLOR = "#466688" // this is the color used for highlight
 //     return paletteNames[paletteIndex % paletteNames.length];
 // }
 
+
+export function randomColor() {
+    return Math.floor(Math.random()*16777215).toString(16);
+}
