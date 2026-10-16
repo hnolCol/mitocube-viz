@@ -31,7 +31,8 @@ function Bar({
     fill,
     stroke,
     strokeWidth,
-    opacity}) {
+    opacity,
+    ...eventHandlers}) {
     // provide box coordinates in pixel 
     const barHeight = y0 > y1 ? y0-y1 : y1-y0
     const barBaseLine = y0 > y1 ? y1 : y0
@@ -40,6 +41,7 @@ function Bar({
         <g {...{opacity}}>
             {barHeight === 0 ? <line x1={x} x2={x + width} y1={barBaseLine} y2={barBaseLine} {...{ stroke, strokeWidth }} /> :
                 <rect x={x} y={barBaseLine} height={barHeight} {...{ width, fill, stroke, strokeWidth }} />}
+            {_.some(eventHandlers) ? <rect x={x} y={barBaseLine} height={barHeight} width={width} fill="transparent" style={{ pointerEvents: "all" }} {...eventHandlers} /> : null}
         </g>
     )
 }
