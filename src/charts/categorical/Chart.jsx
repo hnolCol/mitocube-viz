@@ -315,8 +315,9 @@ function Categorical({
                                                     :
                                                     chartType === "pointplot" ?
                                                     <Group>
-                                                        <Point p={[xPosition + colorBandwidth / 2, yPosition]} fill={color} r={4} />
-                                                        {errorName !== undefined && !_.isNaN(errorValue) && _.isNumber(errorValue) ?
+                                                        {_.isNumber(dataForColorCategory[yaxisName]) && !_.isNaN(dataForColorCategory[yaxisName]) ?
+                                                            <Point p={[xPosition + colorBandwidth / 2, yPosition]} fill={color} r={4} /> : null}
+                                                        {errorName !== undefined && !_.isNaN(errorValue) && _.isNumber(errorValue) && _.isNumber(dataForColorCategory[yaxisName]) && !_.isNaN(dataForColorCategory[yaxisName]) ?
                                                             <ErrorBar
                                                                 x={xPosition + colorBandwidth / 2}
                                                                 y0={yPosition} //point start 
@@ -443,8 +444,9 @@ function Categorical({
                                                         </Group> :
                                                         chartType === "pointplot" ?
                                                             <Group>
-                                                                <Point p={[xBar + boxWidth / 2, yScale(subplotDataArray[yaxisName])]} fill={colorScale(colorCategory)} r={4} />
-                                                                {errorName !== undefined && !_.isNaN(subplotDataArray[errorName]) && _.isNumber(subplotDataArray[errorName]) ?
+                                                                {_.isNumber(subplotDataArray[yaxisName]) && !_.isNaN(subplotDataArray[yaxisName]) ?
+                                                                    <Point p={[xBar + boxWidth / 2, yScale(subplotDataArray[yaxisName])]} fill={colorScale(colorCategory)} r={4} /> : null}
+                                                                {errorName !== undefined && !_.isNaN(subplotDataArray[errorName]) && _.isNumber(subplotDataArray[errorName]) && _.isNumber(subplotDataArray[yaxisName]) && !_.isNaN(subplotDataArray[yaxisName]) ?
                                                                     <ErrorBar
                                                                         x={xBar + boxWidth / 2}
                                                                         y0={yScale(subplotDataArray[yaxisName])}
@@ -489,8 +491,9 @@ function Categorical({
                                                     </Group> :
                                                     chartType === "pointplot" ?
                                                         <Group>
-                                                            <Point p={[xBar + boxWidth / 2, yScale(subplotDataArray[yaxisName])]} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} r={4} />
-                                                            {errorName !== undefined && !_.isNaN(subplotDataArray[errorName]) && _.isNumber(subplotDataArray[errorName]) ?
+                                                            {_.isNumber(subplotDataArray[yaxisName]) && !_.isNaN(subplotDataArray[yaxisName]) ?
+                                                                <Point p={[xBar + boxWidth / 2, yScale(subplotDataArray[yaxisName])]} fill={legendColors[Object.keys(legendColors)[0]] ?? strokeColor} r={4} /> : null}
+                                                            {errorName !== undefined && !_.isNaN(subplotDataArray[errorName]) && _.isNumber(subplotDataArray[errorName]) && _.isNumber(subplotDataArray[yaxisName]) && !_.isNaN(subplotDataArray[yaxisName]) ?
                                                                 <ErrorBar
                                                                     x={xBar + boxWidth / 2}
                                                                     y0={yScale(subplotDataArray[yaxisName])}
@@ -539,8 +542,9 @@ function Categorical({
                                                                 </Group> :
                                                                 chartType === "pointplot" ?
                                                                     <Group>
-                                                                        <Point p={[xBar + colorBandwidth / 2, yScale(colorCatData[yaxisName])]} fill={color} r={4} />
-                                                                        {errorName !== undefined && !_.isNaN(colorCatData[errorName]) && _.isNumber(colorCatData[errorName]) ?
+                                                                        {_.isNumber(colorCatData[yaxisName]) && !_.isNaN(colorCatData[yaxisName]) ?
+                                                                            <Point p={[xBar + colorBandwidth / 2, yScale(colorCatData[yaxisName])]} fill={color} r={4} /> : null}
+                                                                        {errorName !== undefined && !_.isNaN(colorCatData[errorName]) && _.isNumber(colorCatData[errorName]) && _.isNumber(colorCatData[yaxisName]) && !_.isNaN(colorCatData[yaxisName]) ?
                                                                             <ErrorBar
                                                                                 x={xBar + colorBandwidth / 2}
                                                                                 y0={yScale(colorCatData[yaxisName])}
