@@ -226,11 +226,11 @@ export function GroupedYearComparisonChart({
                         </Text>
                     }
                 />
-                <g transform={`translate(${margins.left},${margins.top + chartHeight + margins.bottom - 20})`}>
+                <g transform={`translate(${margins.left + chartWidth},${margins.top})`}>
                     {years.map((year, i) => (
-                        <g key={`year-${year}`} transform={`translate(${i * 60},0)`}>
-                            <rect x={0} y={-10} width={12} height={12} fill={"#888888"} opacity={yearOpacity(year)} />
-                            <Text x={17} y={0} fontSize={11} verticalAnchor="middle" fill={darkmode ? "#ffffff" : "#000000"}>{year}</Text>
+                        <g key={`year-${year}`} transform={`translate(0,${i * 16})`}>
+                            <rect x={-12} y={-5} width={10} height={10} fill={"#888888"} opacity={yearOpacity(year)} />
+                            <Text x={0} y={0} fontSize={11} textAnchor={"end"} dx={-16} dy={4} verticalAnchor={"start"} fill={darkmode ? "#ffffff" : "#000000"}>{year}</Text>
                         </g>
                     ))}
                 </g>
