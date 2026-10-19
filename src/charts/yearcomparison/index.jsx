@@ -30,7 +30,8 @@ GroupedYearComparisonChart.propTypes = {
     yaxisLabel: PropTypes.string,
     xaxisLabel: PropTypes.string,
     svgID: PropTypes.string,
-    darkmode: PropTypes.bool
+    darkmode: PropTypes.bool,
+    colorGroups: PropTypes.array
 }
 
 /**
@@ -50,6 +51,7 @@ GroupedYearComparisonChart.propTypes = {
  * @param {string} props.xaxisLabel
  * @param {string} props.svgID
  * @param {boolean} props.darkmode
+ * @param {Array} props.colorGroups - Full (unfiltered) category list used to assign colors. Pass this to keep colors stable when visible groups change (e.g. via year toggles). Defaults to the union of `groups` and groups found in `data`.
  */
 export function GroupedYearComparisonChart({
     data = [],
@@ -61,7 +63,8 @@ export function GroupedYearComparisonChart({
     yaxisLabel = "Count",
     xaxisLabel = undefined,
     svgID = "grouped-year-comparison-chart",
-    darkmode = false
+    darkmode = false,
+    colorGroups = null
 }) {
     const currentYear = years.length > 0 ? Math.max(...years.map(Number)) : null
     const chartWidth = width - margins.left - margins.right
@@ -101,10 +104,19 @@ export function GroupedYearComparisonChart({
         })
     }, [yMax, margins.top, chartHeight])
 
-    const colorPalette = useMemo(() => getColorPalette(Math.max(groups.length, 1), darkmode), [groups, darkmode])
+    // Color domain for stable colors. When the caller toggles years or filters
+    // groups, the visible `groups`/`data` shrink and re-order. To keep each
+    // category's color stable across such filter changes, pass the full
+    // (unfiltered) category list via `colorGroups`. If omitted, we fall back to
+    // the union of `groups` and the groups present in `data`.
+    const colorDomain = useMemo(() => {
+        if (_.isArray(colorGroups) && colorGroups.length > 0) return colorGroups
+        return _.uniq([...groups, ...data.map(d => d.group)])
+    }, [colorGroups, groups, data])
+    const colorPalette = useMemo(() => getColorPalette(Math.max(colorDomain.length, 1), darkmode), [colorDomain, darkmode])
     const colorByGroup = useMemo(() => {
-        return _.fromPairs(groups.map((g, i) => [g, colorPalette[i % colorPalette.length]]))
-    }, [groups, colorPalette])
+        return _.fromPairs(colorDomain.map((g, i) => [g, colorPalette[i % colorPalette.length]]))
+    }, [colorDomain, colorPalette])
 
     const {
         tooltipData,
