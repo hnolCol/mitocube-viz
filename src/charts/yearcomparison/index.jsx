@@ -11,15 +11,16 @@ import Bar from "../../primitives/Bar"
 import MetricTable from "../../tooltip/MetricTable"
 import { getColorPalette } from "../../colors/palette"
 import { getAxisStrokeColor, getStrokeColor } from "../../colors/stroke"
+import { getAxisBackgroundFill, mixHexColors } from "../../colors/fill"
 import { getNumberTicks } from "../../axis/ticks"
 
 const DEFAULT_MARGINS = { left: 50, right: 15, bottom: 60, top: 15 }
 // fraction of a bar width by which successive year bars are offset (0.75 => 25% overlap)
 const YEAR_OVERLAP = 0.75
-// opacity floor for the oldest visible year; opacity is interpolated between
-// this and 1.0 across all selected years so even many years stay readable
-const MIN_YEAR_OPACITY = 0.35
-const YEAR_OPACITY = { current: 1.0, previous: 0.45, older: 0.2 }
+// how strongly older years are tinted toward the chart background (0..1);
+// replaces the former opacity gradient so bars stay opaque and nothing
+// shines through where they overlap
+const MAX_YEAR_TINT = 0.65
 
 GroupedYearComparisonChart.propTypes = {
     data: PropTypes.arrayOf(PropTypes.shape({
@@ -213,17 +214,24 @@ export function GroupedYearComparisonChart({
         scroll: true
     })
 
-    const yearOpacity = year => {
-        // interpolate opacity smoothly between 1.0 (current year) and
-        // MIN_YEAR_OPACITY (oldest visible year) instead of three fixed tiers,
-        // so many selected years remain readable
+    // mix weight toward the chart background per year: 0 = full group color
+    // (newest year), up to MAX_YEAR_TINT for the oldest year. Tinting keeps
+    // bars opaque (nothing shines through the overlap) while still
+    // distinguishing years.
+    const yearTint = year => {
         const n = years.length
         const idx = years.indexOf(year)
-        // single year or unknown year: full opacity
-        if (n <= 1 || idx === -1) return YEAR_OPACITY.current
-        // t = 0 for the newest year (idx n-1), t = 1 for the oldest (idx 0)
+        if (n <= 1 || idx === -1) return 0
         const t = (n - 1 - idx) / (n - 1)
-        return YEAR_OPACITY.current + (MIN_YEAR_OPACITY - YEAR_OPACITY.current) * t
+        return t * MAX_YEAR_TINT
+    }
+
+    // opaque fill for a group/year: group color tinted toward the background
+    const yearFillColor = (group, year) => {
+        const base = colorByGroup[group] ?? "#aaaaaa"
+        const w = yearTint(year)
+        if (w <= 0) return base
+        return mixHexColors(base, getAxisBackgroundFill(darkmode), w)
     }
 
     const handleMouseOver = (event, tooltipRows) => {
@@ -275,8 +283,8 @@ export function GroupedYearComparisonChart({
                                         y1={y}
                                         y0={yScale(0)}
                                         width={barWidth}
-                                        fill={colorByGroup[group]}
-                                        opacity={yearOpacity(year)}
+                                        fill={yearFillColor(group, year)}
+                                        opacity={1}
                                         onMouseOver={e => { setHoveredBar(`${group}::${year}`); handleMouseOver(e, getTooltipRows(group, year, value)) }}
                                         onMouseMove={e => handleMouseOver(e, getTooltipRows(group, year, value))}
                                         onMouseLeave={() => { setHoveredBar(null); hideTooltip() }}
@@ -316,7 +324,7 @@ export function GroupedYearComparisonChart({
                 <g transform={`translate(${Math.min(margins.left + chartWidth, width - margins.right)},${margins.top})`}>
                     {years.map((year, i) => (
                         <g key={`year-${year}`} transform={`translate(0,${i * 16})`}>
-                            <rect x={-12} y={-5} width={10} height={10} fill={"#888888"} opacity={yearOpacity(year)} />
+                            <rect x={-12} y={-5} width={10} height={10} fill={mixHexColors("#888888", getAxisBackgroundFill(darkmode), yearTint(year))} />
                             <Text x={0} y={0} fontSize={11} textAnchor={"end"} dx={-16} dy={4} verticalAnchor={"start"} fill={darkmode ? "#ffffff" : "#000000"}>{year}</Text>
                         </g>
                     ))}
