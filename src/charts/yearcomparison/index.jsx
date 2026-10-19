@@ -83,15 +83,23 @@ export function GroupedYearComparisonChart({
     darkmode = false,
     minWidthPerGroup = 40,
     maxGroups = null,
-    otherGroupLabel = "Other"
+    otherGroupLabel = "Other",
+    colorGroups = null
 }) {
+    // index rows by group::year once, avoiding per-(group x year) data.find scans
+    const valueByGroupYearIndex = useMemo(() => {
+        const idx = new Map()
+        for (const d of data) idx.set(`${d.group}::${d.year}`, d.value)
+        return idx
+    }, [data])
+
     // total value per group across selected years, used for ranking when limiting
     const totalValueByGroup = useMemo(() => {
         return _.fromPairs(groups.map(g => [g, _.sumBy(
-            years.map(year => data.find(d => d.group === g && d.year === year)?.value),
+            years.map(year => valueByGroupYearIndex.get(`${g}::${year}`)),
             v => (_.isNumber(v) ? v : 0)
         )]))
-    }, [data, groups, years])
+    }, [valueByGroupYearIndex, groups, years])
 
     // determine effective group limit: "auto" = how many fit into twice the given
     // width (no scrolling), number = explicit cap, null = no limit
@@ -114,12 +122,12 @@ export function GroupedYearComparisonChart({
         const otherRows = years.map(year => {
             const value = _.sum(
                 collapsed.map(g => {
-                    const row = data.find(d => d.group === g && d.year === year)
-                    return _.isNumber(row?.value) ? row.value : 0
+                    const v = valueByGroupYearIndex.get(`${g}::${year}`)
+                    return _.isNumber(v) ? v : 0
                 })
             )
             return { group: otherGroupLabel, year, value }
-        }).filter(d => data.some(row => collapsed.includes(row.group) && row.year === d.year))
+        }).filter(d => collapsed.some(g => valueByGroupYearIndex.has(`${g}::${d.year}`)))
         return { limitedGroups: [...kept, otherGroupLabel], hasOtherBucket: true, otherGroupData: otherRows }
     }, [groupLimit, groups, totalValueByGroup, years, data, otherGroupLabel])
 
@@ -127,7 +135,7 @@ export function GroupedYearComparisonChart({
     const effectiveData = useMemo(() => {
         if (!hasOtherBucket) return data
         const collapsedSet = new Set(limitedGroups.filter(g => g !== otherGroupLabel))
-        return [...data.filter(d => collapsedSet.has(d.group) || !groups.includes(d.group)), ...otherGroupData]
+        return [...data.filter(d => collapsedSet.has(d.group)), ...otherGroupData]
     }, [data, hasOtherBucket, otherGroupData, limitedGroups, otherGroupLabel, groups])
 
     // grow the chart horizontally when many groups would squeeze the bars;
@@ -177,13 +185,19 @@ export function GroupedYearComparisonChart({
         })
     }, [yMax, margins.top, chartHeight])
 
-    // color domain: stable across limiting/selection; the collapsed bucket gets a neutral grey
-    const colorPalette = useMemo(() => getColorPalette(Math.max(groups.length, 1), darkmode), [groups, darkmode])
+    // color domain: prefer the caller-provided full (unfiltered) category list so
+    // colors stay stable when the year selection changes the visible groups;
+    // the collapsed bucket gets a neutral grey
+    const colorDomain = useMemo(() => {
+        if (_.isArray(colorGroups) && colorGroups.length > 0) return colorGroups
+        return _.uniq([...groups, ...data.map(d => d.group)])
+    }, [colorGroups, groups, data])
+    const colorPalette = useMemo(() => getColorPalette(Math.max(colorDomain.length, 1), darkmode), [colorDomain, darkmode])
     const colorByGroup = useMemo(() => {
-        const byGroup = _.fromPairs(groups.map((g, i) => [g, colorPalette[i % colorPalette.length]]))
+        const byGroup = _.fromPairs(colorDomain.map((g, i) => [g, colorPalette[i % colorPalette.length]]))
         if (hasOtherBucket) byGroup[otherGroupLabel] = darkmode ? "#777777" : "#aaaaaa"
         return byGroup
-    }, [groups, colorPalette, hasOtherBucket, otherGroupLabel])
+    }, [colorDomain, colorPalette, hasOtherBucket, otherGroupLabel, darkmode])
 
     const {
         tooltipData,
@@ -295,7 +309,7 @@ export function GroupedYearComparisonChart({
                         </Text>
                     }
                 />
-                <g transform={`translate(${margins.left + chartWidth},${margins.top})`}>
+                <g transform={`translate(${Math.min(margins.left + chartWidth, width - margins.right)},${margins.top})`}>
                     {years.map((year, i) => (
                         <g key={`year-${year}`} transform={`translate(0,${i * 16})`}>
                             <rect x={-12} y={-5} width={10} height={10} fill={"#888888"} opacity={yearOpacity(year)} />
