@@ -86,15 +86,15 @@ export function MinimalBoxplots({ qs: rawQs, boxWidth, width, height, margins, y
             {qs.map((q, i) => {
                 return <Box key={`boxplot-${i}`} x={boxX(i)} q25={yScale(q.q25)} q75={yScale(q.q75)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.median)} width={checkedBoxWidth} fill={fills[i]} />
             })}
-            {xtickLabels.map((label, i) => <Text key={`boxplot-xtick-${i}`} x={boxX(i)} y={height - margins.bottom} dy={0} fontSize={10} verticalAnchor={"middle"} textAnchor={"end"} angle={-90}  totalYOffset={0}>{label}</Text>)}
+            {xtickLabels.map((label, i) => <Text key={`boxplot-xtick-${i}`} x={boxX(i)} y={height - margins.bottom} dy={0} fontSize={10} verticalAnchor={"middle"} textAnchor={"end"} angle={-90}>{label}</Text>)}
             {indicateN ? qs.map((q, i) => <Text
                 key={`idnicate-n-boxplot${i}`}
                 x={boxX(i)}
                 y={yScale(q.max)}
                 dy={-4}
                 verticalAnchor={"bottom"}
-                textAnchor={"middle"}
-                totalYOffset={0}>{abbreviateNumber(q.N)}</Text>) : null}
+                textAnchor={"middle"}>
+                {abbreviateNumber(q.N)}</Text>) : null}
             
             {showMedian ? qs.map((q, i) => <TextLabel key={`boxplot-median-${i}`} 
                 x={boxX(i)}
