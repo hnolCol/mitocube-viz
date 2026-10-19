@@ -35,7 +35,11 @@ GroupedYearComparisonChart.propTypes = {
     yaxisLabel: PropTypes.string,
     xaxisLabel: PropTypes.string,
     svgID: PropTypes.string,
-    darkmode: PropTypes.bool
+    darkmode: PropTypes.bool,
+    colorGroups: PropTypes.array,
+    minWidthPerGroup: PropTypes.number,
+    maxGroups: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    otherGroupLabel: PropTypes.string
 }
 
 /**
@@ -59,6 +63,12 @@ GroupedYearComparisonChart.propTypes = {
  * group (category). If groups * minWidthPerGroup exceeds `width`, the chart grows
  * horizontally and becomes scrollable (overflow-x) so bars stay readable with
  * many categories.
+ * @param {number | "auto"} props.maxGroups - Limit the number of categories shown.
+ * "auto" derives the limit from the available width (max 2x the given `width`;
+ * the chart then never scrolls). A number caps the categories explicitly.
+ * Categories are ranked by total value across all selected years and the
+ * remaining ones are collapsed into an "Other" bucket. `null`/`undefined` = no limit.
+ * @param {string} props.otherGroupLabel - Label for the collapsed categories bucket.
  */
 export function GroupedYearComparisonChart({
     data = [],
@@ -71,32 +81,79 @@ export function GroupedYearComparisonChart({
     xaxisLabel = undefined,
     svgID = "grouped-year-comparison-chart",
     darkmode = false,
-    minWidthPerGroup = 40
+    minWidthPerGroup = 40,
+    maxGroups = null,
+    otherGroupLabel = "Other"
 }) {
+    // total value per group across selected years, used for ranking when limiting
+    const totalValueByGroup = useMemo(() => {
+        return _.fromPairs(groups.map(g => [g, _.sumBy(
+            years.map(year => data.find(d => d.group === g && d.year === year)?.value),
+            v => (_.isNumber(v) ? v : 0)
+        )]))
+    }, [data, groups, years])
+
+    // determine effective group limit: "auto" = how many fit into twice the given
+    // width (no scrolling), number = explicit cap, null = no limit
+    const groupLimit = useMemo(() => {
+        if (maxGroups === "auto") {
+            return Math.max(1, Math.floor((width - margins.left - margins.right) / minWidthPerGroup))
+        }
+        if (_.isNumber(maxGroups) && maxGroups >= 1) return Math.floor(maxGroups)
+        return null
+    }, [maxGroups, width, margins.left, margins.right, minWidthPerGroup])
+
+    // rank groups by total value, keep the top ones, collapse the rest into "Other"
+    const { limitedGroups, hasOtherBucket, otherGroupData } = useMemo(() => {
+        if (groupLimit === null || groups.length <= groupLimit) {
+            return { limitedGroups: groups, hasOtherBucket: false, otherGroupData: [] }
+        }
+        const ranked = [...groups].sort((a, b) => (totalValueByGroup[b] ?? 0) - (totalValueByGroup[a] ?? 0))
+        const kept = ranked.slice(0, groupLimit)
+        const collapsed = groups.filter(g => !kept.includes(g))
+        const otherRows = years.map(year => {
+            const value = _.sum(
+                collapsed.map(g => {
+                    const row = data.find(d => d.group === g && d.year === year)
+                    return _.isNumber(row?.value) ? row.value : 0
+                })
+            )
+            return { group: otherGroupLabel, year, value }
+        }).filter(d => data.some(row => collapsed.includes(row.group) && row.year === d.year))
+        return { limitedGroups: [...kept, otherGroupLabel], hasOtherBucket: true, otherGroupData: otherRows }
+    }, [groupLimit, groups, totalValueByGroup, years, data, otherGroupLabel])
+
+    // combine original rows with the "Other" bucket rows
+    const effectiveData = useMemo(() => {
+        if (!hasOtherBucket) return data
+        const collapsedSet = new Set(limitedGroups.filter(g => g !== otherGroupLabel))
+        return [...data.filter(d => collapsedSet.has(d.group) || !groups.includes(d.group)), ...otherGroupData]
+    }, [data, hasOtherBucket, otherGroupData, limitedGroups, otherGroupLabel, groups])
+
     // grow the chart horizontally when many groups would squeeze the bars;
     // the wrapper div scrolls horizontally in that case
-    const totalGroupWidth = groups.length * minWidthPerGroup
+    const totalGroupWidth = limitedGroups.length * minWidthPerGroup
     const svgWidth = Math.max(width, margins.left + margins.right + totalGroupWidth)
     const currentYear = years.length > 0 ? Math.max(...years.map(Number)) : null
     const chartWidth = svgWidth - margins.left - margins.right
     const chartHeight = height - margins.top - margins.bottom
 
     const valueByGroupYear = useMemo(() => {
-        return _.fromPairs(data.map(d => [`${d.group}::${d.year}`, d.value]))
-    }, [data])
+        return _.fromPairs(effectiveData.map(d => [`${d.group}::${d.year}`, d.value]))
+    }, [effectiveData])
 
     const yMax = useMemo(() => {
-        return Math.max(1, ...data.map(d => d.value))
-    }, [data])
+        return Math.max(1, ...effectiveData.map(d => d.value))
+    }, [effectiveData])
 
     const xScale = useMemo(() => {
         return scaleBand({
-            domain: groups,
+            domain: limitedGroups,
             range: [margins.left, margins.left + chartWidth],
             round: true,
             padding: 0.3
         })
-    }, [groups, margins.left, chartWidth])
+    }, [limitedGroups, margins.left, chartWidth])
 
     const yearScale = useMemo(() => {
         // with YEAR_OVERLAP < 1, bars overlap: each year is offset by a fraction
@@ -120,10 +177,13 @@ export function GroupedYearComparisonChart({
         })
     }, [yMax, margins.top, chartHeight])
 
+    // color domain: stable across limiting/selection; the collapsed bucket gets a neutral grey
     const colorPalette = useMemo(() => getColorPalette(Math.max(groups.length, 1), darkmode), [groups, darkmode])
     const colorByGroup = useMemo(() => {
-        return _.fromPairs(groups.map((g, i) => [g, colorPalette[i % colorPalette.length]]))
-    }, [groups, colorPalette])
+        const byGroup = _.fromPairs(groups.map((g, i) => [g, colorPalette[i % colorPalette.length]]))
+        if (hasOtherBucket) byGroup[otherGroupLabel] = darkmode ? "#777777" : "#aaaaaa"
+        return byGroup
+    }, [groups, colorPalette, hasOtherBucket, otherGroupLabel])
 
     const {
         tooltipData,
@@ -181,7 +241,7 @@ export function GroupedYearComparisonChart({
                     tickLineProps={{ stroke: getStrokeColor(darkmode) }}
                     stroke={getAxisStrokeColor(darkmode)}
                 />
-                {groups.map(group => {
+                {limitedGroups.map(group => {
                     const x0 = xScale(group)
                     return (
                         <g key={`group-${group}`}>
@@ -216,7 +276,7 @@ export function GroupedYearComparisonChart({
                     label={xaxisLabel}
                     labelOffset={30}
                     labelProps={{ fontSize: "0.8rem", textAnchor: "middle", fill: darkmode ? "#ffffff" : "#000000" }}
-                    numTicks={Math.max(groups.length, 1)}
+                    numTicks={Math.max(limitedGroups.length, 1)}
                     tickLength={3}
                     tickLineProps={{ stroke: getStrokeColor(darkmode) }}
                     stroke={getAxisStrokeColor(darkmode)}
