@@ -63,7 +63,7 @@ export function GroupedYearComparisonChart({
     svgID = "grouped-year-comparison-chart",
     darkmode = false
 }) {
-    const currentYear = years.length > 0 ? Math.max(...years) : null
+    const currentYear = years.length > 0 ? Math.max(...years.map(Number)) : null
     const chartWidth = width - margins.left - margins.right
     const chartHeight = height - margins.top - margins.bottom
 
@@ -82,7 +82,7 @@ export function GroupedYearComparisonChart({
             round: true,
             padding: 0.3
         })
-    }, [groups, width])
+    }, [groups, margins.left, chartWidth])
 
     const yearScale = useMemo(() => {
         return scaleBand({
@@ -91,7 +91,7 @@ export function GroupedYearComparisonChart({
             round: true,
             padding: 0.1
         })
-    }, [years, groups, width])
+    }, [years, groups, xScale])
 
     const yScale = useMemo(() => {
         return scaleLinear({
@@ -99,7 +99,7 @@ export function GroupedYearComparisonChart({
             range: [margins.top + chartHeight, margins.top],
             nice: true
         })
-    }, [yMax, height])
+    }, [yMax, margins.top, chartHeight])
 
     const colorPalette = useMemo(() => getColorPalette(Math.max(groups.length, 1), darkmode), [groups, darkmode])
     const colorByGroup = useMemo(() => {
@@ -121,12 +121,14 @@ export function GroupedYearComparisonChart({
     })
 
     const yearOpacity = year => {
-        if (year === currentYear) return YEAR_OPACITY.current
-        return year === currentYear - 1 ? YEAR_OPACITY.previous : YEAR_OPACITY.older
+        if (Number(year) === currentYear) return YEAR_OPACITY.current
+        return Number(year) === currentYear - 1 ? YEAR_OPACITY.previous : YEAR_OPACITY.older
     }
 
     const handleMouseOver = (event, tooltipRows) => {
-        const coords = localPoint(event.target.ownerSVGElement, event)
+        const svg = event?.target?.ownerSVGElement || event?.currentTarget?.ownerSVGElement
+        if (!svg) return
+        const coords = localPoint(svg, event)
         if (coords === null) return
         showTooltip({ tooltipLeft: coords.x, tooltipTop: coords.y, tooltipData: tooltipRows })
     }
