@@ -5,6 +5,7 @@ import Box from "./src/primitives/Box"
 import Point from "./src/primitives/Point"
 import ScatterPoints from "./src/primitives/ScatterPoints"
 import Categorical from "./src/charts/categorical/Chart"
+import { GroupedYearComparisonChart } from "./src/charts/yearcomparison"
 import { TextLabel } from "./src/text/TextLabel"
 import ScatterLabel from "./src/text/ScatterLabel"
 import Heatmap from "./src/charts/heatmap/Heatmap"
@@ -88,6 +89,7 @@ export default {
             "MonthlyTrendLine": MonthlyTrendLine
                     },
         "Categorical": Categorical,
+        "GroupedYearComparisonChart": GroupedYearComparisonChart,
         "Heatmap": Heatmap,
         "HeatmapGrouping": HeatmapGrouping,
         "HeatmapColumnNames": HeatmapColumnNames,

@@ -31,7 +31,8 @@ function Bar({
     fill,
     stroke,
     strokeWidth,
-    opacity}) {
+    opacity,
+    ...eventHandlers}) {
     // provide box coordinates in pixel 
     const barHeight = y0 > y1 ? y0-y1 : y1-y0
     const barBaseLine = y0 > y1 ? y1 : y0
@@ -40,6 +41,7 @@ function Bar({
         <g {...{opacity}}>
             {barHeight === 0 ? <line x1={x} x2={x + width} y1={barBaseLine} y2={barBaseLine} {...{ stroke, strokeWidth }} /> :
                 <rect x={x} y={barBaseLine} height={barHeight} {...{ width, fill, stroke, strokeWidth }} />}
+            {_.some(eventHandlers) ? <rect x={x} y={barBaseLine} height={Math.max(barHeight, 1)} width={width} fill="transparent" style={{ pointerEvents: "all" }} {...eventHandlers} /> : null}
         </g>
     )
 }
@@ -53,9 +55,12 @@ function areEqual(prevProps, nextProps) {
     if (prevProps.y0 !== nextProps.y0) return false
     if (prevProps.y1 !== nextProps.y1) return false
     if (prevProps.x!== nextProps.x) return false
+    if (prevProps.width !== nextProps.width) return false
     if (prevProps.opacity!== nextProps.opacity) return false
     if (prevProps.fill !== nextProps.fill) return false
     if (prevProps.stroke !== nextProps.stroke) return false
+    // keep transparent overlay rect (event handlers) in sync
+    if (_.some(prevProps, _.isFunction) || _.some(nextProps, _.isFunction)) return false
     return true
 
 }
