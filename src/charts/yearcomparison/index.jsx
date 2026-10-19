@@ -55,6 +55,10 @@ GroupedYearComparisonChart.propTypes = {
  * @param {string} props.xaxisLabel
  * @param {string} props.svgID
  * @param {boolean} props.darkmode
+ * @param {number} props.minWidthPerGroup - Minimum chart width allocated to each
+ * group (category). If groups * minWidthPerGroup exceeds `width`, the chart grows
+ * horizontally and becomes scrollable (overflow-x) so bars stay readable with
+ * many categories.
  */
 export function GroupedYearComparisonChart({
     data = [],
@@ -66,10 +70,15 @@ export function GroupedYearComparisonChart({
     yaxisLabel = "Count",
     xaxisLabel = undefined,
     svgID = "grouped-year-comparison-chart",
-    darkmode = false
+    darkmode = false,
+    minWidthPerGroup = 40
 }) {
+    // grow the chart horizontally when many groups would squeeze the bars;
+    // the wrapper div scrolls horizontally in that case
+    const totalGroupWidth = groups.length * minWidthPerGroup
+    const svgWidth = Math.max(width, margins.left + margins.right + totalGroupWidth)
     const currentYear = years.length > 0 ? Math.max(...years.map(Number)) : null
-    const chartWidth = width - margins.left - margins.right
+    const chartWidth = svgWidth - margins.left - margins.right
     const chartHeight = height - margins.top - margins.bottom
 
     const valueByGroupYear = useMemo(() => {
@@ -159,8 +168,8 @@ export function GroupedYearComparisonChart({
     }
 
     return (
-        <div ref={containerRef} className="flex flex-column">
-            <SVG {...{ width, height, svgID }}>
+        <div ref={containerRef} className="flex flex-column" style={{ overflowX: "auto" }}>
+            <SVG {...{ width: svgWidth, height, svgID }}>
                 <AxisLeft
                     scale={yScale}
                     left={margins.left}
