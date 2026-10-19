@@ -163,18 +163,15 @@ export function GroupedYearComparisonChart({
         })
     }, [limitedGroups, margins.left, chartWidth])
 
-    const yearScale = useMemo(() => {
-        // with YEAR_OVERLAP < 1, bars overlap: each year is offset by a fraction
-        // of the bar width instead of a full bandwidth
+    // bar width and per-year offset producing a 25% overlap:
+    // total span = barWidth + (years - 1) * step, with step = barWidth * YEAR_OVERLAP
+    const { barWidth, yearStep } = useMemo(() => {
         const bandwidth = xScale.bandwidth()
-        const slot = bandwidth / Math.max(years.length, 1)
-        const barWidth = Math.min(slot / YEAR_OVERLAP, bandwidth)
-        return scaleBand({
-            domain: years,
-            range: [0, (years.length - 1) * barWidth * YEAR_OVERLAP + barWidth],
-            round: true,
-            padding: 0.1
-        })
+        const n = Math.max(years.length, 1)
+        // span must fit within the group's band: barWidth + (n-1)*step <= bandwidth
+        const step = Math.min(bandwidth / (n - 1 + 1 / YEAR_OVERLAP), bandwidth * YEAR_OVERLAP)
+        const barWidth = step / YEAR_OVERLAP
+        return { barWidth, yearStep: step }
     }, [years, xScale])
 
     const yScale = useMemo(() => {
@@ -222,8 +219,10 @@ export function GroupedYearComparisonChart({
         // so many selected years remain readable
         const n = years.length
         const idx = years.indexOf(year)
-        if (n <= 1 || idx === -1 || idx === n - 1) return YEAR_OPACITY.current
-        const t = idx / (n - 1)
+        // single year or unknown year: full opacity
+        if (n <= 1 || idx === -1) return YEAR_OPACITY.current
+        // t = 0 for the newest year (idx n-1), t = 1 for the oldest (idx 0)
+        const t = (n - 1 - idx) / (n - 1)
         return YEAR_OPACITY.current + (MIN_YEAR_OPACITY - YEAR_OPACITY.current) * t
     }
 
@@ -267,7 +266,7 @@ export function GroupedYearComparisonChart({
                                 if (value === undefined) return null
                                 // draw older years first so the current year (full opacity)
                                 // ends up on top of the overlaps
-                                const x = x0 + (yearScale(year) ?? 0)
+                                const x = x0 + years.indexOf(year) * yearStep
                                 const y = yScale(value)
                                 return (
                                     <Bar
@@ -275,7 +274,7 @@ export function GroupedYearComparisonChart({
                                         x={x}
                                         y1={y}
                                         y0={yScale(0)}
-                                        width={yearScale.bandwidth()}
+                                        width={barWidth}
                                         fill={colorByGroup[group]}
                                         opacity={yearOpacity(year)}
                                         onMouseOver={e => { setHoveredBar(`${group}::${year}`); handleMouseOver(e, getTooltipRows(group, year, value)) }}
