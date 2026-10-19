@@ -14,6 +14,11 @@ import { getAxisStrokeColor, getStrokeColor } from "../../colors/stroke"
 import { getNumberTicks } from "../../axis/ticks"
 
 const DEFAULT_MARGINS = { left: 50, right: 15, bottom: 60, top: 15 }
+// fraction of a bar width by which successive year bars are offset (0.75 => 25% overlap)
+const YEAR_OVERLAP = 0.75
+// opacity floor for the oldest visible year; opacity is interpolated between
+// this and 1.0 across all selected years so even many years stay readable
+const MIN_YEAR_OPACITY = 0.35
 const YEAR_OPACITY = { current: 1.0, previous: 0.45, older: 0.2 }
 
 GroupedYearComparisonChart.propTypes = {
@@ -85,13 +90,18 @@ export function GroupedYearComparisonChart({
     }, [groups, margins.left, chartWidth])
 
     const yearScale = useMemo(() => {
+        // with YEAR_OVERLAP < 1, bars overlap: each year is offset by a fraction
+        // of the bar width instead of a full bandwidth
+        const bandwidth = xScale.bandwidth()
+        const slot = bandwidth / Math.max(years.length, 1)
+        const barWidth = Math.min(slot / YEAR_OVERLAP, bandwidth)
         return scaleBand({
             domain: years,
-            range: [0, xScale.bandwidth()],
+            range: [0, (years.length - 1) * barWidth * YEAR_OVERLAP + barWidth],
             round: true,
             padding: 0.1
         })
-    }, [years, groups, xScale])
+    }, [years, xScale])
 
     const yScale = useMemo(() => {
         return scaleLinear({
@@ -121,8 +131,14 @@ export function GroupedYearComparisonChart({
     })
 
     const yearOpacity = year => {
-        if (Number(year) === currentYear) return YEAR_OPACITY.current
-        return Number(year) === currentYear - 1 ? YEAR_OPACITY.previous : YEAR_OPACITY.older
+        // interpolate opacity smoothly between 1.0 (current year) and
+        // MIN_YEAR_OPACITY (oldest visible year) instead of three fixed tiers,
+        // so many selected years remain readable
+        const n = years.length
+        const idx = years.indexOf(year)
+        if (n <= 1 || idx === -1 || idx === n - 1) return YEAR_OPACITY.current
+        const t = idx / (n - 1)
+        return YEAR_OPACITY.current + (MIN_YEAR_OPACITY - YEAR_OPACITY.current) * t
     }
 
     const handleMouseOver = (event, tooltipRows) => {
@@ -163,7 +179,9 @@ export function GroupedYearComparisonChart({
                             {years.map(year => {
                                 const value = valueByGroupYear[`${group}::${year}`]
                                 if (value === undefined) return null
-                                const x = x0 + yearScale(year)
+                                // draw older years first so the current year (full opacity)
+                                // ends up on top of the overlaps
+                                const x = x0 + (yearScale(year) ?? 0)
                                 const y = yScale(value)
                                 return (
                                     <Bar
