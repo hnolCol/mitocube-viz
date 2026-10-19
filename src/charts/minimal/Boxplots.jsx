@@ -50,13 +50,17 @@ MinimalBoxplots.defaultProps = {
  * @returns 
  */
 export function MinimalBoxplots({ qs: rawQs, boxWidth, width, height, margins, yaxisLabel, rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true, xtickLabels = [], showYAxis = true, markerValues, markerLabels }) {
-    const qs = (rawQs ?? []).map(normalizeQuantiles)
+    const qs = useMemo(() => (rawQs ?? []).map(normalizeQuantiles), [rawQs])
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
-    const checkedBoxWidth = _.isNumber(boxWidth) && boxWidth < chartWidth ? boxWidth : chartWidth / qs.length
+    // fit all boxes incl. spacing into the available chart width
+    const maxBoxWidth = qs.length > 1 ? (chartWidth - (qs.length - 1) * spaceBetween) / qs.length : chartWidth
+    const checkedBoxWidth = _.isNumber(boxWidth) && boxWidth < maxBoxWidth ? boxWidth : Math.max(maxBoxWidth, 0)
     const fills = _.isArray(fill) && fill.length === qs.length ? fill : qs.map(() => fill)
     const boxX = (i) => margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween)
     const yScale = useMemo(() => {
         if (_.isFunction(preYScale)) return preYScale
+        // guard against empty data (e.g. loading state): fall back to a dummy domain
+        if (qs.length === 0) return scaleLinear({ domain: [1, 0], range: [margins.top, margins.top + chartHeight] })
         const max = _.maxBy(qs, (q) => q.max).max
         const min = _.minBy(qs, (q) => q.min).min
 
