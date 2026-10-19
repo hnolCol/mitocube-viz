@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import _ from "lodash"
 import PropTypes from "prop-types"
 import { scaleBand, scaleLinear } from "@visx/scale"
@@ -208,6 +208,9 @@ export function GroupedYearComparisonChart({
         hideTooltip
     } = useTooltip()
 
+    // id ("group::year") of the currently hovered bar, used for the hover outline
+    const [hoveredBar, setHoveredBar] = useState(null)
+
     const { containerRef, TooltipInPortal } = useTooltipInPortal({
         detectBounds: true,
         scroll: true
@@ -275,9 +278,11 @@ export function GroupedYearComparisonChart({
                                         width={yearScale.bandwidth()}
                                         fill={colorByGroup[group]}
                                         opacity={yearOpacity(year)}
-                                        onMouseOver={e => handleMouseOver(e, getTooltipRows(group, year, value))}
+                                        onMouseOver={e => { setHoveredBar(`${group}::${year}`); handleMouseOver(e, getTooltipRows(group, year, value)) }}
                                         onMouseMove={e => handleMouseOver(e, getTooltipRows(group, year, value))}
-                                        onMouseLeave={hideTooltip}
+                                        onMouseLeave={() => { setHoveredBar(null); hideTooltip() }}
+                                        stroke={hoveredBar === `${group}::${year}` ? (darkmode ? "#ffffff" : "#000000") : undefined}
+                                        strokeWidth={hoveredBar === `${group}::${year}` ? 1.5 : undefined}
                                     />
                                 )
                             })}
