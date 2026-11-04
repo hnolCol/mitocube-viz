@@ -9,6 +9,7 @@ import _ from "lodash"
  */
 export function isPropHexColorString(props, propName, componentName) {
     const colorProp = props[propName]
+    if (_.isNil(colorProp)) return null
     if (!_.isString(colorProp)) {
         return new Error(
             'Invalid prop `' + propName + '` supplied to' +
