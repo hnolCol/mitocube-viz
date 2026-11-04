@@ -26,30 +26,13 @@ MinimalBoxplots.propTypes = {
     yaxisLabel : PropTypes.string
 }
 
-
-MinimalBoxplots.defaultProps = {
-    boxWidth : 30,
-    width: 90, 
-    height : 150,
-    margins: {
-        left: 20,
-        right: 5,
-        bottom: 5,
-        top: 5
-    },
-    showMedian: true,
-    medianSuffix: "",
-    roundToDigits: 1,
-    yaxisLabel : "value"
-    
-}
 /**
  * 
  * 
  * @param {*} param0 
  * @returns 
  */
-export function MinimalBoxplots({ qs: rawQs, boxWidth, width, height, margins, yaxisLabel, rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true, xtickLabels = [], showYAxis = true, markerValues, markerLabels }) {
+export function MinimalBoxplots({ qs: rawQs, boxWidth = 30, width = 90, height = 150, margins = { left: 20, right: 5, bottom: 5, top: 5 }, yaxisLabel = "value", rerender, showMedian = true, medianSuffix = "", roundToDigits = 1, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true, xtickLabels = [], showYAxis = true, markerValues, markerLabels }) {
     const qs = useMemo(() => (rawQs ?? []).map(normalizeQuantiles), [rawQs])
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     // fit all boxes incl. spacing into the available chart width

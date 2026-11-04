@@ -47,20 +47,6 @@ HeatmapRow.propTypes = {
     marginBetweenValues: PropTypes.number,
 };
 
-HeatmapRow.defaultProps = {
-    opacity: 1,
-    nanFill: "#fafafa",
-    showLabel: true,
-    isLabelProteinTag: false,
-    colorValuesExist: false,
-    labelsExist: true,
-    handleMouseEnter: undefined,
-    handleMouseLeave: undefined,
-    isLabelFeatureTag: false,
-    darkmode: false
-};
-
-
 /**
  * HeatmapRow - A single row in the heatmap. The 
  *
@@ -79,7 +65,7 @@ function HeatmapRow({
     minIdx,
     valueNames,
     colorNames,
-    colorValuesExist,
+    colorValuesExist = false,
     opacity = 1,
     binHeight,
     marginBetweenValuesAndColors,
@@ -89,15 +75,15 @@ function HeatmapRow({
     handleMouseLeave,
     nanFill = "#fafafa",
     clusterIndexColor,
-    showLabel,
-    isLabelProteinTag,
-    isLabelFeatureTag,
+    showLabel = true,
+    isLabelProteinTag = false,
+    isLabelFeatureTag = false,
     annotation_tags = ["dXtpH"],
     proteinTagMap,
     clusterExists,
-    darkmode,
-    marginBetweenValues = 8
-}) {
+    darkmode = false,
+    marginBetweenValues = 8,
+    labelsExist = true}) {
     return(
         
         <g onMouseEnter={_.isFunction(handleMouseEnter) ? (e) => handleMouseEnter(e, index) : undefined}

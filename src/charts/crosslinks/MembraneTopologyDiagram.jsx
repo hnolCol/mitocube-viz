@@ -14,32 +14,6 @@ const MEMBRANE_TOP = TOP_Y + 40
 const MEMBRANE_BOTTOM = BOTTOM_Y - 40
 const TM_TUBE_WIDTH = 16
 
-MembraneTopologyDiagram.defaultProps = {
-    aaLength: 435,
-    tmSegments: [
-        { start: 114, end: 134, description: "Helical" },
-        { start: 140, end: 160, description: "Helical" },
-        { start: 213, end: 233, description: "Helical" },
-        { start: 261, end: 281, description: "Helical" },
-        { start: 300, end: 320, description: "Helical" },
-    ],
-    topologicalDomains: [
-        { start: 1, end: 113, label: "Mitochondrial intermembrane" },
-        { start: 135, end: 139, label: "Mitochondrial matrix" },
-        { start: 161, end: 212, label: "Mitochondrial intermembrane" },
-        { start: 234, end: 260, label: "Mitochondrial matrix" },
-        { start: 282, end: 299, label: "Mitochondrial intermembrane" },
-        { start: 321, end: 435, label: "Mitochondrial matrix" },
-    ],
-    labeledSites: [
-        { residue: 195, label: "195" },
-        { residue: 196, label: "196" },
-        { residue: 411, label: "411" },
-        { residue: 427, label: "427" },
-        { residue: 428, label: "428" },
-    ],
-}
-
 MembraneTopologyDiagram.propTypes = {
     aaLength: PropTypes.number.isRequired,
     tmSegments: PropTypes.arrayOf(PropTypes.shape({
@@ -58,7 +32,31 @@ MembraneTopologyDiagram.propTypes = {
     })),
 }
 
-export function MembraneTopologyDiagram({ aaLength, tmSegments, topologicalDomains, labeledSites }) {
+export function MembraneTopologyDiagram({
+    aaLength = 435,
+    tmSegments = [
+        { start: 114, end: 134, description: "Helical" },
+        { start: 140, end: 160, description: "Helical" },
+        { start: 213, end: 233, description: "Helical" },
+        { start: 261, end: 281, description: "Helical" },
+        { start: 300, end: 320, description: "Helical" },
+    ],
+    topologicalDomains = [
+        { start: 1, end: 113, label: "Mitochondrial intermembrane" },
+        { start: 135, end: 139, label: "Mitochondrial matrix" },
+        { start: 161, end: 212, label: "Mitochondrial intermembrane" },
+        { start: 234, end: 260, label: "Mitochondrial matrix" },
+        { start: 282, end: 299, label: "Mitochondrial intermembrane" },
+        { start: 321, end: 435, label: "Mitochondrial matrix" },
+    ],
+    labeledSites = [
+        { residue: 195, label: "195" },
+        { residue: 196, label: "196" },
+        { residue: 411, label: "411" },
+        { residue: 427, label: "427" },
+        { residue: 428, label: "428" },
+    ],
+}) {
     const hasTM = tmSegments && tmSegments.length > 0
 
     const layout = useMemo(() => {

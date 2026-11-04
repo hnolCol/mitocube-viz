@@ -89,26 +89,6 @@ ScatterPoints.propTypes = {
     colorMap : PropTypes.objectOf(isPropHexColorString),
     glyphMap : PropTypes.objectOf(PropTypes.oneOf(["rect","circle"]))
 }
-ScatterPoints.defaultProps = {
-    data: [],
-    valid: [],
-    indices: undefined,
-    sizeName: undefined,
-    colorName: undefined,
-    fill: "#efefef",
-    stroke: "#000000",
-    strokeWidth: 0.5,
-    searchStrokeWidth: 1.0,
-    checkColorMap: false,
-    colorMap: { pathway: "#79c29e" },
-    colorMapKeyName: "node_type",
-    glyphMap: { pathway: "rect" },
-    checkPolyMap: false,
-    polyMapKeyName: "node_type",
-    rerenderDependency: [],
-    searchIndices: new Set(),
-    filterIndices: new Set()
-};
 
 /**
  * 

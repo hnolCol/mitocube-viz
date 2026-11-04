@@ -16,15 +16,7 @@ Line.propTypes = {
     opacity: PropTypes.number
 }
 
-Line.defaultProps = {
-    stroke: "#000000",
-    strokeWidth: 1,
-    opacity : 1,
-    rerenderDependency: []
-}
-
-
-function Line({x1, y1, x2, y2, stroke, strokeWidth, opacity, rerenderDependency, ...props }) { 
+function Line({x1, y1, x2, y2, stroke = "#000000", strokeWidth = 1, opacity = 1, rerenderDependency = [], ...props }) { 
     if (!_.every([x1, y1, x2, y2], _.isNumber)) return null
 
     return (

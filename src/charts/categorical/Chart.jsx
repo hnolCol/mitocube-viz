@@ -48,10 +48,10 @@ Categorical.propTypes = {
     attributeTagToText: PropTypes.object
 }
 
-Categorical.defaultProps = {
-    width: 400,
-    height: 300,
-    data: [
+function Categorical({
+    width = 400,
+    height = 300,
+    data = [
         { y: 5, T: "A", G: "WT", O: "0.5h", e: 0.2 },
         { y: 4, T: "B", G: "WT", O: "0.5h", e: 0.4 },
         { y: 10, T: "C", G: "WT", O: "0.5h", e: 1.2 },
@@ -68,53 +68,24 @@ Categorical.defaultProps = {
         { y: 4, T: "B", G: "KO", O: "10h", e: 0.2 },
         { y: 2, T: "C", G: "KO", O: "10h", e: 6.2 }
     ],
-    chartType: "boxplot",
-    margins: {
-        left: 45,
-        right: 5,
-        bottom: 35,
-        top: 8
-    },
-    yaxisName: "value",
-    colorName: undefined,
-    splitName: undefined,
-    subplotName: undefined,
-    yaxisLabel: undefined,
-    errorName: "e",
-    tooltipNames: [],
-    colorPalette: [],
-    minMaxYDomain: undefined,
-    innerSubplotPadding: 0.05,
-    outerSubplotPadding: 0.1,
-    innerSplitPadding: 0.2,
-    innerColorPadding: 0.0,
-    svgID: undefined,
-    darkmode: false,
-    bottomTicksAreConditionApplicationLabels: true,
-}
-
-function Categorical({
-    width,
-    height,
-    data,
-    margins,
-    yaxisName,
+    margins = { left: 45, right: 5, bottom: 35, top: 8 },
+    yaxisName = "value",
     colorName,
     splitName,
     subplotName,
     yaxisLabel,
-    errorName,
-    tooltipNames,
-    colorPalette,
+    errorName = "e",
+    tooltipNames = [],
+    colorPalette = [],
     minMaxYDomain,
-    innerSubplotPadding,
-    outerSubplotPadding,
-    innerSplitPadding,
-    innerColorPadding,
+    innerSubplotPadding = 0.05,
+    outerSubplotPadding = 0.1,
+    innerSplitPadding = 0.2,
+    innerColorPadding = 0.0,
     svgID,
-    darkmode,
-    chartType,
-    bottomTicksAreConditionApplicationLabels,
+    darkmode = false,
+    chartType = "boxplot",
+    bottomTicksAreConditionApplicationLabels = true,
     caTagToText,
     attributeTagToText
 }) {

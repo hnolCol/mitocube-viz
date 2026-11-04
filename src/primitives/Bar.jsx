@@ -16,22 +16,15 @@ Bar.propTypes = {
     opacity: PropType.number
 }
 
-Bar.defaultProps = {
-    fill: "#efefef",
-    stroke: "#000000",
-    strokeWidth: 0.5,
-    opacity: 1 
-}
-
 function Bar({
     x,
     width,
     y1, // the actual height of the bar
     y0, // the baseline of the bar
-    fill,
-    stroke,
-    strokeWidth,
-    opacity,
+    fill = "#efefef",
+    stroke = "#000000",
+    strokeWidth = 0.5,
+    opacity = 1,
     ...eventHandlers}) {
     // provide box coordinates in pixel 
     const barHeight = y0 > y1 ? y0-y1 : y1-y0

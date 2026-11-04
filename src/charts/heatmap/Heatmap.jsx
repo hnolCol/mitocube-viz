@@ -35,32 +35,6 @@ Heatmap.propTypes = {
     selectedClusters : PropTypes.arrayOf(PropTypes.number)
 }
 
-Heatmap.defaultProps = {
-    data: [
-        { v: 2, v1: 4, B: "+", C: "-" },
-        { v: 2, v1: 4, B: "+", C: "-" },
-        { v: 2, v1: 4, B: "+", C: "-" },
-        { v: -2, v1: 2, B: "-", C: "+" },
-        { v: 0, v1: 1.2, B: "-", C: "+" }
-    ],
-    valueNames: ["v", "v1"],
-    clusterName:  undefined,
-    colorNames: ["B", "C"],
-    labelNames: ["tag"],
-    binHeight: 15,
-    legendElementSize: 20,
-    matchWidth: true,
-    handleSearchByDataIndex: undefined,
-    resetSearchIdcs: undefined,
-    searchIndices: new Set(),
-    hoverIndices: new Set(),
-    setHoverDataByDataIndex: () => {},
-    minMax: [-6, 6],
-    darkmode: false,
-    selectedClusters: [],
-    
-}
-
 /**
  * 
  * @param {Object} props 
@@ -74,25 +48,31 @@ Heatmap.defaultProps = {
  * @returns {React.ReactElement} - The heatmap JSX Element.
  */
 function Heatmap({
-    data,
-    valueNames,
+    data = [
+        { v: 2, v1: 4, B: "+", C: "-" },
+        { v: 2, v1: 4, B: "+", C: "-" },
+        { v: 2, v1: 4, B: "+", C: "-" },
+        { v: -2, v1: 2, B: "-", C: "+" },
+        { v: 0, v1: 1.2, B: "-", C: "+" }
+    ],
+    valueNames = ["v", "v1"],
     clusterName,
-    colorNames,
-    //labelNames,
-    binHeight,
-    legendElementSize,
-    matchWidth,
+    colorNames = ["B", "C"],
+    //labelNames = ["tag"],
+    binHeight = 15,
+    legendElementSize = 20,
+    matchWidth = true,
     handleSearchByDataIndex,
     resetSearchIdcs,
-    searchIndices,
+    searchIndices = new Set(),
     rerenderBackground,
-    hoverIndices,
-    setHoverDataByDataIndex,
-    minMax,
-    darkmode,
+    hoverIndices = new Set(),
+    setHoverDataByDataIndex = () => {},
+    minMax = [-6, 6],
+    darkmode = false,
     isLabelFeatureTag,
     isLabelProteinTag,
-    selectedClusters,
+    selectedClusters = [],
     setRequiredProteinTags,
     proteinTagMap,
     refetchedTrigger,

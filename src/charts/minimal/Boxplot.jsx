@@ -24,30 +24,13 @@ MinimalBoxplot.propTypes = {
     yaxisLabel : PropTypes.string
 }
 
-
-MinimalBoxplot.defaultProps = {
-    boxWidth : 30,
-    width: 90, 
-    height : 150,
-    margins: {
-        left: 20,
-        right: 5,
-        bottom: 5,
-        top: 5
-    },
-    showMedian: true,
-    medianSuffix: "",
-    roundToDigits: 1,
-    yaxisLabel : "value"
-    
-}
 /**
  * 
  * 
  * @param {*} param0 
  * @returns 
  */
-export function MinimalBoxplot({ q: rawQ, boxWidth, width, height, margins, yaxisLabel ,  rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill="#efefef" }) {
+export function MinimalBoxplot({ q: rawQ, boxWidth = 30, width = 90, height = 150, margins = { left: 20, right: 5, bottom: 5, top: 5 }, yaxisLabel = "value" ,  rerender, showMedian = true, medianSuffix = "", roundToDigits = 1, preYScale, fill="#efefef" }) {
     const q = normalizeQuantiles(rawQ)
     
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })

@@ -115,15 +115,6 @@ HeatmapGrouping.propTypes = {
     containerRef: PropType.string
 }
 
-HeatmapGrouping.defaultProps = {
-    startX: 0,
-    startY: 0,
-    binHeight: 15,
-    binWidth: 15,
-    verticalMargin: 5,
-    stroke: "#000000"
-}
-
 /**
  * 
  * @param {Object} props 
@@ -140,7 +131,7 @@ HeatmapGrouping.defaultProps = {
  * the tooltip will fetch data from the mitocube backend to get the required information.
  * @returns 
  */
-export function HeatmapGrouping({data, startX, startY, binHeight, binWidth, verticalMargin, keyNames, stroke, tooltipNames, is_condition_application, caTagMap, attributeTagMap, darkmode = false }) {
+export function HeatmapGrouping({data, startX = 0, startY = 0, binHeight = 15, binWidth = 15, verticalMargin = 5, keyNames, stroke = "#000000", tooltipNames, is_condition_application, caTagMap, attributeTagMap, darkmode = false }) {
 
     const N = keyNames.length // number of grouping rows 
     const heatmapSVGHeight = (N+1) * (binHeight + verticalMargin)

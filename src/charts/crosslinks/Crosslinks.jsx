@@ -7,30 +7,6 @@ import { localPoint } from "@visx/event"
 import { CROSSLINK_COLORS, featureColor } from "../../colors/crosslinks"
 import { toRad, baseArcPath, featureBandPath, residuePoint, R, ARC_THICK, computeCrosslinkLayout } from "../../utils/crosslinks"
 
-CrosslinkViewer.defaultProps = {
-    tag: "A",
-    crosslinks: [
-        { tag: "xl1", protein_tag_a: "A", protein_tag_b: "B", pos_a: 50,  pos_b: 75,  score: 0.9 },
-        { tag: "xl2", protein_tag_a: "A", protein_tag_b: "C", pos_a: 120, pos_b: 40,  score: 0.6 },
-        { tag: "xl3", protein_tag_a: "A", protein_tag_b: "B", pos_a: 180, pos_b: 100, score: 0.4 },
-    ],
-    allTags: ["A", "B", "C"],
-    proteinsByTag: {
-        "A": { aa_length: 200, label: "Protein A", features: [] },
-        "B": { aa_length: 150, label: "Protein B", features: [] },
-        "C": { aa_length: 100, label: "Protein C", features: [] },
-    },
-    showInterPartner: false,
-    selectedInterPartners: new Set(),
-    interPartnerLinks: [],
-    focusedPartnerTag: null,
-    onArcClick: () => {},
-    onLayoutComputed: null,
-    getLabelText: null,
-    onLinkClick: () => {},
-    onOwnArcClick: () => {},
-}
-
 CrosslinkViewer.propTypes = {
     tag: PropTypes.string.isRequired,
     crosslinks: PropTypes.array.isRequired,
@@ -48,19 +24,27 @@ CrosslinkViewer.propTypes = {
 }
 
 export function CrosslinkViewer({
-    tag,
-    crosslinks,
-    allTags,
-    proteinsByTag,
-    interPartnerLinks,
-    focusedPartnerTag,
-    showInterPartner,
-    selectedInterPartners,
-    onArcClick,
-    onLayoutComputed,
-    getLabelText,
-    onLinkClick,
-    onOwnArcClick, 
+    tag = "A",
+    crosslinks = [
+        { tag: "xl1", protein_tag_a: "A", protein_tag_b: "B", pos_a: 50,  pos_b: 75,  score: 0.9 },
+        { tag: "xl2", protein_tag_a: "A", protein_tag_b: "C", pos_a: 120, pos_b: 40,  score: 0.6 },
+        { tag: "xl3", protein_tag_a: "A", protein_tag_b: "B", pos_a: 180, pos_b: 100, score: 0.4 },
+    ],
+    allTags = ["A", "B", "C"],
+    proteinsByTag = {
+        "A": { aa_length: 200, label: "Protein A", features: [] },
+        "B": { aa_length: 150, label: "Protein B", features: [] },
+        "C": { aa_length: 100, label: "Protein C", features: [] },
+    },
+    interPartnerLinks = [],
+    focusedPartnerTag = null,
+    showInterPartner = false,
+    selectedInterPartners = new Set(),
+    onArcClick = () => {},
+    onLayoutComputed = null,
+    getLabelText = null,
+    onLinkClick = () => {},
+    onOwnArcClick = () => {}, 
 }) {
     const [selected, setSelected] = useState(null)
 

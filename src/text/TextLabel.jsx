@@ -21,21 +21,7 @@ TextLabel.propTypes = {
     color: PropTypes.arrayOf(isPropHexColorString).isRequired,
     isProtein : PropTypes.arrayOf(PropTypes.bool)
 }
-TextLabel.defaultProps = {
-    x: 0,
-    y: 0,
-    margins: { left: 0, right: 0, top: 0, bottom: 0 },
-    dx: 1,
-    dy: 0,
-    totalYOffset: 4,
-    fontSize: 14,
-    color: ["#00000"],
-    isProtein: [false],
-    verticalAnchor: "start",
-    textAnchor : "start"
-}
-
-export function TextLabel({x, y, margins, labelTexts, dx, dy, totalYOffset, fontSize, color, isProtein, verticalAnchor, textAnchor}) {
+export function TextLabel({x = 0, y = 0, margins = { left: 0, right: 0, top: 0, bottom: 0 }, labelTexts, dx = 1, dy = 0, totalYOffset = 4, fontSize = 14, color = ["#00000"], isProtein = [false], verticalAnchor = "start", textAnchor = "start"}) {
 
     return (
         <Group left={margins.left} top={margins.top + totalYOffset}>

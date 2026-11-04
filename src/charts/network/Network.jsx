@@ -69,13 +69,7 @@ export function InteractiveNetwork({
         // <Suspense fallback={<div>Loading...</div>}>
     )
 }
-    
 
-
-Network.defaultProps = {
-    width : 400,
-    height: 400
-}
     
 Network.propTypes = {
     width: PropTypes.number.isRequired,
@@ -83,8 +77,8 @@ Network.propTypes = {
 }
 
 export function Network({
-    width,
-    height,
+    width = 400,
+    height = 400,
     svgRef,
     svgID}
 ) {

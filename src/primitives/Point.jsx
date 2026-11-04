@@ -3,16 +3,6 @@ import PropTypes from 'prop-types';
 import _ from "lodash";
 import { isPropHexColorString } from "../types/checks/color"
 
-Point.defaultProps = {
-    r: 4,
-    opacity: 0.95,
-    fill: "red",
-    stroke: "#262626",
-    strokeWidth: 1,
-    circleProps: {}
-}
-
-
 Point.propTypes = {
     idx: PropTypes.number,
     p: PropTypes.array.isRequired,
@@ -39,7 +29,7 @@ Point.propTypes = {
  * @param {Object} props.mouseOverParams Additional parameters to pass to the mouse over event handler
  * @returns 
  */
-function Point({idx, p, r, opacity,  fill, stroke, strokeWidth, circleProps, mouseOver, mouseOverParams, onMouseDown, mouseDownParams}) {
+function Point({idx, p, r = 4, opacity = 0.95,  fill = "red", stroke = "#262626", strokeWidth = 1, circleProps = {}, mouseOver, mouseOverParams, onMouseDown, mouseDownParams}) {
     const xValue = p[0]
     const yValue = p[1]
     return( 
