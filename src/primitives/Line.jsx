@@ -3,6 +3,7 @@
 import React, { memo } from "react"
 import PropTypes from "prop-types"
 import { isPropHexColorString } from "../types/checks/color"
+import { getStrokeColor } from "../colors/stroke"
 import _ from "lodash"
 
 Line.propTypes = {
@@ -16,19 +17,12 @@ Line.propTypes = {
     opacity: PropTypes.number
 }
 
-Line.defaultProps = {
-    stroke: "#000000",
-    strokeWidth: 1,
-    opacity : 1,
-    rerenderDependency: []
-}
-
-
-function Line({x1, y1, x2, y2, stroke, strokeWidth, opacity, rerenderDependency, ...props }) { 
+function Line({x1, y1, x2, y2, stroke, strokeWidth = 1, opacity = 1, darkmode = false, rerenderDependency = [], ...props }) { 
+    const strokeColor = stroke !== undefined ? stroke : getStrokeColor(darkmode)
     if (!_.every([x1, y1, x2, y2], _.isNumber)) return null
 
     return (
-        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={stroke} strokeWidth={strokeWidth} opacity={opacity} {...props}/>
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={strokeColor} strokeWidth={strokeWidth} opacity={opacity} {...props}/>
     )
 }
 
@@ -40,6 +34,7 @@ function areEqual(prevProps, nextProps) {
     */
    
     if (_.some(prevProps.rerenderDependency, (value, idx) => nextProps.rerenderDependency[idx] !== value)) return false
+    if (prevProps.darkmode !== nextProps.darkmode) return false
     
     if (_.some(["x1", "y1", "x2", "y2"], key => prevProps[key] !== nextProps[key])) return false
     if (prevProps.opacity!== nextProps.opacity) return false

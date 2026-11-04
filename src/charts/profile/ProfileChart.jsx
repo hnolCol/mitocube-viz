@@ -36,7 +36,7 @@ export function ProfileChart({
     yaxisLabel,
     xaxisLabel,
     limits,
-    stroke = "#00000",
+    stroke,
     colorName, 
     svgID,
     rerenderHover,
@@ -125,7 +125,7 @@ export function ProfileChart({
 
     const colorScale = useMemo(() => {
      
-        if (colorName === undefined) return () => stroke
+        if (colorName === undefined) return () => stroke !== undefined ? stroke : getStrokeColor(darkmode)
         const colorDomain = _.uniqBy(data, colorName).map(d => d[colorName])
         const colorRange = getColorPalette(colorDomain.length, darkmode)
    

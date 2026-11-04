@@ -1,5 +1,6 @@
 import _ from "lodash"
 import React, { useMemo } from "react"
+import { getStrokeColor } from "../../colors/stroke"
 /**
  * 
  * @param {Object} props 
@@ -15,6 +16,7 @@ function areEqual(prevProps, nextProps) {
     the same result as passing prevProps to render,
     otherwise return false
     */
+    if (prevProps.darkmode !== nextProps.darkmode) return false
     if (!_.isArray(prevProps.rerenderDependency)) return false
     if (prevProps.rerenderDependency.length !== nextProps.rerenderDependency.length) return false 
     if (_.some(prevProps.rerenderDependency, (value,idx) => nextProps.rerenderDependency[idx] !== value)) return false 
@@ -22,7 +24,7 @@ function areEqual(prevProps, nextProps) {
   }
 
 const QuantileBackground = React.memo(
-    function QuantileBackground({ data, keyNames, xScale, yScale, showMedianPoints = false, rerenderDependency = [] }) {
+    function QuantileBackground({ data, keyNames, xScale, yScale, showMedianPoints = false, darkmode = false, rerenderDependency = [] }) {
         const reversedKeyNames = Array.from(keyNames).reverse()
         
         const getBackgroundLines = () => {
@@ -44,7 +46,7 @@ const QuantileBackground = React.memo(
 
             const medianPointCoords = _.map(keyNames, keyName => {
                 const qs = data[keyName]
-                return { cx: xScale(keyName) + halfBandwidth, cy: yScale(qs.values[1]), r: 5, fill: "white", stroke: "#000", key: `${keyName}-median-circle` }
+                return { cx: xScale(keyName) + halfBandwidth, cy: yScale(qs.values[1]), r: 5, fill: darkmode ? "#2b2b2b" : "white", stroke: getStrokeColor(darkmode), key: `${keyName}-median-circle` }
             })
 
             return { quantileBackgroundPoints: _.join(_.concat(q25, q75, q25[0]), ", "), medianLinePoints: _.join(median, ", "), medianPointCoords}
@@ -54,9 +56,9 @@ const QuantileBackground = React.memo(
         return (
         <g>
                 {/* Background of 25 and 75% quantile. */}
-                {_.isString(quantileBackgroundPoints) ? <polyline points={quantileBackgroundPoints} stroke="#000" fill="#efefef" strokeWidth={0.2} /> : null}
+                {_.isString(quantileBackgroundPoints) ? <polyline points={quantileBackgroundPoints} stroke={getStrokeColor(darkmode)} fill={darkmode ? "#3a3a3a" : "#efefef"} strokeWidth={0.2} /> : null}
                 {/* Median Line */}
-                {_.isString(medianLinePoints) ? <polyline points={medianLinePoints} stroke="#000" strokeWidth={1} fill="none" strokeDasharray={"4"}/> : null}
+                {_.isString(medianLinePoints) ? <polyline points={medianLinePoints} stroke={getStrokeColor(darkmode)} strokeWidth={1} fill="none" strokeDasharray={"4"}/> : null}
                 {showMedianPoints && _.isArray(medianPointCoords) ? medianPointCoords.map(circleProps => <circle {...circleProps}/>) : null}
                 </g>
         )

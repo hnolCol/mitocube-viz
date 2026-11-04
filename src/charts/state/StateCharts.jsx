@@ -2,7 +2,7 @@ import { Dot } from "../../text/InstrumentStats"
 import { DAY_MS, MONTH_LABELS } from "../../utils/time"
 
 
-export function StateDurationPie({ segments, size = 90 }) {
+export function StateDurationPie({ segments, size = 90, darkmode = false }) {
     const total = segments.reduce((sum, s) => sum + s.totalMs, 0)
     if (total === 0) return null
 
@@ -23,7 +23,7 @@ export function StateDurationPie({ segments, size = 90 }) {
                     <div key={seg.state_tag} className="flex center-items" style={{ gap: "0.4rem", fontSize: "0.75rem" }}>
                         <Dot color={seg.color} size={9} />
                         <span>{seg.text}</span>
-                        <span style={{ color: "#999" }}>{(seg.totalMs / DAY_MS).toFixed(1)}d</span>
+                        <span style={{ color: darkmode ? "#bbbbbb" : "#999" }}>{(seg.totalMs / DAY_MS).toFixed(1)}d</span>
                     </div>
                 ))}
             </div>
@@ -31,9 +31,9 @@ export function StateDurationPie({ segments, size = 90 }) {
     )
 }
 
-function YearBar({ segments }) {
+function YearBar({ segments, darkmode = false }) {
     return (
-        <div style={{ position: "relative", width: "100%", height: "28px", borderRadius: "4px", overflow: "hidden", backgroundColor: "#f0f0f0" }}>
+        <div style={{ position: "relative", width: "100%", height: "28px", borderRadius: "4px", overflow: "hidden", backgroundColor: darkmode ? "#2b2b2b" : "#f0f0f0" }}>
             {segments.map((seg, idx) => (
                 <div
                     key={idx}
@@ -52,13 +52,13 @@ function YearBar({ segments }) {
 }
 
 
-export function StateTimeline({ years, byYear, minWidth = 520 }) {
+export function StateTimeline({ years, byYear, minWidth = 520, darkmode = false }) {
     return (
         <div style={{ overflowX: "auto" }}>
             <div style={{ minWidth }}>
                 <div className="flex" style={{ paddingLeft: "50px", marginBottom: "4px" }}>
                     {MONTH_LABELS.map(label => (
-                        <div key={label} style={{ flex: 1, fontSize: "0.65rem", color: "#aaa", textAlign: "center" }}>
+                        <div key={label} style={{ flex: 1, fontSize: "0.65rem", color: darkmode ? "#999999" : "#aaa", textAlign: "center" }}>
                             {label}
                         </div>
                     ))}
@@ -66,8 +66,8 @@ export function StateTimeline({ years, byYear, minWidth = 520 }) {
                 <div className="flex flex-column" style={{ gap: "8px" }}>
                     {years.map(year => (
                         <div key={year} className="flex center-items" style={{ gap: "0.5rem" }}>
-                            <div style={{ width: "42px", fontSize: "0.75rem", color: "#888", flexShrink: 0 }}>{year}</div>
-                            <YearBar segments={byYear[year]} />
+                            <div style={{ width: "42px", fontSize: "0.75rem", color: darkmode ? "#bbbbbb" : "#888", flexShrink: 0 }}>{year}</div>
+                            <YearBar segments={byYear[year]} darkmode={darkmode} />
                         </div>
                     ))}
                 </div>

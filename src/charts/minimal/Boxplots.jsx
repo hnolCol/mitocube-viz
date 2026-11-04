@@ -12,6 +12,8 @@ import _ from "lodash"
 import { Text } from "@visx/text";
 import { abbreviateNumber } from "../../transforms/numbers";
 import { AxisLeft } from "@visx/axis";
+import { getStrokeColor } from "../../colors/stroke";
+import { getFillColor } from "../../colors/fill";
 
 MinimalBoxplots.propTypes = {
     qs: PropTypes.arrayOf(PropTypes.object),
@@ -26,36 +28,20 @@ MinimalBoxplots.propTypes = {
     yaxisLabel : PropTypes.string
 }
 
-
-MinimalBoxplots.defaultProps = {
-    boxWidth : 30,
-    width: 90, 
-    height : 150,
-    margins: {
-        left: 20,
-        right: 5,
-        bottom: 5,
-        top: 5
-    },
-    showMedian: true,
-    medianSuffix: "",
-    roundToDigits: 1,
-    yaxisLabel : "value"
-    
-}
 /**
  * 
  * 
  * @param {*} param0 
  * @returns 
  */
-export function MinimalBoxplots({ qs: rawQs, boxWidth, width, height, margins, yaxisLabel, rerender, showMedian, medianSuffix, roundToDigits, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true, xtickLabels = [], showYAxis = true, markerValues, markerLabels }) {
+export function MinimalBoxplots({ qs: rawQs, boxWidth = 30, width = 90, height = 150, margins = { left: 20, right: 5, bottom: 5, top: 5 }, yaxisLabel = "value", rerender, showMedian = true, medianSuffix = "", roundToDigits = 1, preYScale, fill = "#efefef", spaceBetween = 10, indicateN = true, verticalLineAtZero = true, xtickLabels = [], showYAxis = true, markerValues, markerLabels, darkmode = false }) {
+    const defaultFill = darkmode ? "#3a3a3a" : "#efefef"
     const qs = useMemo(() => (rawQs ?? []).map(normalizeQuantiles), [rawQs])
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
     // fit all boxes incl. spacing into the available chart width
     const maxBoxWidth = qs.length > 1 ? (chartWidth - (qs.length - 1) * spaceBetween) / qs.length : chartWidth
     const checkedBoxWidth = _.isNumber(boxWidth) && boxWidth < maxBoxWidth ? boxWidth : Math.max(maxBoxWidth, 0)
-    const fills = _.isArray(fill) && fill.length === qs.length ? fill : qs.map(() => fill)
+    const fills = _.isArray(fill) && fill.length === qs.length ? fill : qs.map(() => fill !== undefined ? fill : defaultFill)
     const boxX = (i) => margins.left + checkedBoxWidth / 2 + (i * checkedBoxWidth) + (i * spaceBetween)
     const yScale = useMemo(() => {
         if (_.isFunction(preYScale)) return preYScale
@@ -78,29 +64,32 @@ export function MinimalBoxplots({ qs: rawQs, boxWidth, width, height, margins, y
                 left={margins.left-spaceBetween}
                 top={0}
                 label={yaxisLabel}
-                labelProps={{ fontSize: 10, textAnchor: "middle", verticalAnchor: "end" }}
-                tickLabelProps={() => ({ fontSize: 10, textAnchor: "end", verticalAnchor: "middle" })}
+                stroke={getStrokeColor(darkmode)}
+                tickStroke={getStrokeColor(darkmode)}
+                labelProps={{ fontSize: 10, textAnchor: "middle", verticalAnchor: "end", fill: getFillColor(darkmode) }}
+                tickLabelProps={() => ({ fontSize: 10, textAnchor: "end", verticalAnchor: "middle", fill: getFillColor(darkmode) })}
                 />}
-            {verticalLineAtZero ? <line x1={margins.left} x2={margins.left + chartWidth} y1={yScale(0)} y2={yScale(0)} stroke={"#000000"} strokeWidth={1} /> : null}
+            {verticalLineAtZero ? <line x1={margins.left} x2={margins.left + chartWidth} y1={yScale(0)} y2={yScale(0)} stroke={getStrokeColor(darkmode)} strokeWidth={1} /> : null}
 
             {qs.map((q, i) => {
-                return <Box key={`boxplot-${i}`} x={boxX(i)} q25={yScale(q.q25)} q75={yScale(q.q75)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.median)} width={checkedBoxWidth} fill={fills[i]} />
+                return <Box key={`boxplot-${i}`} x={boxX(i)} q25={yScale(q.q25)} q75={yScale(q.q75)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.median)} width={checkedBoxWidth} fill={fills[i]} darkmode={darkmode} />
             })}
-            {xtickLabels.map((label, i) => <Text key={`boxplot-xtick-${i}`} x={boxX(i)} y={height - margins.bottom} dy={0} fontSize={10} verticalAnchor={"middle"} textAnchor={"end"} angle={-90}>{label}</Text>)}
+            {xtickLabels.map((label, i) => <Text key={`boxplot-xtick-${i}`} x={boxX(i)} y={height - margins.bottom} dy={0} fontSize={10} fill={getFillColor(darkmode)} verticalAnchor={"middle"} textAnchor={"end"} angle={-90}>{label}</Text>)}
             {indicateN ? qs.map((q, i) => <Text
                 key={`idnicate-n-boxplot${i}`}
                 x={boxX(i)}
                 y={yScale(q.max)}
                 dy={-4}
                 verticalAnchor={"bottom"}
-                textAnchor={"middle"}>
+                textAnchor={"middle"}
+                fill={getFillColor(darkmode)}>
                 {abbreviateNumber(q.N)}</Text>) : null}
             
             {showMedian ? qs.map((q, i) => <TextLabel key={`boxplot-median-${i}`} 
                 x={boxX(i)}
                 dx={2}
                 y={yScale(q.median)}
-                labelTexts={[`${_.round(q.median, roundToDigits)} ${medianSuffix}`]} verticalAnchor={"middle"} textAnchor={"start"} totalYOffset={0} />) : null}
+                labelTexts={[`${_.round(q.median, roundToDigits)} ${medianSuffix}`]} verticalAnchor={"middle"} textAnchor={"start"} totalYOffset={0} darkmode={darkmode} />) : null}
             {_.isArray(markerValues) ? qs.map((q, i) => {
                 const markerValue = markerValues[i]
                 if (!_.isNumber(markerValue)) return null
@@ -110,10 +99,10 @@ export function MinimalBoxplots({ qs: rawQs, boxWidth, width, height, margins, y
                 const labelText = _.isString(markerLabel) ? `${markerLabel} (${_.round(markerValue, roundToDigits)})` : `${_.round(markerValue, roundToDigits)}${medianSuffix}`
                 return <g key={`boxplot-marker-${i}`}>
                     <circle cx={cx} cy={cy} r={4} fill="none" stroke="#ae0000" strokeWidth={2} />
-                    <TextLabel x={cx} dx={checkedBoxWidth / 2 + 4} y={cy} labelTexts={[labelText]} verticalAnchor="middle" textAnchor="start" totalYOffset={0} />
+                    <TextLabel x={cx} dx={checkedBoxWidth / 2 + 4} y={cy} labelTexts={[labelText]} verticalAnchor="middle" textAnchor="start" totalYOffset={0} darkmode={darkmode} />
                 </g>
             }) : null}
-            {!showYAxis && _.isString(yaxisLabel) && <Text x={margins.left} dx={-8} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text>}
+            {!showYAxis && _.isString(yaxisLabel) && <Text x={margins.left} dx={-8} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90} fill={getFillColor(darkmode)}>{yaxisLabel}</Text>}
         </SVG>
     )
 }

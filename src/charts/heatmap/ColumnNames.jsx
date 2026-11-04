@@ -4,6 +4,7 @@ import PropType from "prop-types"
 import { Text } from "@visx/text";
 import { isPropHexColorString } from "../../types/checks/color";
 import { getColorPalette } from "../../colors/palette";
+import { getFillColor } from "../../colors/fill";
 import { useTooltip, useTooltipInPortal } from "@visx/tooltip";
 
 
@@ -30,7 +31,8 @@ HeatmapColumnNames.propTypes = {
 
  * @returns 
  */
-export function HeatmapColumnNames({columnNames, startX = 0, startY = 0, binHeight = 15, binWidth = 15, verticalMargin = 5, keyNames, stroke = "#000000", tooltipNames, darkmode = false, marginBetweenValues = 8, svgID, svgHeight = 200, containerRef }) {
+export function HeatmapColumnNames({columnNames, startX = 0, startY = 0, binHeight = 15, binWidth = 15, verticalMargin = 5, keyNames, stroke, tooltipNames, darkmode = false, marginBetweenValues = 8, svgID, svgHeight = 200, containerRef }) {
+    const fillColor = getFillColor(darkmode)
 
     const heatmapSVGHeight = svgHeight //binHeight + verticalMargin
     const heatmapSVGWidth = columnNames.length * binWidth + 200 // extra space for labels
@@ -50,6 +52,7 @@ export function HeatmapColumnNames({columnNames, startX = 0, startY = 0, binHeig
                             verticalAnchor="start"
                             textAnchor="start"
                             angle = {-60}
+                            fill={fillColor}
                         >
                             {columnName}
                         </Text>

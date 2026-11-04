@@ -47,20 +47,6 @@ HeatmapRow.propTypes = {
     marginBetweenValues: PropTypes.number,
 };
 
-HeatmapRow.defaultProps = {
-    opacity: 1,
-    nanFill: "#fafafa",
-    showLabel: true,
-    isLabelProteinTag: false,
-    colorValuesExist: false,
-    labelsExist: true,
-    handleMouseEnter: undefined,
-    handleMouseLeave: undefined,
-    isLabelFeatureTag: false,
-    darkmode: false
-};
-
-
 /**
  * HeatmapRow - A single row in the heatmap. The 
  *
@@ -79,7 +65,7 @@ function HeatmapRow({
     minIdx,
     valueNames,
     colorNames,
-    colorValuesExist,
+    colorValuesExist = false,
     opacity = 1,
     binHeight,
     marginBetweenValuesAndColors,
@@ -87,17 +73,18 @@ function HeatmapRow({
     labelString = "",
     handleMouseEnter,
     handleMouseLeave,
-    nanFill = "#fafafa",
+    nanFill,
     clusterIndexColor,
-    showLabel,
-    isLabelProteinTag,
-    isLabelFeatureTag,
+    showLabel = true,
+    isLabelProteinTag = false,
+    isLabelFeatureTag = false,
     annotation_tags = ["dXtpH"],
     proteinTagMap,
     clusterExists,
-    darkmode,
-    marginBetweenValues = 8
-}) {
+    darkmode = false,
+    marginBetweenValues = 8,
+    labelsExist = true}) {
+    const nanFillColor = nanFill !== undefined ? nanFill : darkmode ? "#2b2b2b" : "#fafafa"
     return(
         
         <g onMouseEnter={_.isFunction(handleMouseEnter) ? (e) => handleMouseEnter(e, index) : undefined}
@@ -122,7 +109,7 @@ function HeatmapRow({
                     width={binHeight}
                     height={binHeight}
                     stroke={getStrokeColor(darkmode)}
-                    fill={data[valueName]===undefined ? nanFill : valueScale(data[valueName])}
+                    fill={data[valueName]===undefined ? nanFillColor : valueScale(data[valueName])}
                 />)}
             
                 {colorValuesExist ?

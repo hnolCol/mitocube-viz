@@ -3,7 +3,8 @@ import _ from "lodash"
 import React from "react"
 import { isPropHexColorString } from "../types/checks/color"
 import { isPropSet } from "../types/checks/set"
-import { isInRange } from "../utils/inrange" 
+import { isInRange } from "../utils/inrange"
+import { getStrokeColor } from "../colors/stroke" 
 
 
 
@@ -89,26 +90,6 @@ ScatterPoints.propTypes = {
     colorMap : PropTypes.objectOf(isPropHexColorString),
     glyphMap : PropTypes.objectOf(PropTypes.oneOf(["rect","circle"]))
 }
-ScatterPoints.defaultProps = {
-    data: [],
-    valid: [],
-    indices: undefined,
-    sizeName: undefined,
-    colorName: undefined,
-    fill: "#efefef",
-    stroke: "#000000",
-    strokeWidth: 0.5,
-    searchStrokeWidth: 1.0,
-    checkColorMap: false,
-    colorMap: { pathway: "#79c29e" },
-    colorMapKeyName: "node_type",
-    glyphMap: { pathway: "rect" },
-    checkPolyMap: false,
-    polyMapKeyName: "node_type",
-    rerenderDependency: [],
-    searchIndices: new Set(),
-    filterIndices: new Set()
-};
 
 /**
  * 
@@ -146,8 +127,9 @@ function ScatterPoints({
     yScale, 
     sizeScale, 
     colorScale, 
-    fill = "#efefef",
-    stroke = "#000000", 
+    fill,
+    stroke,
+    darkmode = false, 
     strokeWidth = 0.5,
     searchStrokeWidth = 1.0,
     checkColorMap = false,
@@ -161,6 +143,8 @@ function ScatterPoints({
     searchIndices = new Set() ,
     filterIndices =  new Set()}){
  
+    const strokeColor = stroke !== undefined ? stroke : getStrokeColor(darkmode)
+    const fillColor = fill !== undefined ? fill : darkmode ? "#3a3a3a" : "#efefef"
     const filterByIdx = filterIndices.size !== 0
     const opacityBySearch = searchIndices.size !== 0
 
@@ -255,8 +239,8 @@ function ScatterPoints({
                     sizeName,
                     colorMap,
                     colorMapKeyName,
-                    fill,
-                    stroke,
+                    fill: fillColor,
+                    stroke: strokeColor,
                     strokeWidth,
                     opacity,
                     sizeScale,
@@ -286,8 +270,8 @@ function ScatterPoints({
                     sizeName,
                     colorMap,
                     colorMapKeyName,
-                    fill,
-                    stroke,
+                    fill: fillColor,
+                    stroke: strokeColor,
                     strokeWidth,
                     opacity,
                     sizeScale,
@@ -307,6 +291,7 @@ function areEqual(prevProps, nextProps) {
     the same result as passing prevProps to render,
     otherwise return false
     */
+    if (prevProps.darkmode !== nextProps.darkmode) return false
     if (!_.isArray(prevProps.rerenderDependency)) return false
     if (prevProps.rerenderDependency.length !== nextProps.rerenderDependency.length) return false 
     if (_.some(prevProps.rerenderDependency, (value,idx) => nextProps.rerenderDependency[idx] !== value)) return false 

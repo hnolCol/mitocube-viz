@@ -4,6 +4,8 @@ import { Text } from '@visx/text'
 import { areAllValuesNumbers } from '../types/checks/numbers'
 import { abbreviateNumber } from '../transforms/numbers'
 import { isPropHexColorString } from '../types/checks/color'
+import { getStrokeColor } from '../colors/stroke'
+import { getFillColor } from '../colors/fill'
 
 Box.propTypes = {
     x: PropType.number.isRequired,
@@ -49,9 +51,10 @@ function Box({
     max,
     q25,
     q75,
-    fill = "#efefef",
-    stroke = "#000000",
+    fill,
+    stroke,
     strokeWidth = 0.5,
+    darkmode = false,
     showWhiskers = true,
     opacity = 1,
     whiskerScale = 0.5,
@@ -63,28 +66,30 @@ function Box({
     const whiskerWidth = width * whiskerScale
     const halfWidth = width / 2
     const medianStrokeWidth = strokeWidth * 1.2
+    const strokeColor = stroke !== undefined ? stroke : getStrokeColor(darkmode)
+    const fillColor = fill !== undefined ? fill : darkmode ? "#3a3a3a" : "#efefef"
 
     return (
         <g opacity={opacity}>
-            <rect x={x - halfWidth} y={q75} height={q25 - q75} width={width} fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+            <rect x={x - halfWidth} y={q75} height={q25 - q75} width={width} fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth} />
 
             {/* Min-Max lines */}
-            <line x1={x} x2={x} y1={min} y2={q25} stroke={stroke} strokeWidth={strokeWidth} />
-            <line x1={x} x2={x} y1={max} y2={q75} stroke={stroke} strokeWidth={strokeWidth} />
+            <line x1={x} x2={x} y1={min} y2={q25} stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1={x} x2={x} y1={max} y2={q75} stroke={strokeColor} strokeWidth={strokeWidth} />
 
             {/* Whiskers */}
             {showWhiskers && (
                 <>
-                    <line x1={x - whiskerWidth / 2} x2={x + whiskerWidth / 2} y1={min} y2={min} stroke={stroke} strokeWidth={strokeWidth} />
-                    <line x1={x - whiskerWidth / 2} x2={x + whiskerWidth / 2} y1={max} y2={max} stroke={stroke} strokeWidth={strokeWidth} />
+                    <line x1={x - whiskerWidth / 2} x2={x + whiskerWidth / 2} y1={min} y2={min} stroke={strokeColor} strokeWidth={strokeWidth} />
+                    <line x1={x - whiskerWidth / 2} x2={x + whiskerWidth / 2} y1={max} y2={max} stroke={strokeColor} strokeWidth={strokeWidth} />
                 </>
             )}
 
             {/* Median line gets a 1.2x strokeWidth by default */}
-            <line x1={x - halfWidth} x2={x + halfWidth} y1={median} y2={median} stroke={stroke} strokeWidth={medianStrokeWidth} />
+            <line x1={x - halfWidth} x2={x + halfWidth} y1={median} y2={median} stroke={strokeColor} strokeWidth={medianStrokeWidth} />
 
             {typeof N === 'number' && (
-                <Text x={x} y={max - halfWidth / 2} verticalAnchor='center' textAnchor='middle' fontSize={9}>
+                <Text x={x} y={max - halfWidth / 2} verticalAnchor='center' textAnchor='middle' fontSize={9} fill={getFillColor(darkmode)}>
                     {abbreviateNumber(N)}
                 </Text>
             )}
@@ -99,6 +104,7 @@ function areEqual(prevProps, nextProps) {
     }
     if (prevProps.fill !== nextProps.fill) return false
     if (prevProps.stroke !== nextProps.stroke) return false
+    if (prevProps.darkmode !== nextProps.darkmode) return false
     if (prevProps.showWhiskers !== nextProps.showWhiskers) return false
     return true
 }

@@ -14,16 +14,16 @@ ConditionApplicationLabel.propTypes = {
 };
 
 
-export function ConditionApplicationLabel({ x, y, tag, textProps, caTagToText }) {
+export function ConditionApplicationLabel({ x, y, tag, textProps, caTagToText, darkmode = false }) {
     if (tag.includes(";")) {
         const tags = tag.split(";")
         return (
             <g>
                 {tags.map((t, idx) => (
-                    <Text key={`tag-${idx}`} x={x} y={y + idx * 14} {...{ fill: "#333",  textAnchor: "middle", verticalAnchor: "middle", fontSize: 12, ...textProps }}>{caTagToText.get(t)}</Text>
+                    <Text key={`tag-${idx}`} x={x} y={y + idx * 14} {...{ fill: darkmode ? "#cccccc" : "#333",  textAnchor: "middle", verticalAnchor: "middle", fontSize: 12, ...textProps }}>{caTagToText.get(t)}</Text>
                 ))}
             </g>
         )
     }
-    return <Text x={x} y={y}  {...{ fill: "#333",  textAnchor: "middle", verticalAnchor: "middle", fontSize: 12, ...textProps }}>{caTagToText.get(tag)}</Text>
+    return <Text x={x} y={y}  {...{ fill: darkmode ? "#cccccc" : "#333",  textAnchor: "middle", verticalAnchor: "middle", fontSize: 12, ...textProps }}>{caTagToText.get(tag)}</Text>
 }

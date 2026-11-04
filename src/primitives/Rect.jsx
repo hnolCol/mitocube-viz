@@ -1,3 +1,5 @@
+import { getStrokeColor } from "../colors/stroke"
+
 /**
  * Render a simple SVG rectangle (<rect />) with common layout and styling props.
  *
@@ -23,7 +25,8 @@
  * // Using strings and custom stroke
  * <Rect x="5%" y="10%" width="90%" height="80%" fill="navy" stroke="white" strokeWidth={2} opacity={0.8} />
  */
-export function Rect({x,y,width,height,fill,stroke = "#000000", strokeWidth = 0.5, opacity = 1, onMouseLeave, onMouseOver}) {
+export function Rect({x,y,width,height,fill,stroke, strokeWidth = 0.5, opacity = 1, darkmode = false, onMouseLeave, onMouseOver}) {
+    const strokeColor = stroke !== undefined ? stroke : getStrokeColor(darkmode)
     return (
         <rect 
             {...{
@@ -31,7 +34,7 @@ export function Rect({x,y,width,height,fill,stroke = "#000000", strokeWidth = 0.
                 y,
                 width,
                 height,
-                stroke,
+                stroke: strokeColor,
                 fill,
                 strokeWidth,
                 fillOpacity: opacity,

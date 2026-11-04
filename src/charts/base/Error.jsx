@@ -17,7 +17,8 @@ import { getAxisStrokeColor } from '../../colors/stroke'
  * @param {Boolean} props.cap If a cap should be added to the error. 
  * @returns 
  */
-function ErrorBar({ x, y0, y1, width = 0, cap = true, stroke = getAxisStrokeColor(), ...rest }) {
+function ErrorBar({ x, y0, y1, width = 0, cap = true, stroke, darkmode = false, ...rest }) {
+    const strokeColor = stroke !== undefined ? stroke : getAxisStrokeColor(darkmode)
     
     if (!areAllValuesNumbers([x,y0,y1])) return null 
     return (
@@ -30,7 +31,7 @@ function ErrorBar({ x, y0, y1, width = 0, cap = true, stroke = getAxisStrokeColo
                 x2={x}
                 y1={y0}
                 y2={y1}
-                stroke={stroke}
+                stroke={strokeColor}
                 {...rest} />
             
             {/* cap line */}
@@ -41,7 +42,7 @@ function ErrorBar({ x, y0, y1, width = 0, cap = true, stroke = getAxisStrokeColo
                     x2={x + width / 2 }
                     y1={y1}
                     y2={y1}
-                    stroke={stroke}
+                    stroke={strokeColor}
                     {...rest} /> : null}
         </g>
     )

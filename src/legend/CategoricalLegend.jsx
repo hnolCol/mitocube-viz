@@ -2,6 +2,7 @@ import React from "react";
 import { LegendItem, LegendLabel, LegendOrdinal } from "@visx/legend";
 import { Tooltip, useTooltip, useTooltipInPortal } from "@visx/tooltip";
 import _ from "lodash"
+import { getStrokeColor } from "../colors/stroke"
 
 
 
@@ -27,7 +28,8 @@ function areEqual(prevProps, nextProps) {
     if (prevProps.titleOnly !== nextProps.titleOnly) return false
     if (prevProps.colorScale !== nextProps.colorScale) return false 
     if (prevProps.colorName !== nextProps.colorName) return false 
-    if (prevProps.sizeName !== nextProps.sizeName) return false 
+    if (prevProps.sizeName !== nextProps.sizeName) return false
+    if (prevProps.darkmode !== nextProps.darkmode) return false 
     return true
   }
 
@@ -52,7 +54,8 @@ const CategoricalLegend = React.memo(
         size = 20,
         caTagToText,
         attributeTagToText,
-        titleOnly = false
+        titleOnly = false,
+        darkmode = false
 
     }) {
 
@@ -87,7 +90,7 @@ const CategoricalLegend = React.memo(
         return <svg width={size} height={size} ><circle cx={size / 2} cy={size / 2}
                 fill={fill}
                 r={r}
-                stroke="#000"
+                stroke={getStrokeColor(darkmode)}
                 strokeWidth={0.5} />
             </svg>
         } 

@@ -30,34 +30,6 @@ SingleCategoricalChart.propTypes = {
     caTagToText : PropTypes.object
 }
 
-SingleCategoricalChart.defaultProps = {
-    width: 600,
-    height: 300,
-    data: [
-        { y: 5, T: "A", G: "WT", O: "0.5h" },
-        { y: 4, T: "B", G: "WT", O: "0.5h" },
-        { y: 10, T: "C", G: "WT", O: "0.5h" }
-    ],
-    margins: {
-        left: 15,
-        right: 5,
-        bottom: 30,
-        top: 5
-    },
-    yaxisName: "y",
-    colorName: "Treatment",
-    innerColorPadding: 0.1,
-    outerColorPadding: 0.2,
-    svgID: undefined,
-    svgRef: undefined,
-    colorPalette: [],
-    minMaxYDomain: undefined,
-    yScaleStartsAtZero: true,
-    darkmode: false,
-    children: () => null,
-    chartType: "boxplot"
-}
-
 /**
  * SingleCategoricalChart
  *
@@ -110,22 +82,26 @@ SingleCategoricalChart.defaultProps = {
  * - If the component may return null conditionally, use React.ReactElement|null or JSX.Element|null.
  */
 function SingleCategoricalChart({
-    width,
-    height,
-    data,
-    margins,
-    yaxisName,
-    colorName,
-    innerColorPadding,
-    outerColorPadding,
+    width = 600,
+    height = 300,
+    data = [
+        { y: 5, T: "A", G: "WT", O: "0.5h" },
+        { y: 4, T: "B", G: "WT", O: "0.5h" },
+        { y: 10, T: "C", G: "WT", O: "0.5h" }
+    ],
+    margins = { left: 15, right: 5, bottom: 30, top: 5 },
+    yaxisName = "y",
+    colorName = "Treatment",
+    innerColorPadding = 0.1,
+    outerColorPadding = 0.2,
     svgID,
     svgRef,
-    colorPalette,
+    colorPalette = [],
     minMaxYDomain,
-    yScaleStartsAtZero,
-    darkmode,
-    children,
-    chartType,
+    yScaleStartsAtZero = true,
+    darkmode = false,
+    children = () => null,
+    chartType = "boxplot",
     caTagToText,
     attributeTagToText
 }) {

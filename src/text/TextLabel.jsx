@@ -6,6 +6,7 @@ import { Text } from "@visx/text"
 import Margins from "../types/Margins"
 import { isPropHexColorString } from "../types/checks/color"
 import { ProteinLabel } from "./ProteinLabel"
+import { getFillColor } from "../colors/fill"
 
 
 
@@ -21,21 +22,7 @@ TextLabel.propTypes = {
     color: PropTypes.arrayOf(isPropHexColorString).isRequired,
     isProtein : PropTypes.arrayOf(PropTypes.bool)
 }
-TextLabel.defaultProps = {
-    x: 0,
-    y: 0,
-    margins: { left: 0, right: 0, top: 0, bottom: 0 },
-    dx: 1,
-    dy: 0,
-    totalYOffset: 4,
-    fontSize: 14,
-    color: ["#00000"],
-    isProtein: [false],
-    verticalAnchor: "start",
-    textAnchor : "start"
-}
-
-export function TextLabel({x, y, margins, labelTexts, dx, dy, totalYOffset, fontSize, color, isProtein, verticalAnchor, textAnchor}) {
+export function TextLabel({x = 0, y = 0, margins = { left: 0, right: 0, top: 0, bottom: 0 }, labelTexts, dx = 1, dy = 0, totalYOffset = 4, fontSize = 14, color = ["#00000"], isProtein = [false], verticalAnchor = "start", textAnchor = "start", darkmode = false}) {
 
     return (
         <Group left={margins.left} top={margins.top + totalYOffset}>
@@ -43,7 +30,7 @@ export function TextLabel({x, y, margins, labelTexts, dx, dy, totalYOffset, font
             {labelTexts.map((text, textIdx) => {
                 const textProps = {
                     
-                    fill : color ? color[textIdx] : "#000000",
+                    fill : color ? color[textIdx] : getFillColor(darkmode),
                     x : x,
                     dx: dx,
                     dy : dy,

@@ -6,6 +6,7 @@ import { isInRange } from "../utils/inrange"
 import React from "react"
 import PropTypes from "prop-types"
 import { isPropHexColorString } from "../types/checks/color"
+import { getStrokeColor } from "../colors/stroke"
 const isValidNumber = value => Number.isFinite(value)
 
 function buildPolylineSegments(ds) {
@@ -52,7 +53,8 @@ function ProfilesWithNaN({
     data,
     xScale,
     yScale,
-    stroke = "#000000",
+    stroke,
+    darkmode = false,
     xaxisName,
     yaxisName,
     fill = "none",
@@ -60,6 +62,7 @@ function ProfilesWithNaN({
     showPoints = true,
     includeXs = [],
     rerenderDependency = []}) { 
+    const strokeColor = stroke !== undefined ? stroke : getStrokeColor(darkmode)
     const [minX, maxX] = xScale.domain()
     const [maxY, minY] = yScale.domain()
     const yRange = [minY, maxY]
@@ -86,7 +89,7 @@ function ProfilesWithNaN({
                             <polyline
                                 key={i}
                                 points={segment.map(p => `${p.x},${p.y}`).join(", ")}
-                                stroke={stroke}
+                                stroke={strokeColor}
                                 strokeWidth={strokeWidth}
                                 fill={fill}
                             />
@@ -98,8 +101,8 @@ function ProfilesWithNaN({
                                 cx={p.x}
                                 cy={p.y}
                                 r={5}
-                                fill="#fff"
-                                stroke={stroke}
+                                fill={darkmode ? "#2b2b2b" : "#fff"}
+                                stroke={strokeColor}
                             />
                         ))}
                     {showPoints &&
@@ -117,8 +120,8 @@ function ProfilesWithNaN({
                                     cx={x}
                                     cy={y}
                                     r={5}
-                                    fill="#fff"
-                                    stroke={stroke}
+                                    fill={darkmode ? "#2b2b2b" : "#fff"}
+                                    stroke={strokeColor}
                                 />
                             )
                         })}
@@ -133,6 +136,7 @@ function areEqual(prevProps, nextProps) {
     otherwise return false
     */
     if (prevProps.stroke !== nextProps.stroke) return false
+    if (prevProps.darkmode !== nextProps.darkmode) return false
     if (prevProps.strokeWidth !== nextProps.strokeWidth) return false
     if (!_.isArray(prevProps.rerenderDependency)) return false
     if (prevProps.rerenderDependency.length !== nextProps.rerenderDependency.length) return false 

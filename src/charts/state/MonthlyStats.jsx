@@ -7,7 +7,10 @@ const formatTick = (t, decimals) => (t >= 1000 ? `${(t / 1000).toFixed(0)}k` : t
  * Jan–Dec chart. One series -> bars (optional median line); several -> one line per series.
  * series: [{ year, color, months: (number|null)[12] }]
  */
-export function MonthlyBarLineChart({ series, tickStep = 1, decimals = 0, showMedian = false, width = 620, height = 255 }) {
+export function MonthlyBarLineChart({ series, tickStep = 1, decimals = 0, showMedian = false, width = 620, height = 255, darkmode = false }) {
+    const gridColor = darkmode ? "#3a3a3a" : "#f0f0f0"
+    const axisColor = darkmode ? "#666666" : "#ccc"
+    const tickColor = darkmode ? "#999999" : "#aaa"
     const padding = { top: 10, right: 40, bottom: 24, left: 10 }
     const plotWidth = width - padding.left - padding.right
     const plotHeight = height - padding.top - padding.bottom
@@ -29,14 +32,14 @@ export function MonthlyBarLineChart({ series, tickStep = 1, decimals = 0, showMe
         <svg width="100%" viewBox={`0 0 ${width} ${height}`} style={{ overflow: "visible" }}>
             {ticks.map(t => (
                 <g key={t}>
-                    <line x1={padding.left} x2={width - padding.right} y1={toY(t)} y2={toY(t)} stroke="#f0f0f0" strokeWidth="1" />
-                    <text x={width - padding.right + 8} y={toY(t)} fontSize="9" fill="#aaa" dominantBaseline="middle">
+                    <line x1={padding.left} x2={width - padding.right} y1={toY(t)} y2={toY(t)} stroke={gridColor} strokeWidth="1" />
+                    <text x={width - padding.right + 8} y={toY(t)} fontSize="9" fill={tickColor} dominantBaseline="middle">
                         {formatTick(t, decimals)}
                     </text>
                 </g>
             ))}
-            <line x1={padding.left} x2={padding.left} y1={padding.top} y2={baseline} stroke="#ccc" strokeWidth="1" />
-            <line x1={padding.left} x2={width - padding.right} y1={baseline} y2={baseline} stroke="#ccc" strokeWidth="1" />
+            <line x1={padding.left} x2={padding.left} y1={padding.top} y2={baseline} stroke={axisColor} strokeWidth="1" />
+            <line x1={padding.left} x2={width - padding.right} y1={baseline} y2={baseline} stroke={axisColor} strokeWidth="1" />
 
             {isSingle
                 ? series[0].months.map((val, idx) => {
@@ -49,7 +52,7 @@ export function MonthlyBarLineChart({ series, tickStep = 1, decimals = 0, showMe
                               width={barW * 0.7}
                               height={barHeight}
                               rx="3"
-                              fill={val != null ? series[0].color : "#eee"}
+                              fill={val != null ? series[0].color : darkmode ? "#444444" : "#eee"}
                           >
                               <title>{val != null ? `${MONTH_LABELS[idx]}: ${val.toFixed(decimals)}` : `${MONTH_LABELS[idx]}: no data`}</title>
                           </rect>
@@ -83,7 +86,7 @@ export function MonthlyBarLineChart({ series, tickStep = 1, decimals = 0, showMe
             ) : null}
 
             {MONTH_LABELS.map((label, idx) => (
-                <text key={label} x={centerX(idx)} y={height - 6} textAnchor="middle" fontSize="9" fill="#aaa">
+                <text key={label} x={centerX(idx)} y={height - 6} textAnchor="middle" fontSize="9" fill={tickColor}>
                     {label}
                 </text>
             ))}
@@ -95,7 +98,10 @@ export function MonthlyBarLineChart({ series, tickStep = 1, decimals = 0, showMe
  * Compact Jan–Dec line chart, one line per series (null months are skipped).
  * series: [{ year, color, months: (number|null)[12] }]
  */
-export function MonthlyTrendLine({ series, yLabel, unit = "", tickStep = 5, width = 300, height = 100 }) {
+export function MonthlyTrendLine({ series, yLabel, unit = "", tickStep = 5, width = 300, height = 100, darkmode = false }) {
+    const gridColor = darkmode ? "#3a3a3a" : "#f0f0f0"
+    const axisColor = darkmode ? "#666666" : "#ccc"
+    const tickColor = darkmode ? "#999999" : "#aaa"
     const padding = { top: 10, right: 10, bottom: 20, left: 40 }
     const plotWidth = width - padding.left - padding.right
     const plotHeight = height - padding.top - padding.bottom
@@ -111,22 +117,22 @@ export function MonthlyTrendLine({ series, yLabel, unit = "", tickStep = 5, widt
     return (
         <svg width={width} height={height} style={{ overflow: "visible" }}>
             {yLabel ? (
-                <text x={-(padding.top + plotHeight / 2)} y={12} textAnchor="middle" fontSize="9" fill="#999" transform="rotate(-90)">
+                <text x={-(padding.top + plotHeight / 2)} y={12} textAnchor="middle" fontSize="9" fill={tickColor} transform="rotate(-90)">
                     {yLabel}
                 </text>
             ) : null}
 
             {ticks.map(t => (
                 <g key={t}>
-                    <line x1={padding.left} x2={width - padding.right} y1={scaleY(t)} y2={scaleY(t)} stroke="#f0f0f0" strokeWidth="1" />
-                    <text x={padding.left - 6} y={scaleY(t)} textAnchor="end" dominantBaseline="middle" fontSize="9" fill="#aaa">
+                    <line x1={padding.left} x2={width - padding.right} y1={scaleY(t)} y2={scaleY(t)} stroke={gridColor} strokeWidth="1" />
+                    <text x={padding.left - 6} y={scaleY(t)} textAnchor="end" dominantBaseline="middle" fontSize="9" fill={tickColor}>
                         {Math.round(t)}
                     </text>
                 </g>
             ))}
 
-            <line x1={padding.left} x2={padding.left} y1={padding.top} y2={padding.top + plotHeight} stroke="#ccc" strokeWidth="1" />
-            <line x1={padding.left} x2={width - padding.right} y1={padding.top + plotHeight} y2={padding.top + plotHeight} stroke="#ccc" strokeWidth="1" />
+            <line x1={padding.left} x2={padding.left} y1={padding.top} y2={padding.top + plotHeight} stroke={axisColor} strokeWidth="1" />
+            <line x1={padding.left} x2={width - padding.right} y1={padding.top + plotHeight} y2={padding.top + plotHeight} stroke={axisColor} strokeWidth="1" />
 
             {series.map((s, sIdx) => {
                 // Small vertical offset so overlapping series stay visible
@@ -145,7 +151,7 @@ export function MonthlyTrendLine({ series, yLabel, unit = "", tickStep = 5, widt
             })}
 
             {MONTH_LABELS.map((label, idx) => (
-                <text key={label} x={scaleX(idx)} y={height - 4} textAnchor="middle" fontSize="9" fill="#aaa">
+                <text key={label} x={scaleX(idx)} y={height - 4} textAnchor="middle" fontSize="9" fill={tickColor}>
                     {label}
                 </text>
             ))}
