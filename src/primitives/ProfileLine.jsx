@@ -2,6 +2,8 @@ import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 import { Text } from "@visx/text"
+import { getStrokeColor } from "../colors/stroke"
+import { getFillColor } from "../colors/fill"
 
 ProfileLine.propTypes = {
     data : PropTypes.array.isRequired,
@@ -27,26 +29,28 @@ function ProfileLine({
     sizeScale, 
     colorScale, 
     fill = "none",
-    stroke = "#000000", 
-    strokeWidth = 2, 
+    stroke, 
+    strokeWidth = 2,
+    darkmode = false, 
     rerenderDependency = [], 
     searchIndices = new Set() ,
     filterIndices = new Set(),
     showPoints = true}) {
 
     const halfBandWidth = xScale.bandwidth() / 2
+    const strokeColor = stroke !== undefined ? stroke : getStrokeColor(darkmode)
     return(
         <g>
             {data.map((d, idx) => <g key={`${idx}-profile-line`}>
                 <polyline
                     points={_.join(_.map(yaxisName, yName => `${xScale(yName)+halfBandWidth},${yScale(d[yName])}`), ", ")}
-                    {...{ stroke, strokeWidth, fill }} />
+                    {...{ stroke: strokeColor, strokeWidth, fill }} />
                 {showPoints ? _.map(yaxisName, yName => <circle {...{
                     cx: xScale(yName) + halfBandWidth,
                     cy: yScale(d[yName]),
                     r: 5,
-                    fill: "#fff",
-                    stroke
+                    fill: darkmode ? "#2b2b2b" : "#fff",
+                    stroke: strokeColor
                 }} />) : null
                 }
                 {labelNames.length > 0 && yaxisName.length > 0 ?
@@ -55,7 +59,8 @@ function ProfileLine({
                         y={yScale(yScale.domain().at(-1))}
                         dy={-8}
                         textAnchor="end"
-                        verticalAnchor="middle">
+                        verticalAnchor="middle"
+                        fill={getFillColor(darkmode)}>
                         {_.join(_.map(labelNames, labelName => d[labelName]), ", ")}
                     </Text> : null}
             </g>)}
@@ -72,6 +77,7 @@ function areEqual(prevProps, nextProps) {
     the same result as passing prevProps to render,
     otherwise return false
     */
+    if (prevProps.darkmode !== nextProps.darkmode) return false
     if (!_.isArray(prevProps.rerenderDependency)) return false
     if (prevProps.rerenderDependency.length !== nextProps.rerenderDependency.length) return false 
     if (_.some(prevProps.rerenderDependency, (value,idx) => nextProps.rerenderDependency[idx] !== value)) return false 

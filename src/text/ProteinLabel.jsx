@@ -1,4 +1,5 @@
 import { Text } from "@visx/text"
+import { getFillColor } from "../colors/fill"
 import hooks from "@mitocube/api-hooks"
 /**
  * ProteinLabel - Text for Heatmap rows.
@@ -34,7 +35,8 @@ import hooks from "@mitocube/api-hooks"
  * - Ensure provided x/y coordinates correspond to the same coordinate system as the heatmap.
  * - Adjust dx and fontSize to avoid overlap with heatmap cells.
  */
-export function ProteinLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAnchor = "middle", textAnchor = "start", fill = "#000000" }) {
+export function ProteinLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAnchor = "middle", textAnchor = "start", fill, darkmode = false }) {
+    const fillColor = fill !== undefined ? fill : getFillColor(darkmode)
 
     // const { data: protein, isSuccess } = hooks.features.proteins.useGetProteinByTag({ tag: text }, { enabled: typeof text === "string" })
     
@@ -47,7 +49,7 @@ export function ProteinLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, vertic
             textAnchor,
             verticalAnchor,
             fontSize,
-            fill
+            fill: fillColor
         }}>
             {text}
         </Text>

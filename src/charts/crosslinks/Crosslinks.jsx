@@ -45,6 +45,7 @@ export function CrosslinkViewer({
     getLabelText = null,
     onLinkClick = () => {},
     onOwnArcClick = () => {}, 
+    darkmode = false,
 }) {
     const [selected, setSelected] = useState(null)
 
@@ -105,7 +106,7 @@ export function CrosslinkViewer({
                     const isFocused = focusedPartnerTag === p.id
                     const isInterSelected = selectedInterPartners.has(p.id)
                     const baseColor = focusedPartnerTag
-                        ? "#ccc"
+                        ? darkmode ? "#555555" : "#ccc"
                         : (p.id === tag ? "#1D9E75" : CROSSLINK_COLORS[i % CROSSLINK_COLORS.length])
                     const labelColor = p.id === tag ? "#1D9E75" : CROSSLINK_COLORS[i % CROSSLINK_COLORS.length]
                     const midRad = toRad(p.midDeg)
@@ -258,7 +259,7 @@ export function CrosslinkViewer({
                         </b>
                         {bandTooltipData.name ? `: ${bandTooltipData.name}` : ""}
                         <br />
-                        <span style={{ color: "#888", fontSize: 11 }}>{bandTooltipData.source}</span>
+                        <span style={{ color: darkmode ? "#bbbbbb" : "#888", fontSize: 11 }}>{bandTooltipData.source}</span>
                         <br />
                         Residues {bandTooltipData.start}–{bandTooltipData.end}
                     </div>

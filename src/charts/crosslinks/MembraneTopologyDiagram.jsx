@@ -56,6 +56,7 @@ export function MembraneTopologyDiagram({
         { residue: 427, label: "427" },
         { residue: 428, label: "428" },
     ],
+    darkmode = false,
 }) {
     const hasTM = tmSegments && tmSegments.length > 0
 
@@ -70,8 +71,8 @@ export function MembraneTopologyDiagram({
     if (!layout) {
         return (
             <div style={{
-                padding: 20, textAlign: "center", color: "#888", fontSize: 13,
-                border: "1px dashed #ccc", borderRadius: 6, maxWidth: 800,
+                padding: 20, textAlign: "center", color: darkmode ? "#bbbbbb" : "#888", fontSize: 13,
+                border: `1px dashed ${darkmode ? "#555" : "#ccc"}`, borderRadius: 6, maxWidth: 800,
             }}>
                 No transmembrane topology data available 
             </div>
@@ -116,10 +117,10 @@ export function MembraneTopologyDiagram({
         <div ref={containerRef} style={{ position: "relative", width: "100%", maxWidth: WIDTH }}>
             <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} style={{ width: "100%", height: "auto", display: "block" }}>
                 {compartments[0] && (
-                    <text x={8} y={TOP_Y + 4} fontSize={11} fontWeight={600} fill="#5c7080">{compartments[0]}</text>
+                    <text x={8} y={TOP_Y + 4} fontSize={11} fontWeight={600} fill={darkmode ? "#9ab0c0" : "#5c7080"}>{compartments[0]}</text>
                 )}
                 {compartments[1] && (
-                    <text x={8} y={BOTTOM_Y + 4} fontSize={11} fontWeight={600} fill="#5c7080">{compartments[1]}</text>
+                    <text x={8} y={BOTTOM_Y + 4} fontSize={11} fontWeight={600} fill={darkmode ? "#9ab0c0" : "#5c7080"}>{compartments[1]}</text>
                 )}
 
                 <rect
@@ -129,7 +130,7 @@ export function MembraneTopologyDiagram({
                 />
 
                 {/* the continuous chain */}
-                <path d={pathD} fill="none" stroke="#8f99a3" strokeWidth={2.5} strokeLinecap="round" />
+                <path d={pathD} fill="none" stroke={darkmode ? "#a9b4bd" : "#8f99a3"} strokeWidth={2.5} strokeLinecap="round" />
 
                 {/* TM tubes drawn on top of the chain, at each crossing */}
                 {segments.filter(s => s.type === "tm").map((seg, i) => {
@@ -152,17 +153,17 @@ export function MembraneTopologyDiagram({
                                 }}
                                 onMouseLeave={hideTooltip}
                             />
-                            <text x={x} y={MEMBRANE_TOP - 12} fontSize={9} fill="#555" textAnchor="middle">{topResidue}</text>
-                            <text x={x} y={MEMBRANE_BOTTOM + 18} fontSize={9} fill="#555" textAnchor="middle">{bottomResidue}</text>
+                            <text x={x} y={MEMBRANE_TOP - 12} fontSize={9} fill={darkmode ? "#bbbbbb" : "#555"} textAnchor="middle">{topResidue}</text>
+                            <text x={x} y={MEMBRANE_BOTTOM + 18} fontSize={9} fill={darkmode ? "#bbbbbb" : "#555"} textAnchor="middle">{bottomResidue}</text>
                         </g>
                     )
                 })}
                 {/* N-term / C-term labels */}
-                <text x={pathPoints[0].x} y={pathPoints[0].y - 14} fontSize={10} fontWeight={700} fill="#333" textAnchor="middle">N</text>
+                <text x={pathPoints[0].x} y={pathPoints[0].y - 14} fontSize={10} fontWeight={700} fill={darkmode ? "#dddddd" : "#333"} textAnchor="middle">N</text>
                 <text
                     x={pathPoints[pathPoints.length - 1].x}
                     y={pathPoints[pathPoints.length - 1].y - 14}
-                    fontSize={10} fontWeight={700} fill="#333" textAnchor="middle"
+                    fontSize={10} fontWeight={700} fill={darkmode ? "#dddddd" : "#333"} textAnchor="middle"
                 >
                     C
                 </text>

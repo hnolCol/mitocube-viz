@@ -1,5 +1,5 @@
 /** Circular percentage gauge. */
-export function RingGauge({ percent, size = 80, color = "#558ba4", strokeWidth = 10 }) {
+export function RingGauge({ percent, size = 80, color = "#558ba4", strokeWidth = 10, darkmode = false }) {
     const center = size / 2
     const radius = center - 8
     const circumference = 2 * Math.PI * radius
@@ -7,7 +7,7 @@ export function RingGauge({ percent, size = 80, color = "#558ba4", strokeWidth =
 
     return (
         <svg width={size} height={size}>
-            <circle cx={center} cy={center} r={radius} fill="none" stroke="#eee" strokeWidth={strokeWidth} />
+            <circle cx={center} cy={center} r={radius} fill="none" stroke={darkmode ? "#444444" : "#eee"} strokeWidth={strokeWidth} />
             <circle
                 cx={center}
                 cy={center}
@@ -19,7 +19,7 @@ export function RingGauge({ percent, size = 80, color = "#558ba4", strokeWidth =
                 strokeLinecap="round"
                 transform={`rotate(-90 ${center} ${center})`}
             />
-            <text x={center} y={center} textAnchor="middle" dominantBaseline="middle" fontSize="20" fontWeight="700" fill="#333">
+            <text x={center} y={center} textAnchor="middle" dominantBaseline="middle" fontSize="20" fontWeight="700" fill={darkmode ? "#dddddd" : "#333"}>
                 {percent.toFixed(0)}%
             </text>
         </svg>
@@ -27,16 +27,16 @@ export function RingGauge({ percent, size = 80, color = "#558ba4", strokeWidth =
 }
 
 /** Horizontal bar showing value / total. */
-export function ProportionBar({ value, total, color = "#558ba4", height = 14, valueLabel = "done", restLabel = "remaining" }) {
+export function ProportionBar({ value, total, color = "#558ba4", height = 14, valueLabel = "done", restLabel = "remaining", darkmode = false }) {
     const pct = total > 0 ? Math.min((value / total) * 100, 100) : 0
     const rest = Math.max(total - value, 0)
 
     return (
-        <div style={{ display: "flex", height, borderRadius: height / 2, overflow: "hidden", backgroundColor: "#f0f0f0" }}>
+        <div style={{ display: "flex", height, borderRadius: height / 2, overflow: "hidden", backgroundColor: darkmode ? "#2b2b2b" : "#f0f0f0" }}>
             {total > 0 ? (
                 <>
                     <div style={{ width: `${pct}%`, backgroundColor: color }} title={`${value} ${valueLabel}`} />
-                    <div style={{ width: `${100 - pct}%`, backgroundColor: "#eee" }} title={`${rest} ${restLabel}`} />
+                    <div style={{ width: `${100 - pct}%`, backgroundColor: darkmode ? "#444444" : "#eee" }} title={`${rest} ${restLabel}`} />
                 </>
             ) : null}
         </div>

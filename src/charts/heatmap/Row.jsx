@@ -73,7 +73,7 @@ function HeatmapRow({
     labelString = "",
     handleMouseEnter,
     handleMouseLeave,
-    nanFill = "#fafafa",
+    nanFill,
     clusterIndexColor,
     showLabel = true,
     isLabelProteinTag = false,
@@ -84,6 +84,7 @@ function HeatmapRow({
     darkmode = false,
     marginBetweenValues = 8,
     labelsExist = true}) {
+    const nanFillColor = nanFill !== undefined ? nanFill : darkmode ? "#2b2b2b" : "#fafafa"
     return(
         
         <g onMouseEnter={_.isFunction(handleMouseEnter) ? (e) => handleMouseEnter(e, index) : undefined}
@@ -108,7 +109,7 @@ function HeatmapRow({
                     width={binHeight}
                     height={binHeight}
                     stroke={getStrokeColor(darkmode)}
-                    fill={data[valueName]===undefined ? nanFill : valueScale(data[valueName])}
+                    fill={data[valueName]===undefined ? nanFillColor : valueScale(data[valueName])}
                 />)}
             
                 {colorValuesExist ?

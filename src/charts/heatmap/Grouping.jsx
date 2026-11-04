@@ -7,6 +7,8 @@ import { isPropHexColorString } from "../../types/checks/color";
 import { scaleOrdinal } from "@visx/scale";
 import { useMemo } from "react";
 import { getColorPalette } from "../../colors/palette";
+import { getStrokeColor } from "../../colors/stroke";
+import { getFillColor } from "../../colors/fill";
 import { useTooltip, useTooltipInPortal } from "@visx/tooltip";
 import { localPoint } from "@visx/event"
 import { ConditionApplicationsView } from "../../../../mitocube-frontend/src/comps/core/base/condition_applications/ConditionApplicationView";
@@ -39,7 +41,7 @@ function getGroupLabel(value, is_condition_application, caTagMap) {
  * the tooltip will fetch data from the mitocube backend to get the required information. 
  * @returns 
  */
-function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOver, handleMouseLeave, is_condition_application, attributeTagMap, colorScale }) {
+function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOver, handleMouseLeave, is_condition_application, attributeTagMap, colorScale, darkmode = false }) {
     const isSuccess = true
 
     return (
@@ -65,7 +67,7 @@ function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOv
                 y={y + height / 2}
                 verticalAnchor="middle"
                 fontSize={height * 0.8}
-                fill="#000000">
+                fill={getFillColor(darkmode)}>
                 {is_condition_application ? isSuccess ? attributeTagMap.get(keyName).text : '' : keyName}
             </Text>
         </g>
@@ -90,7 +92,7 @@ function GroupingLegend({ keyNames, colorScales, is_condition_application, caTag
                             {domain.map(value => (
                                 <div key={value} className="flex center-items" style={{ gap: "0.3rem" }}>
                                     <svg width={legendElementSize} height={legendElementSize}>
-                                        <rect width={legendElementSize} height={legendElementSize} fill={scale(value)} stroke="#000000" />
+                                        <rect width={legendElementSize} height={legendElementSize} fill={scale(value)} stroke={strokeColor} />
                                     </svg>
                                     <span style={{ fontSize: "0.75rem" }}>{getGroupLabel(value, is_condition_application[idx], caTagMap)}</span>
                                 </div>
@@ -131,7 +133,8 @@ HeatmapGrouping.propTypes = {
  * the tooltip will fetch data from the mitocube backend to get the required information.
  * @returns 
  */
-export function HeatmapGrouping({data, startX = 0, startY = 0, binHeight = 15, binWidth = 15, verticalMargin = 5, keyNames, stroke = "#000000", tooltipNames, is_condition_application, caTagMap, attributeTagMap, darkmode = false }) {
+export function HeatmapGrouping({data, startX = 0, startY = 0, binHeight = 15, binWidth = 15, verticalMargin = 5, keyNames, stroke, tooltipNames, is_condition_application, caTagMap, attributeTagMap, darkmode = false }) {
+    const strokeColor = stroke !== undefined ? stroke : getStrokeColor(darkmode)
 
     const N = keyNames.length // number of grouping rows 
     const heatmapSVGHeight = (N+1) * (binHeight + verticalMargin)
@@ -192,7 +195,8 @@ export function HeatmapGrouping({data, startX = 0, startY = 0, binHeight = 15, b
                             width={binWidth}
                             height={binHeight}
                             keyName={keyName}
-                            stroke={stroke}
+                            stroke={strokeColor}
+                            darkmode={darkmode}
                             handleMouseOver={handleMouseOver}
                             handleMouseLeave={hideTooltip}
                             attributeTagMap={attributeTagMap}

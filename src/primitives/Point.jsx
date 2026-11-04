@@ -29,7 +29,8 @@ Point.propTypes = {
  * @param {Object} props.mouseOverParams Additional parameters to pass to the mouse over event handler
  * @returns 
  */
-function Point({idx, p, r = 4, opacity = 0.95,  fill = "red", stroke = "#262626", strokeWidth = 1, circleProps = {}, mouseOver, mouseOverParams, onMouseDown, mouseDownParams}) {
+function Point({idx, p, r = 4, opacity = 0.95,  fill = "red", stroke, strokeWidth = 1, darkmode = false, circleProps = {}, mouseOver, mouseOverParams, onMouseDown, mouseDownParams}) {
+    const strokeColor = stroke !== undefined ? stroke : darkmode ? "#ffffff" : "#262626"
     const xValue = p[0]
     const yValue = p[1]
     return( 
@@ -43,7 +44,7 @@ function Point({idx, p, r = 4, opacity = 0.95,  fill = "red", stroke = "#262626"
                 opacity,
                 fill,
                 r,
-                stroke,
+                stroke: strokeColor,
                 strokeWidth,
                 onMouseDown
             }}
@@ -60,7 +61,8 @@ function Point({idx, p, r = 4, opacity = 0.95,  fill = "red", stroke = "#262626"
     */
     if (prevProps.r !== nextProps.r) return false 
     if (prevProps.fill !== nextProps.fill) return false 
-    if (prevProps.opacity !== nextProps.opacity) return false 
+    if (prevProps.opacity !== nextProps.opacity) return false
+    if (prevProps.darkmode !== nextProps.darkmode) return false 
     if (prevProps.p[0] !== nextProps.p[0]) return false
     if (prevProps.p[1] !== nextProps.p[1]) return false
 

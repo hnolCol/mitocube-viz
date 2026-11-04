@@ -7,6 +7,7 @@ import Line from "../../primitives/Line";
 import Point from "../../primitives/Point"; 
 import { scaleLinear } from "@visx/scale";
 import { localPoint } from "@visx/event"
+import { getStrokeColor } from "../../colors/stroke"
 
 
 
@@ -56,7 +57,8 @@ export function InteractiveNetwork({
     width,
     height,
     svgRef,
-    svgID
+    svgID,
+    darkmode = false
 }) {
 
 
@@ -64,7 +66,7 @@ export function InteractiveNetwork({
     return (
 
 
-        <Network {...{ width, height, data: defaultData, svgRef, svgID }} />
+        <Network {...{ width, height, data: defaultData, svgRef, svgID, darkmode }} />
 
         // <Suspense fallback={<div>Loading...</div>}>
     )
@@ -80,7 +82,8 @@ export function Network({
     width = 400,
     height = 400,
     svgRef,
-    svgID}
+    svgID,
+    darkmode = false}
 ) {
     
     const [dragState, setDragState] = useState({dx : 0, dy : 0, nodeId: null, isDragging: false})
@@ -182,7 +185,7 @@ export function Network({
                     {defaultData.edges.map(edge => {
                         const {x1, y1, x2, y2} = getEdgePositions(edge)
                       
-                        return <Line key={edge.id} {...{x1, y1, x2, y2}} stroke={"black"} strokeWidth={0.5}/>
+                        return <Line key={edge.id} {...{x1, y1, x2, y2}} stroke={getStrokeColor(darkmode)} strokeWidth={0.5}/>
                     })}
 
                     {defaultData.nodes.map(node => {
@@ -202,6 +205,7 @@ export function Network({
                                 r={10} 
                                 fill={"red"} 
                                 strokeWidth={0.5}
+                                darkmode={darkmode}
                                 onMouseDown={(e) => handleMouseDown(e, node.id)}
                                 style={{ cursor: 'pointer' }}
                             />

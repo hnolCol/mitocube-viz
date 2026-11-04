@@ -1,4 +1,5 @@
 import { Text } from "@visx/text"
+import { getFillColor } from "../colors/fill"
 /**
  * RowLabel - Text for Heatmap rows.
  *
@@ -33,7 +34,8 @@ import { Text } from "@visx/text"
  * - Ensure provided x/y coordinates correspond to the same coordinate system as the heatmap.
  * - Adjust dx and fontSize to avoid overlap with heatmap cells.
  */
-export function RowLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAnchor = "middle", textAnchor = "start", isLabelFeatureTag, isLabelProteinTag = false, fill = "#000000" }) {
+export function RowLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAnchor = "middle", textAnchor = "start", isLabelFeatureTag, isLabelProteinTag = false, fill, darkmode = false }) {
+    const fillColor = fill !== undefined ? fill : getFillColor(darkmode)
 
     // const { data: protein, isSuccess } = hooks.features.proteins.useGetProteinByTag({ tag: text }, { enabled: isLabelProteinTag && typeof text === "string", staleTime : Infinity })
     // const { data: feature } = hooks.features.useGetFeatureByTag({ tag: text }, { enabled: isLabelFeatureTag && typeof text === "string", staleTime : Infinity })
@@ -48,7 +50,7 @@ export function RowLabel({ x, y, text, dx = 5, dy = 0, fontSize = 14, verticalAn
             textAnchor,
             verticalAnchor,
             fontSize,
-            fill
+            fill: fillColor
         }}>
             {text}
         </Text>

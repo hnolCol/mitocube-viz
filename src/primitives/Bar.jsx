@@ -4,6 +4,7 @@ import _ from "lodash"
 import { memo } from 'react'
 import { areAllValuesNumbers } from '../types/checks/numbers'
 import { isPropHexColorString } from '../types/checks/color'
+import { getStrokeColor } from '../colors/stroke'
 
 
 Bar.propTypes = {
@@ -21,19 +22,22 @@ function Bar({
     width,
     y1, // the actual height of the bar
     y0, // the baseline of the bar
-    fill = "#efefef",
-    stroke = "#000000",
+    fill,
+    stroke,
     strokeWidth = 0.5,
+    darkmode = false,
     opacity = 1,
     ...eventHandlers}) {
+    const strokeColor = stroke !== undefined ? stroke : getStrokeColor(darkmode)
+    const fillColor = fill !== undefined ? fill : darkmode ? "#3a3a3a" : "#efefef"
     // provide box coordinates in pixel 
     const barHeight = y0 > y1 ? y0-y1 : y1-y0
     const barBaseLine = y0 > y1 ? y1 : y0
     if (!areAllValuesNumbers([x,width,y1,y0])) return null 
     return (
         <g {...{opacity}}>
-            {barHeight === 0 ? <line x1={x} x2={x + width} y1={barBaseLine} y2={barBaseLine} {...{ stroke, strokeWidth }} /> :
-                <rect x={x} y={barBaseLine} height={barHeight} {...{ width, fill, stroke, strokeWidth }} />}
+            {barHeight === 0 ? <line x1={x} x2={x + width} y1={barBaseLine} y2={barBaseLine} {...{ stroke: strokeColor, strokeWidth }} /> :
+                <rect x={x} y={barBaseLine} height={barHeight} {...{ width, fill: fillColor, stroke: strokeColor, strokeWidth }} />}
             {_.some(eventHandlers) ? <rect x={x} y={barBaseLine} height={Math.max(barHeight, 1)} width={width} fill="transparent" style={{ pointerEvents: "all" }} {...eventHandlers} /> : null}
         </g>
     )
@@ -52,6 +56,7 @@ function areEqual(prevProps, nextProps) {
     if (prevProps.opacity!== nextProps.opacity) return false
     if (prevProps.fill !== nextProps.fill) return false
     if (prevProps.stroke !== nextProps.stroke) return false
+    if (prevProps.darkmode !== nextProps.darkmode) return false
     // keep transparent overlay rect (event handlers) in sync
     if (_.some(prevProps, _.isFunction) || _.some(nextProps, _.isFunction)) return false
     return true

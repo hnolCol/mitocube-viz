@@ -10,6 +10,7 @@ import { scaleLinear } from "@visx/scale";
 import { TextLabel } from "../../text/TextLabel";
 import _ from "lodash"
 import { Text } from "@visx/text";
+import { getFillColor } from "../../colors/fill";
 
 MinimalBoxplot.propTypes = {
     q: PropTypes.object,
@@ -30,7 +31,7 @@ MinimalBoxplot.propTypes = {
  * @param {*} param0 
  * @returns 
  */
-export function MinimalBoxplot({ q: rawQ, boxWidth = 30, width = 90, height = 150, margins = { left: 20, right: 5, bottom: 5, top: 5 }, yaxisLabel = "value" ,  rerender, showMedian = true, medianSuffix = "", roundToDigits = 1, preYScale, fill="#efefef" }) {
+export function MinimalBoxplot({ q: rawQ, boxWidth = 30, width = 90, height = 150, margins = { left: 20, right: 5, bottom: 5, top: 5 }, yaxisLabel = "value" ,  rerender, showMedian = true, medianSuffix = "", roundToDigits = 1, preYScale, fill, darkmode = false }) {
     const q = normalizeQuantiles(rawQ)
     
     const { chartHeight, chartWidth } = getChartWidthAndHeightWithMargins({ width, height, margins })
@@ -49,9 +50,9 @@ export function MinimalBoxplot({ q: rawQ, boxWidth = 30, width = 90, height = 15
     return (
         <SVG {...{ width, height }}>
 
-            <Box x={margins.left + checkedBoxWidth/2} q25={yScale(q.q25)} q75={yScale(q.q75)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.median)}  width={checkedBoxWidth} fill={fill} />
-            {showMedian ? <TextLabel x={margins.left + checkedBoxWidth} dx={2} y={yScale(q.median)} labelTexts={[`${_.round(q.median, roundToDigits)} ${medianSuffix}`]} verticalAnchor={"middle"} textAnchor={"start"} totalYOffset={0} /> : null}
-            <Text x={margins.left} dx={-4} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90}>{yaxisLabel}</Text> 
+            <Box x={margins.left + checkedBoxWidth/2} q25={yScale(q.q25)} q75={yScale(q.q75)} max={yScale(q.max)} min={yScale(q.min)} median={yScale(q.median)}  width={checkedBoxWidth} fill={fill !== undefined ? fill : darkmode ? "#3a3a3a" : "#efefef"} darkmode={darkmode} />
+            {showMedian ? <TextLabel x={margins.left + checkedBoxWidth} dx={2} y={yScale(q.median)} labelTexts={[`${_.round(q.median, roundToDigits)} ${medianSuffix}`]} verticalAnchor={"middle"} textAnchor={"start"} totalYOffset={0} darkmode={darkmode} /> : null}
+            <Text x={margins.left} dx={-4} y={chartHeight / 2} textAnchor="middle" verticalAnchor="end" angle={-90} fill={getFillColor(darkmode)}>{yaxisLabel}</Text> 
         </SVG>
     )
 }
