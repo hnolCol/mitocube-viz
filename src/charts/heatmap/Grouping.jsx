@@ -75,7 +75,7 @@ function GroupingRow({ data, x, y, width, height, keyName, stroke, handleMouseOv
 }
 
 
-function GroupingLegend({ keyNames, colorScales, is_condition_application, caTagMap, attributeTagMap, legendElementSize = 12 }) {
+function GroupingLegend({ keyNames, colorScales, is_condition_application, caTagMap, attributeTagMap, strokeColor, legendElementSize = 12 }) {
     return (
         <div className="flex flex-column" style={{ gap: "0.35rem" }}>
             {keyNames.map((keyName, idx) => {
@@ -181,7 +181,7 @@ export function HeatmapGrouping({data, startX = 0, startY = 0, binHeight = 15, b
     return (
         <div className="flex flex-column">
             <div className="margin--medium">
-                <GroupingLegend keyNames={keyNames} colorScales={colorScales} is_condition_application={is_condition_application} caTagMap={caTagMap} attributeTagMap={attributeTagMap} />
+                <GroupingLegend keyNames={keyNames} colorScales={colorScales} is_condition_application={is_condition_application} caTagMap={caTagMap} attributeTagMap={attributeTagMap} strokeColor={strokeColor} />
             </div>
             <div>
                 <SVG {...{ width: heatmapSVGWidth, height: heatmapSVGHeight, svgRef: containerRef }}>
