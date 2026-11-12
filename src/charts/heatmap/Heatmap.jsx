@@ -84,9 +84,9 @@ function Heatmap({
     exportMode = false
 }) {
     const [scrollPos, setScrollPos] = useState(0)
-    const uniqueColorValues = useMemo(() => colorNames.length > 0 ? getUniqueValuesInArrayOfObjects({ data, keyName: colorNames }) : [], [_.join(colorNames), data.length])
-    const uniqueClusterValues = useMemo(() => getUniqueValuesInArrayOfObjects({ data, keyName: clusterName }).filter(v => v !== undefined), [clusterName])
-    const heatmapValues = useMemo(() => _.map(data, d => _.map(valueNames, valueName => d[valueName])), [_.join(valueNames), data.length])
+    const uniqueColorValues = useMemo(() => colorNames.length > 0 ? getUniqueValuesInArrayOfObjects({ data, keyName: colorNames }) : [], [data, _.join(colorNames)])
+    const uniqueClusterValues = useMemo(() => getUniqueValuesInArrayOfObjects({ data, keyName: clusterName }).filter(v => v !== undefined), [data, clusterName])
+    const heatmapValues = useMemo(() => _.map(data, d => _.map(valueNames, valueName => d[valueName])), [data, _.join(valueNames)])
     //const labels = useMemo(() => { return labelNames.length > 0?_.map(data, d => _.join(_.map(labelNames, labelName => d[labelName])," | ")) : undefined}, [_.join(labelNames),data.length])
     //const labelsExist = _.isArray(labels)
     const colorValuesExist = uniqueColorValues.length > 0
