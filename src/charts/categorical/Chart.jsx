@@ -276,11 +276,11 @@ function Categorical({
                                                 chartType === "barplot" ?
                                                     <Group>
                                                         <Bar x={xPosition} y1={yPosition} y0={yScale(0)} fill={color} width={colorBandwidth} />
-                                                        {errorName !== undefined && !_.isNaN(errorValue) && _.isNumber(errorValue) ?
+                                                        {errorName !== undefined && !_.isNaN(errorValue) && _.isNumber(errorValue) && _.isNumber(dataForColorCategory[yaxisName]) ?
                                                             <ErrorBar
                                                                 x={xPosition + colorBandwidth / 2}
-                                                                y0={yPosition} //bar start 
-                                                                y1={yPosition > 0 ? yScale(yPosition + errorValue) : yScale(yPosition - errorValue)}
+                                                                y0={yPosition} //bar start
+                                                                y1={dataForColorCategory[yaxisName] > 0 ? yScale(dataForColorCategory[yaxisName] + errorValue) : yScale(dataForColorCategory[yaxisName] - errorValue)}
                                                                 width={colorBandwidth * 0.5} /> : null}
                                                     </Group>
                                                     :
@@ -291,8 +291,8 @@ function Categorical({
                                                         {errorName !== undefined && !_.isNaN(errorValue) && _.isNumber(errorValue) && _.isNumber(dataForColorCategory[yaxisName]) && !_.isNaN(dataForColorCategory[yaxisName]) ?
                                                             <ErrorBar
                                                                 x={xPosition + colorBandwidth / 2}
-                                                                y0={yPosition} //point start 
-                                                                y1={yPosition > 0 ? yScale(yPosition + errorValue) : yScale(yPosition - errorValue)}
+                                                                y0={yPosition} //point start
+                                                                y1={dataForColorCategory[yaxisName] > 0 ? yScale(dataForColorCategory[yaxisName] + errorValue) : yScale(dataForColorCategory[yaxisName] - errorValue)}
                                                                 width={colorBandwidth * 0.5} /> : null}
                                                     </Group>
                                                     :
