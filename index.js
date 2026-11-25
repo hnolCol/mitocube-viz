@@ -39,6 +39,7 @@ import { MONTH_LABELS, DAY_MS, parseYearMonth, groupByYearMonth,totalDurationByS
 import { median } from "./src/utils/stats"
 import { normalizeQuantiles } from "./src/utils/quantiles"
 import { SERIES_COLORS, seriesColor } from "./src/colors/series"
+import { GSEARunningSumChart } from "./src/charts/gsea/RunningSum"
 
 export default {
 
@@ -76,6 +77,9 @@ export default {
         "Line" : Line
     },
     charts: {
+        "gsea": {
+            "GSEARunningSumChart": GSEARunningSumChart
+        },
         "minimal": {
             "MinimalBoxplot": MinimalBoxplot,
             "MinimalBoxplots": MinimalBoxplots
