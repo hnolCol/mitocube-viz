@@ -105,7 +105,7 @@ export function GSEARunningSumChart({
                 top={margins.top + chartHeight}
                 stroke={getAxisStrokeColor(darkmode)}
                 tickStroke={getAxisStrokeColor(darkmode)}
-                tickLabelProps={() => ({ fill: getFillColor(darkmode), fontSize: 10, textAnchor: "middle })}
+                tickLabelProps={() => ({ fill: getFillColor(darkmode), fontSize: 10, textAnchor: "middle" })}
                 label={xaxisLabel}
                 labelProps={{ fill: getFillColor(darkmode), fontSize: 11, textAnchor: "middle" }}
                 numTicks={getNumberTicks(chartWidth)}
