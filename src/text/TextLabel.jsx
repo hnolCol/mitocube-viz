@@ -39,7 +39,7 @@ export function TextLabel({x = 0, y = 0, margins = { left: 0, right: 0, top: 0, 
                     verticalAnchor,
                     textAnchor
                 }
-                if (isProtein[textIdx]) return <ProteinLabel text={text} {...textProps} />
+                if (isProtein[textIdx]) return <ProteinLabel key = {`${text}-${textIdx}`} text={text} {...textProps} />
                 return <Text
                 key = {`${text}-${textIdx}`}
                     {...textProps}>
